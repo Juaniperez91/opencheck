@@ -1,1 +1,2885 @@
-<html><head><title>OpenCheck</title></head><body><script>window.location='https://opencheck.netlify.app'</script></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenCheck — Marketplace de eCheques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--g:#0F6E56;--gl:#E1F5EE;--gm:#1D9E75;--gb:#9FE1CB;--gd:#085041;
+--am:#854F0B;--al:#FAEEDA;
+--bl:#E6F1FB;--bd:#0C447C;
+--rl:#FCEBEB;--rm:#A32D2D;
+--s:#fff;--s2:#F8F7F4;--s3:#EDECEA;
+--t:#1A1917;--t2:#6B6963;--t3:#9A9891;
+--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+--r:8px;--rl2:12px;--rxl:16px;
+--sh:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+--sh2:0 2px 8px rgba(0,0,0,.12),0 8px 32px rgba(0,0,0,.1);
+}
+html,body{height:100%;font-family:var(--font);color:var(--t);background:var(--s2);font-size:14px;line-height:1.5}
+/* UTILITIES */
+.hidden{display:none!important}
+.flex{display:flex}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-4{gap:4px}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-24{gap:24px}
+.w-full{width:100%}.text-center{text-align:center}
+.mt-4{margin-top:4px}.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+.mb-4{margin-bottom:4px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}
+.p-8{padding:8px}.p-12{padding:12px}.p-16{padding:16px}.p-24{padding:24px}
+.bold{font-weight:600}.text-sm{font-size:12px}.text-lg{font-size:16px}.text-xl{font-size:20px}.text-2xl{font-size:24px}
+.text-muted{color:var(--t2)}.text-green{color:var(--g)}.text-red{color:var(--rm)}
+.mono{font-family:var(--mono)}
+.rounded{border-radius:var(--r)}.rounded-lg{border-radius:var(--rl2)}.rounded-xl{border-radius:var(--rxl)}
+/* SCREENS */
+#screen-login,#screen-register,#screen-app{position:fixed;inset:0;overflow:hidden;display:flex;flex-direction:column}
+/* LOGIN */
+#screen-login{background:linear-gradient(135deg,var(--gd) 0%,var(--g) 50%,var(--gm) 100%);display:flex;align-items:center;justify-content:center}
+.login-card{background:var(--s);border-radius:20px;padding:48px;width:420px;box-shadow:var(--sh2)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.login-logo-icon{width:40px;height:40px;background:var(--g);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.login-logo-icon svg{fill:white;width:22px;height:22px}
+.login-logo-text{font-size:22px;font-weight:700;color:var(--t);letter-spacing:-0.5px}
+.login-logo-text span{color:var(--g)}
+.login-title{font-size:24px;font-weight:700;margin-bottom:6px;letter-spacing:-0.5px}
+.login-sub{color:var(--t2);margin-bottom:28px;font-size:14px}
+/* REGISTER */
+#screen-register{background:var(--s2);display:flex;align-items:center;justify-content:center;padding:24px}
+.register-card{background:var(--s);border-radius:20px;width:540px;max-width:100%;box-shadow:var(--sh2);overflow:hidden}
+.register-header{background:linear-gradient(135deg,var(--g),var(--gm));padding:28px 36px;color:white}
+.register-header h2{font-size:20px;font-weight:700;letter-spacing:-0.3px}
+.register-steps{display:flex;gap:8px;margin-top:16px}
+.register-step{flex:1;height:4px;background:rgba(255,255,255,0.3);border-radius:2px;transition:background 0.3s}
+.register-step.done{background:white}
+.register-body{padding:36px}
+/* FORM ELEMENTS */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--t2);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 12px;font-family:var(--font);font-size:14px;color:var(--t);background:var(--s);transition:border-color .2s,box-shadow .2s;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(15,110,86,.1)}
+.field input.error,.field select.error{border-color:var(--rm)}
+.field-hint{font-size:12px;color:var(--t3);margin-top:4px}
+.field-error{font-size:12px;color:var(--rm);margin-top:4px}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.btn-primary{background:var(--g);color:white}.btn-primary:hover{background:var(--gd)}
+.btn-secondary{background:var(--s3);color:var(--t)}.btn-secondary:hover{background:var(--s3);filter:brightness(.95)}
+.btn-outline{background:transparent;color:var(--g);border:1.5px solid var(--gb)}.btn-outline:hover{background:var(--gl)}
+.btn-danger{background:var(--rm);color:white}.btn-danger:hover{filter:brightness(.9)}
+.btn-sm{padding:6px 12px;font-size:13px}
+.btn-lg{padding:12px 24px;font-size:15px;font-weight:600}
+.btn-xl{padding:14px 28px;font-size:16px;font-weight:600;border-radius:var(--rl2)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+/* APP LAYOUT */
+#screen-app{display:flex;flex-direction:column}
+.topbar{background:var(--s);border-bottom:1px solid var(--s3);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.topbar-logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--t)}
+.topbar-logo-icon{width:32px;height:32px;background:var(--g);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.topbar-logo-icon svg{fill:white;width:18px;height:18px}
+.topbar-logo-text{font-size:16px;font-weight:700;letter-spacing:-0.3px}
+.topbar-logo-text span{color:var(--g)}
+.role-selector{display:flex;background:var(--s2);border-radius:var(--r);padding:3px}
+.role-btn{padding:5px 14px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--t2);transition:all .2s}
+.role-btn.active{background:var(--s);color:var(--g);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--g);cursor:pointer}
+/* SIDEBAR + MAIN */
+.app-body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:220px;background:var(--s);border-right:1px solid var(--s3);padding:16px 12px;overflow-y:auto;flex-shrink:0}
+.sidebar-section{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);padding:12px 8px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);cursor:pointer;color:var(--t2);font-size:14px;font-weight:450;transition:all .15s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left}
+.nav-item:hover{background:var(--s2);color:var(--t)}
+.nav-item.active{background:var(--gl);color:var(--g);font-weight:600}
+.nav-item .nav-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* MAIN CONTENT */
+.main-content{flex:1;overflow-y:auto;padding:28px}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;letter-spacing:-0.4px;margin-bottom:4px}
+.page-header p{color:var(--t2);font-size:14px}
+/* CARDS */
+.card{background:var(--s);border-radius:var(--rl2);border:1px solid var(--s3);padding:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:600}
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--s);border-radius:var(--rl2);border:1px solid var(--s3);padding:20px}
+.stat-label{font-size:12px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;letter-spacing:-0.5px;color:var(--t)}
+.stat-sub{font-size:12px;color:var(--t3);margin-top:4px}
+.stat-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;padding:3px 8px;border-radius:20px}
+.stat-badge.up{background:var(--gl);color:var(--g)}
+.stat-badge.neutral{background:var(--s3);color:var(--t2)}
+/* BADGES / CATEGORIES */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;font-family:var(--mono)}
+.badge-A1{background:var(--gl);color:var(--gd)}
+.badge-A2{background:var(--gl);color:var(--g)}
+.badge-B1{background:var(--bl);color:var(--bd)}
+.badge-B2{background:#EEF2FF;color:#3730A3}
+.badge-C1{background:var(--al);color:var(--am)}
+.badge-C2{background:var(--rl);color:var(--rm)}
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;font-weight:600;color:var(--t2);text-align:left;padding:10px 12px;border-bottom:1.5px solid var(--s3);white-space:nowrap}
+td{padding:12px;border-bottom:1px solid var(--s3);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--s2)}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px;opacity:0;transition:opacity .2s}
+.modal-overlay.show{opacity:1}
+.modal{background:var(--s);border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform .2s}
+.modal-overlay.show .modal{transform:translateY(0)}
+.modal-header{padding:24px 24px 0;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-header h3{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--s3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--t2);flex-shrink:0}
+.modal-body{padding:24px}
+.modal-footer{padding:0 24px 24px;display:flex;gap:10px;justify-content:flex-end}
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-chip{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--s3);background:var(--s);color:var(--t2);transition:all .15s}
+.filter-chip.active{border-color:var(--g);background:var(--gl);color:var(--g)}
+/* PROGRESS BAR */
+.progress-bar{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;background:var(--g);border-radius:4px;transition:width .5s}
+/* ALERTS */
+.alert{padding:12px 16px;border-radius:var(--r);font-size:13px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
+.alert-success{background:var(--gl);color:var(--gd);border:1px solid var(--gb)}
+.alert-warning{background:var(--al);color:var(--am);border:1px solid #F5C68A}
+.alert-error{background:var(--rl);color:var(--rm);border:1px solid #F5BABA}
+.alert-info{background:var(--bl);color:var(--bd);border:1px solid #B8D8F5}
+/* SCORING CARD */
+.scoring-card{border:1.5px solid var(--s3);border-radius:var(--rl2);padding:20px;margin-bottom:16px}
+.scoring-card.A1{border-color:var(--gb);background:var(--gl)}
+.scoring-card.A2{border-color:var(--gb);background:var(--gl)}
+.scoring-card.B1{border-color:#B8D8F5;background:var(--bl)}
+.scoring-card.B2{border-color:#C7D2FE;background:#EEF2FF}
+.scoring-card.C1{border-color:#F5C68A;background:var(--al)}
+.scoring-card.C2{border-color:#F5BABA;background:var(--rl)}
+/* MARKETPLACE GRID */
+.market-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.market-card{background:var(--s);border:1.5px solid var(--s3);border-radius:var(--rl2);padding:20px;cursor:pointer;transition:all .2s}
+.market-card:hover{border-color:var(--gb);box-shadow:var(--sh);transform:translateY(-2px)}
+.market-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.market-amount{font-size:22px;font-weight:700;color:var(--t);letter-spacing:-0.5px}
+.market-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.market-meta-item{font-size:12px;color:var(--t2)}
+.market-meta-item span{display:block;font-size:13px;font-weight:600;color:var(--t);margin-top:2px}
+/* CALCULATOR */
+.calc-result{background:var(--s2);border-radius:var(--rl2);padding:20px;margin-top:16px}
+.calc-result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--s3)}
+.calc-result-row:last-child{border-bottom:none;font-weight:700;font-size:15px}
+.calc-result-row.highlight{color:var(--g);font-weight:600}
+/* ADMIN TABS */
+.tab-bar{display:flex;gap:2px;background:var(--s3);border-radius:var(--r);padding:3px;margin-bottom:24px}
+.tab-item{flex:1;padding:8px;border-radius:6px;border:none;background:transparent;font-family:var(--font);font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .2s;text-align:center}
+.tab-item.active{background:var(--s);color:var(--g);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+/* NOTIFICATION DOT */
+.notif-dot{width:8px;height:8px;background:var(--rm);border-radius:50%;display:inline-block}
+/* STEP WIZARD */
+.step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:28px}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid var(--s3);color:var(--t3);transition:all .3s}
+.step-dot.done{background:var(--g);border-color:var(--g);color:white}
+.step-dot.active{border-color:var(--g);color:var(--g)}
+.step-line{flex:1;height:2px;background:var(--s3);transition:background .3s}
+.step-line.done{background:var(--g)}
+/* CHECKBOX */
+.checkbox-field{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--s3)}
+.checkbox-field:last-child{border-bottom:none}
+.checkbox-field input[type=checkbox]{width:16px;height:16px;margin-top:2px;accent-color:var(--g);cursor:pointer;flex-shrink:0}
+.checkbox-field label{font-size:13px;color:var(--t);cursor:pointer;line-height:1.5}
+/* BANK CHIP */
+.bank-chip{display:inline-flex;align-items:center;gap:6px;background:var(--s3);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:500}
+/* RANGE INPUT */
+.range-input{width:100%;accent-color:var(--g);cursor:pointer}
+/* DIVIDER */
+.divider{height:1px;background:var(--s3);margin:16px 0}
+/* GRID 2 COL */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+/* TOAST */
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--t);color:white;padding:12px 18px;border-radius:var(--rl2);font-size:13px;font-weight:500;box-shadow:var(--sh2);opacity:0;transform:translateX(20px);transition:all .3s;max-width:320px}
+.toast.show{opacity:1;transform:translateX(0)}
+.toast.success{background:var(--gd)}
+.toast.error{background:var(--rm)}
+.toast.warning{background:var(--am)}
+/* SPINNER */
+.spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+.spinner-green{border-color:var(--gb);border-top-color:var(--g)}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--t3)}
+.empty-state-icon{font-size:48px;margin-bottom:12px}
+.empty-state h3{font-size:16px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.empty-state p{font-size:13px}
+.spr-in{width:60px;padding:5px 8px;font-size:12px;border:1px solid var(--s3);border-radius:6px;background:var(--s);color:var(--t);text-align:center;font-family:var(--mono)}.spr-in:focus{outline:none;border-color:var(--g)}
+/* EYE TOGGLE */
+.pass-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:2px 4px;line-height:1;transition:color .15s}
+.pass-eye:hover{color:var(--t)}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
+/* INPUTS INLINE */
+.input-inline{border:1.5px solid var(--s3);border-radius:var(--r);padding:8px 12px;font-family:var(--font);font-size:14px;color:var(--t);background:var(--s);outline:none;transition:border-color .2s}
+.input-inline:focus{border-color:var(--g)}
+/* OFFER ROW */
+.offer-row{background:var(--s);border:1px solid var(--s3);border-radius:var(--rl2);padding:16px 20px;margin-bottom:12px}
+.offer-row:last-child{margin-bottom:0}
+/* RATE RANGE */
+.rate-range-bar{position:relative;height:8px;background:var(--s3);border-radius:4px;margin:12px 0}
+.rate-range-fill{position:absolute;height:100%;background:var(--gb);border-radius:4px}
+.rate-range-marker{position:absolute;width:14px;height:14px;background:var(--g);border:2px solid white;border-radius:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+/* ACTIVITY LOG */
+.log-entry{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--s3)}
+.log-entry:last-child{border-bottom:none}
+.log-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.log-text{font-size:13px;color:var(--t)}
+.log-time{font-size:11px;color:var(--t3)}
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- SCREEN: LOGIN -->
+<div id="screen-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="login-logo-text">Open<span>Check</span></div>
+    </div>
+    <div class="login-title">Bienvenido</div>
+    <div class="login-sub">Marketplace de eCheques argentinos</div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="tu@email.com" oninput="clearLoginError()">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <div style="position:relative">
+        <input type="password" id="login-pass" placeholder="••••••••" oninput="clearLoginError()" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 40px 10px 12px;font-family:var(--font);font-size:14px;color:var(--t);background:var(--s);outline:none;transition:border-color .2s">
+        <button type="button" onclick="togglePass('login-pass',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:2px 4px;line-height:1" title="Mostrar/ocultar contraseña">👁</button>
+      </div>
+    </div>
+    <div id="login-error" class="alert alert-error hidden"></div>
+    <button class="btn btn-primary btn-xl w-full mt-4" onclick="doLogin()">Ingresar</button>
+    <div class="text-center mt-16" style="color:var(--t2);font-size:13px">
+      ¿No tenés cuenta? <a href="#" style="color:var(--g);font-weight:600" onclick="showRegister()">Registrate</a>
+    </div>
+    <div class="mt-16" style="padding-top:14px;border-top:1px solid var(--s3)">
+      <div style="font-size:11px;color:var(--t3);text-align:center;margin-bottom:8px">Accesos demo rapidos</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" style="flex:1;font-size:12px" onclick="document.getElementById('login-email').value='admin@opencheck.com';document.getElementById('login-pass').value='Admin2025';clearLoginError()">Admin</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:12px" onclick="document.getElementById('login-email').value='vendedor@test.com';document.getElementById('login-pass').value='Test123';clearLoginError()">Vendedor</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:12px" onclick="document.getElementById('login-email').value='inversor@test.com';document.getElementById('login-pass').value='Test123';clearLoginError()">Inversor</button>
+      </div>
+      <div style="font-size:10px;color:var(--t3);text-align:center;margin-top:8px;font-family:var(--mono)">vendedor/inversor@test.com · cualquier clave de 6+ chars</div>
+      <div style="text-align:center;margin-top:10px">
+        <button onclick="resetDemoData()" style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline">Resetear datos demo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: REGISTER -->
+<div id="screen-register" class="hidden">
+  <div class="register-card">
+    <div class="register-header">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="width:28px;height:28px;background:rgba(255,255,255,.2);border-radius:7px;display:flex;align-items:center;justify-content:center">
+          <svg fill="white" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span style="font-size:15px;font-weight:700">OpenCheck</span>
+      </div>
+      <h2>Crear cuenta</h2>
+      <div style="font-size:13px;opacity:.8;margin-top:4px">Completá los 4 pasos para registrarte</div>
+      <div class="register-steps" id="reg-steps">
+        <div class="register-step" id="rstep-0"></div>
+        <div class="register-step" id="rstep-1"></div>
+        <div class="register-step" id="rstep-2"></div>
+        <div class="register-step" id="rstep-3"></div>
+      </div>
+    </div>
+    <div class="register-body">
+      <div id="reg-step-label" style="font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:16px"></div>
+      <div id="reg-content"></div>
+      <div class="flex gap-8 mt-24" style="justify-content:space-between">
+        <button class="btn btn-secondary" id="reg-back-btn" onclick="regBack()">Volver</button>
+        <button class="btn btn-primary" id="reg-next-btn" onclick="regNext()">Continuar</button>
+      </div>
+      <div class="text-center mt-12" style="font-size:13px;color:var(--t2)">
+        ¿Ya tenés cuenta? <a href="#" style="color:var(--g);font-weight:600" onclick="showLogin()">Ingresá</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: APP -->
+<div id="screen-app" class="hidden">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <div class="topbar-logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="topbar-logo-text">Open<span>Check</span></span>
+      </div>
+      <div class="role-selector" id="role-selector"></div>
+    </div>
+    <div class="topbar-right">
+      <div class="avatar" id="top-avatar">U</div>
+      <button class="btn btn-secondary btn-sm" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+  <!-- APP BODY -->
+  <div class="app-body">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="main-content" id="main-content"></div>
+  </div>
+</div>
+
+<!-- MODAL CONTAINER -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOverlay(event)">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<script>
+// ============================================================
+// CONSTANTS & STATE
+// ============================================================
+var NOSIS_KEY = '73643825-1dab-4d12-bff7-4d32af2331ba';
+var NOSIS_URL = 'https://ws01.nosis.com/rest/variables';
+var BCRA_URL = 'https://api.bcra.gob.ar/cheques/v1.0/denunciados';
+var BCRA_DEUDAS_URL = 'https://api.bcra.gob.ar/CentralDeDeudores/v1.0/Deudas';
+var BCRA_RECHAZADOS_URL = 'https://api.bcra.gob.ar/CentralDeDeudores/v1.0/Deudas/ChequesRechazados';
+var TAMAR = 29.5;
+
+var BANKS = {7:'Galicia',11:'Nacion',14:'Pcia BsAs',17:'Credicoop',27:'Macro',72:'BBVA',330:'Santander'};
+
+var CAT_LABELS = {A1:'A1',A2:'A2',B1:'B1',B2:'B2',C1:'C1',C2:'C2'};
+var CAT_EMOJI = {A1:'🌟',A2:'✅',B1:'🔵',B2:'🟣',C1:'⚠️',C2:'🚫'};
+var CAT_RANGES = {A1:[85,100],A2:[70,84],B1:[55,69],B2:[40,54],C1:[25,39],C2:[0,24]};
+
+var SPREADS = {
+  A1:{min:0,max:1.5,plazo:0.5},
+  A2:{min:1.5,max:3,plazo:1},
+  B1:{min:3,max:4.5,plazo:1.5},
+  B2:{min:4.5,max:6,plazo:2},
+  C1:{min:6,max:8,plazo:3}
+};
+
+var DEMO_NOSIS = {
+  '30708934794':{score:788,deuda:501000000,antiguedad_meses:252,bancos:5,consultas:12,rechazos24m:0,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false,razon:'Cilley SA'},
+  '30710231199':{score:671,deuda:566000000,antiguedad_meses:216,bancos:4,consultas:18,rechazos24m:0,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false,razon:'Aberasturi SRL'},
+  '30708179627':{score:529,deuda:516000000,antiguedad_meses:276,bancos:3,consultas:9,rechazos24m:0,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false,razon:'Irifol SA'},
+  '30715813951':{score:490,deuda:1965000000,antiguedad_meses:96,bancos:4,consultas:22,rechazos24m:0,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false,razon:'Sembrados SS'},
+  '20265666575':{score:439,deuda:7000000,antiguedad_meses:348,bancos:2,consultas:5,rechazos24m:0,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false,razon:'Robla P.D.'},
+  '20240803942':{score:471,deuda:87000000,antiguedad_meses:372,bancos:3,consultas:8,rechazos24m:0,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false,razon:'Ricciuto M.O.'},
+  '30718478118':{score:180,deuda:2000000,antiguedad_meses:12,bancos:1,consultas:3,rechazos24m:44,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false,razon:'EME Autopartes'}
+};
+
+var state = {
+  currentUser: null,
+  currentRole: null,
+  currentPage: null,
+  regStep: 0,
+  regData: {}
+};
+
+// ============================================================
+// LOCAL STORAGE HELPERS
+// ============================================================
+function lsGet(k){try{var v=localStorage.getItem('oc_'+k);return v?JSON.parse(v):null}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem('oc_'+k,JSON.stringify(v))}catch(e){}}
+
+function getUsers(){return lsGet('users')||[]}
+function setUsers(u){lsSet('users',u)}
+function getChecks(){return lsGet('checks')||[]}
+function setChecks(c){lsSet('checks',c)}
+function getOffers(){return lsGet('offers')||[]}
+function setOffers(o){lsSet('offers',o)}
+function getLogs(){return lsGet('logs')||[]}
+function addLog(msg,type){
+  var logs=getLogs();
+  logs.unshift({msg:msg,type:type||'info',ts:Date.now()});
+  if(logs.length>200)logs=logs.slice(0,200);
+  lsSet('logs',logs);
+}
+function getSpreads(){return lsGet('spreads')||SPREADS}
+function setSpreads(s){lsSet('spreads',s)}
+function getTamar(){return lsGet('tamar')||TAMAR}
+function setTamar(t){lsSet('tamar',t)}
+
+// ============================================================
+// INIT — seed demo data
+// ============================================================
+function initData(){
+  forceSeedDemoUsers();
+  var checks=getChecks();
+  if(!checks.length){
+    var now=Date.now();
+    var day=86400000;
+    checks=[
+      {id:'ck001',ownerId:'v1',tipo:'terceros',cuitLibrador:'30708934794',razonLibrador:'Cilley SA',monto:5000000,fechaEmision:new Date(now-day*10).toISOString().split('T')[0],fechaPago:new Date(now+day*45).toISOString().split('T')[0],banco:7,nroEcheq:'00123456',status:'publicado',scoring:{cat:'A1',pts:92,factores:['Score Nosis excelente (788)','Endeudamiento alto ($501M)','Antigüedad >10 años'],atencion:['Consultas financieras moderadas'],rec:'Operacion recomendada'},tasa:31.5,createdAt:now-day*8},
+      {id:'ck002',ownerId:'v1',tipo:'terceros',cuitLibrador:'30710231199',razonLibrador:'Aberasturi SRL',monto:2500000,fechaEmision:new Date(now-day*5).toISOString().split('T')[0],fechaPago:new Date(now+day*60).toISOString().split('T')[0],banco:11,nroEcheq:'00234567',status:'publicado',scoring:{cat:'A2',pts:82,factores:['Score Nosis bueno (671)','Antigüedad 18 años','4 bancos activos'],atencion:['Endeudamiento elevado'],rec:'Operacion favorable'},tasa:33.0,createdAt:now-day*4},
+      {id:'ck003',ownerId:'v1',tipo:'propio',cuitLibrador:'20123456789',razonLibrador:'Carlos Vendedor',monto:1200000,fechaEmision:new Date(now-day*3).toISOString().split('T')[0],fechaPago:new Date(now+day*30).toISOString().split('T')[0],banco:72,nroEcheq:'00345678',status:'negociacion',scoring:{cat:'B1',pts:55,factores:['Antigüedad en sistema','Sin rechazos recientes'],atencion:['Score Nosis moderado','Pocos bancos activos'],rec:'Operacion aceptable con monitoreo'},tasa:36.0,createdAt:now-day*2},
+      {id:'ck004',ownerId:'v1',tipo:'terceros',cuitLibrador:'30715813951',razonLibrador:'Sembrados SS',monto:8000000,fechaEmision:new Date(now-day*2).toISOString().split('T')[0],fechaPago:new Date(now+day*75).toISOString().split('T')[0],banco:27,nroEcheq:'00456789',status:'cartera',scoring:null,tasa:null,createdAt:now-day*1},
+      {id:'ck005',ownerId:'v1',tipo:'terceros',cuitLibrador:'20265666575',razonLibrador:'Robla P.D.',monto:750000,fechaEmision:new Date(now-day*15).toISOString().split('T')[0],fechaPago:new Date(now+day*20).toISOString().split('T')[0],banco:17,nroEcheq:'00567890',status:'acordado',scoring:{cat:'B1',pts:55,factores:['Antigüedad amplia (29 años)'],atencion:['Endeudamiento bajo'],rec:'Perfil conservador aceptable'},tasa:35.5,acordadoCon:'i1',createdAt:now-day*12},
+      {id:'ck006',ownerId:'v1',tipo:'terceros',cuitLibrador:'20240803942',razonLibrador:'Ricciuto M.O.',monto:3200000,fechaEmision:new Date(now-day*7).toISOString().split('T')[0],fechaPago:new Date(now+day*55).toISOString().split('T')[0],banco:330,nroEcheq:'00678901',status:'publicado',scoring:{cat:'B2',pts:45,factores:['Antigüedad 31 años'],atencion:['Score Nosis bajo-moderado','Endeudamiento elevado'],rec:'Operacion de mediano riesgo'},tasa:38.0,createdAt:now-day*5}
+    ];
+    setChecks(checks);
+    var offers=getOffers();
+    if(!offers.length){
+      offers=[
+        {id:'of001',checkId:'ck001',investorId:'i1',tasa:31.0,status:'pendiente',createdAt:now-day*3},
+        {id:'of002',checkId:'ck002',investorId:'i1',tasa:34.0,status:'pendiente',createdAt:now-day*2},
+        {id:'of003',checkId:'ck003',investorId:'i1',tasa:36.5,status:'aceptada',createdAt:now-day*5},
+        {id:'of004',checkId:'ck005',investorId:'i1',tasa:35.5,status:'aceptada',createdAt:now-day*13}
+      ];
+      setOffers(offers);
+    }
+  }
+  addLog('Sistema iniciado','system');
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function doLogin(){
+  var email=document.getElementById('login-email').value.trim().toLowerCase();
+  var pass=document.getElementById('login-pass').value;
+  clearLoginError();
+  if(!email||!pass){showLoginError('Completá email y contraseña.');return;}
+
+  // Admin: strict validation
+  if(email==='admin@opencheck.com'){
+    if(pass==='Admin2025'){
+      var users=getUsers();
+      var admin=users.find(function(u){return u.email==='admin@opencheck.com';});
+      if(!admin){showLoginError('Error interno: usuario admin no encontrado.');return;}
+      state.currentUser=admin;
+      state.currentRole='admin';
+      addLog('Login admin','auth');
+      enterApp();
+      return;
+    }else{
+      showLoginError('Contraseña incorrecta para admin.');return;
+    }
+  }
+
+  // Demo users: accept any password >= 6 chars (like reference)
+  var demoEmails=['vendedor@test.com','inversor@test.com'];
+  var isDemoUser=demoEmails.indexOf(email)>=0;
+  if(isDemoUser&&pass.length<6){
+    showLoginError('La contraseña debe tener al menos 6 caracteres.');return;
+  }
+
+  // Look up user — force re-seed first to ensure demo users are fresh
+  forceSeedDemoUsers();
+  var users=getUsers();
+  // Normalize email comparison
+  var user=users.find(function(u){return (u.email||'').toLowerCase()===email;});
+  if(!user){showLoginError('Email no registrado.');return;}
+  if(user.status==='suspended'){showLoginError('Cuenta suspendida. Contactá a soporte.');return;}
+  // For demo users accept any valid pass; for real users check exact pass
+  if(!isDemoUser&&user.pass&&user.pass!==pass){
+    showLoginError('Contraseña incorrecta.');return;
+  }
+  state.currentUser=user;
+  // Normalize: any non-admin always gets both roles
+  if(user.roles&&user.roles.indexOf('admin')<0){
+    user.roles=['vendedor','inversor'];
+    user.role='vendedor';
+    // Persist the normalized roles
+    var allUsers=getUsers();
+    var ui=allUsers.findIndex(function(u){return u.id===user.id;});
+    if(ui>=0){allUsers[ui].roles=['vendedor','inversor'];allUsers[ui].role='vendedor';setUsers(allUsers);}
+  }
+  state.currentRole=user.roles&&user.roles[0]||'vendedor';
+  addLog('Login: '+user.email,'auth');
+  enterApp();
+}
+
+function forceSeedDemoUsers(){
+  var users=getUsers();
+  var demoUsers=[
+    {id:'admin',email:'admin@opencheck.com',pass:'Admin2025',name:'Administrador',role:'admin',roles:['admin'],status:'active',idVerified:true,tyc:true,createdAt:Date.now()},
+    {id:'v1',email:'vendedor@test.com',pass:'Test123',name:'Carlos Vendedor',role:'vendedor',roles:['vendedor','inversor'],cuit:'20123456789',tipopersona:'juridica',status:'active',idVerified:true,tyc:true,createdAt:Date.now()-86400000*30},
+    {id:'i1',email:'inversor@test.com',pass:'Test123',name:'Ana Inversora',role:'vendedor',roles:['vendedor','inversor'],cuit:'27987654321',tipopersona:'fisica',status:'active',idVerified:true,tyc:true,createdAt:Date.now()-86400000*20}
+  ];
+  demoUsers.forEach(function(demo){
+    var idx=users.findIndex(function(u){return (u.email||'').toLowerCase()===demo.email;});
+    if(idx>=0){
+      users[idx].pass=demo.pass;
+      users[idx].id=demo.id;
+      users[idx].roles=['vendedor','inversor']; // always both for non-admin
+      users[idx].role=demo.role;
+      users[idx].name=users[idx].name||demo.name;
+      users[idx].cuit=users[idx].cuit||demo.cuit;
+      users[idx].idVerified=true;
+      users[idx].tyc=true;
+      if(users[idx].status!=='suspended') users[idx].status='active';
+    }else{
+      users.push(demo);
+    }
+  });
+  setUsers(users);
+}
+function showLoginError(msg){
+  var el=document.getElementById('login-error');
+  el.textContent=msg;
+  el.classList.remove('hidden');
+}
+function clearLoginError(){document.getElementById('login-error').classList.add('hidden')}
+function doLogout(){
+  addLog('Logout: '+state.currentUser.email,'auth');
+  state.currentUser=null;state.currentRole=null;state.currentPage=null;
+  var appEl=document.getElementById('screen-app');
+  appEl.classList.add('hidden');
+  appEl.style.display='none';
+  document.getElementById('screen-login').style.display='';
+  document.getElementById('screen-register').style.display='none';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pass').value='';
+  clearLoginError();
+}
+function resetDemoData(){
+  if(!confirm('Esto borra todos los datos locales y recarga los datos demo originales. ¿Continuar?'))return;
+  var keys=['users','checks','offers','logs','spreads','tamar','scoring_weights','scoring_penalties'];
+  keys.forEach(function(k){localStorage.removeItem('oc_'+k);});
+  initData();
+  showToast('Datos demo reseteados','success');
+}
+function showRegister(){
+  document.getElementById('screen-login').style.display='none';
+  document.getElementById('screen-register').style.display='';
+  document.getElementById('screen-register').classList.remove('hidden');
+  initReg();
+}
+function showLogin(){
+  document.getElementById('screen-register').style.display='none';
+  document.getElementById('screen-login').style.display='';
+  document.getElementById('screen-login').classList.remove('hidden');
+}
+
+// ============================================================
+// REGISTRATION FLOW
+// ============================================================
+var regData={};
+var regStep=0;
+var idVerified=false;
+var regChecks=[false,false,false,false];
+
+function initReg(){
+  regData={};regStep=0;idVerified=false;regChecks=[false,false,false,false];
+  renderRegStep();
+}
+
+var regStepLabels=['Datos básicos','Validación de identidad','Términos y condiciones','Confirmación'];
+
+function renderRegStep(){
+  document.getElementById('reg-step-label').textContent='Paso '+(regStep+1)+' — '+regStepLabels[regStep];
+  for(var i=0;i<4;i++){
+    var el=document.getElementById('rstep-'+i);
+    if(i<regStep){el.style.background='rgba(255,255,255,1)';}
+    else if(i===regStep){el.style.background='rgba(255,255,255,.7)';}
+    else{el.style.background='rgba(255,255,255,.3)';}
+  }
+  document.getElementById('reg-back-btn').style.display=regStep===0?'none':'';
+  document.getElementById('reg-next-btn').textContent=regStep===3?'Crear cuenta':'Continuar';
+  var c=document.getElementById('reg-content');
+  if(regStep===0){c.innerHTML=renderRegStep0();}
+  else if(regStep===1){c.innerHTML=renderRegStep1();}
+  else if(regStep===2){c.innerHTML=renderRegStep2();}
+  else{c.innerHTML=renderRegStep3();}
+}
+
+function renderRegStep0(){
+  return '<div class="grid-2"><div class="field"><label>Tipo de persona</label><select id="r-tipopersona"><option value="fisica" '+(regData.tipopersona==='fisica'?'selected':'')+'>Física</option><option value="juridica" '+(regData.tipopersona==='juridica'?'selected':'')+'>Jurídica</option></select></div><div class="field"><label>CUIT / DNI</label><input type="text" id="r-cuit" value="'+(regData.cuit||'')+'" placeholder="20-12345678-9"></div></div><div class="field"><label>Nombre / Razón Social</label><input type="text" id="r-nombre" value="'+(regData.nombre||'')+'" placeholder="Tu nombre completo o razón social"></div><div class="grid-2"><div class="field"><label>Teléfono</label><input type="tel" id="r-tel" value="'+(regData.tel||'')+'" placeholder="+54 11 ...."></div><div class="field"><label>Email</label><input type="email" id="r-email" value="'+(regData.email||'')+'" placeholder="tu@email.com"></div></div><div class="field"><label>Contraseña</label><div style="position:relative"><input type="password" id="r-pass" value="'+(regData.pass||'')+'" placeholder="Min 8 chars" style="width:100%;border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 40px 10px 12px;font-family:var(--font);font-size:14px;color:var(--t);background:var(--s);outline:none"><button type="button" onclick="togglePass(\'r-pass\',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t3);font-size:16px;padding:2px 4px;line-height:1">👁</button></div><div class="field-hint">Mín. 8 caracteres, una mayúscula y un número</div></div><div class="alert alert-info" style="font-size:12px">Tu cuenta tendrá acceso a los perfiles <strong>Vendedor</strong> e <strong>Inversor</strong>. Podés cambiar entre ellos desde la topbar en cualquier momento.</div><div id="reg-err-0" class="alert alert-error hidden"></div>';
+}
+
+function renderRegStep1(){
+  var html='<div class="text-center" style="padding:20px 0">';
+  html+='<div style="font-size:48px;margin-bottom:12px">🔐</div>';
+  html+='<div class="text-lg bold" style="margin-bottom:8px">Validación de identidad</div>';
+  html+='<div style="color:var(--t2);font-size:13px;margin-bottom:24px">Verificamos tu identidad con Cresium para garantizar la seguridad del marketplace.</div>';
+  if(!idVerified){
+    html+='<button class="btn btn-primary btn-lg" id="btn-verify" onclick="doVerify()">Verificar identidad</button>';
+  }else{
+    html+='<div class="alert alert-success" style="display:inline-flex;margin:0 auto"><span>✅</span><div><div class="bold">Identidad validada</div><div style="font-size:12px;opacity:.8">Badge: Demo — simulado (Cresium)</div></div></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+function renderRegStep2(){
+  var tycHtml='<div style="max-height:200px;overflow-y:auto;background:var(--s2);border-radius:var(--r);padding:16px;font-size:12px;color:var(--t2);margin-bottom:16px;line-height:1.7">';
+  tycHtml+='<div class="bold" style="margin-bottom:8px;color:var(--t);font-size:13px">Términos y Condiciones — OpenCheck v1.0</div>';
+  tycHtml+='<div style="margin-bottom:8px">1. ACEPTACIÓN DE TÉRMINOS: Al utilizar la plataforma OpenCheck, el usuario acepta los presentes Términos y Condiciones en su totalidad. OpenCheck es una plataforma de intermediación para la negociación de cheques electrónicos (eCheques) en el mercado argentino.</div>';
+  tycHtml+='<div style="margin-bottom:8px">2. SERVICIO DE INTERMEDIACIÓN: OpenCheck actúa exclusivamente como intermediario entre vendedores e inversores de eCheques. La plataforma no garantiza la solvencia de las partes ni la efectivización de los pagos.</div>';
+  tycHtml+='<div style="margin-bottom:8px">3. MOTOR DE SCORING: El sistema de scoring A1-C2 es informativo y no constituye una recomendación de inversión. OpenCheck no se responsabiliza por pérdidas derivadas del uso de esta información.</div>';
+  tycHtml+='<div style="margin-bottom:8px">4. CONSULTAS BCRA Y NOSIS: Los datos obtenidos de organismos externos son utilizados para evaluación crediticia y son confidenciales. El usuario autoriza expresamente esta consulta.</div>';
+  tycHtml+='<div style="margin-bottom:8px">5. COMISIONES: OpenCheck cobra una comisión del 1% sobre el monto nominal de cada operación concretada.</div>';
+  tycHtml+='<div style="margin-bottom:8px">6. PRIVACIDAD DE DATOS: La información personal es tratada conforme a la Ley 25.326 de Protección de Datos Personales.</div>';
+  tycHtml+='<div>7. JURISDICCIÓN: Cualquier controversia se somete a los tribunales ordinarios de la Ciudad Autónoma de Buenos Aires.</div>';
+  tycHtml+='</div>';
+  tycHtml+='<div style="background:var(--s);border:1px solid var(--s3);border-radius:var(--r);padding:12px">';
+  var cbs=[
+    'Leí y acepto los Términos y Condiciones v1.0 de OpenCheck',
+    'Autorizo la consulta de mis datos en Nosis y organismos crediticios',
+    'Acepto la comisión del 1% sobre operaciones concretadas',
+    'Confirmo que tengo al menos 18 años y capacidad legal para contratar'
+  ];
+  for(var i=0;i<4;i++){
+    tycHtml+='<div class="checkbox-field"><input type="checkbox" id="tyc-'+i+'" '+(regChecks[i]?'checked':'')+' onchange="regChecks['+i+']=this.checked"><label for="tyc-'+i+'">'+cbs[i]+'</label></div>';
+  }
+  tycHtml+='</div>';
+  return tycHtml;
+}
+
+function renderRegStep3(){
+  return '<div class="scoring-card A1"><div class="bold text-lg" style="margin-bottom:12px">✅ Resumen de registro</div><div class="grid-2 gap-8"><div><div class="text-sm" style="color:var(--t2)">Nombre</div><div class="bold">'+(regData.nombre||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">CUIT/DNI</div><div class="mono">'+(regData.cuit||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Email</div><div>'+(regData.email||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Teléfono</div><div>'+(regData.tel||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Tipo</div><div>'+(regData.tipopersona||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Roles</div><div>Vendedor + Inversor</div></div></div><div class="divider"></div><div class="flex gap-8"><span class="badge badge-A1">✅ ID Verificada</span><span class="badge badge-A1">📋 TyC Aceptados</span><span class="badge badge-B1">Vendedor + Inversor</span></div></div><div class="alert alert-info mt-12" style="font-size:12px">TyC aceptados el '+new Date().toLocaleString('es-AR')+' — Podés cambiar entre perfiles desde la topbar.</div>';
+}
+
+function doVerify(){
+  var btn=document.getElementById('btn-verify');
+  if(!btn)return;
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>&nbsp;Verificando...';
+  setTimeout(function(){
+    idVerified=true;
+    document.getElementById('reg-content').innerHTML=renderRegStep1();
+  },2000);
+}
+
+function regNext(){
+  if(regStep===0){
+    regData.tipopersona=document.getElementById('r-tipopersona').value;
+    regData.cuit=document.getElementById('r-cuit').value.trim();
+    regData.nombre=document.getElementById('r-nombre').value.trim();
+    regData.tel=document.getElementById('r-tel').value.trim();
+    regData.email=document.getElementById('r-email').value.trim();
+    regData.pass=document.getElementById('r-pass').value;
+    var err='';
+    if(!regData.nombre)err='Ingresá tu nombre o razón social.';
+    else if(!regData.cuit)err='Ingresá tu CUIT o DNI.';
+    else if(!regData.email||!regData.email.includes('@'))err='Email inválido.';
+    else if(!regData.pass||regData.pass.length<8)err='La contraseña debe tener al menos 8 caracteres.';
+    else if(!/[A-Z]/.test(regData.pass))err='La contraseña debe tener al menos una mayúscula.';
+    else if(!/[0-9]/.test(regData.pass))err='La contraseña debe tener al menos un número.';
+    else{
+      var users=getUsers();
+      if(users.find(function(u){return u.email===regData.email;}))err='Ese email ya está registrado.';
+    }
+    if(err){
+      var errEl=document.getElementById('reg-err-0');
+      errEl.textContent=err;errEl.classList.remove('hidden');return;
+    }
+    regStep=1;renderRegStep();
+  }else if(regStep===1){
+    if(!idVerified){showToast('Debés validar tu identidad antes de continuar','error');return;}
+    regStep=2;renderRegStep();
+  }else if(regStep===2){
+    for(var i=0;i<4;i++){
+      var cb=document.getElementById('tyc-'+i);
+      if(cb)regChecks[i]=cb.checked;
+    }
+    if(!regChecks[0]||!regChecks[1]||!regChecks[2]||!regChecks[3]){showToast('Debés aceptar todos los términos','error');return;}
+    regStep=3;renderRegStep();
+  }else{
+    // CREATE ACCOUNT — always both roles
+    var users=getUsers();
+    var newUser={
+      id:'u'+Date.now(),
+      email:regData.email,
+      pass:regData.pass,
+      name:regData.nombre,
+      cuit:regData.cuit,
+      tipopersona:regData.tipopersona,
+      tel:regData.tel,
+      role:'vendedor',
+      roles:['vendedor','inversor'],
+      status:'active',
+      idVerified:true,
+      tyc:true,
+      tycTs:Date.now(),
+      createdAt:Date.now()
+    };
+    users.push(newUser);
+    setUsers(users);
+    addLog('Registro: '+newUser.email,'auth');
+    showLogin();
+    showToast('Cuenta creada. Podés ingresar con tus credenciales','success');
+  }
+}
+
+function regBack(){if(regStep>0){regStep--;renderRegStep();}}
+
+// ============================================================
+// APP ENTRY
+// ============================================================
+function enterApp(){
+  // Force correct display states
+  document.getElementById('screen-login').style.display='none';
+  document.getElementById('screen-register').style.display='none';
+  var appEl=document.getElementById('screen-app');
+  appEl.classList.remove('hidden');
+  appEl.style.display='flex';
+  renderTopbar();
+  renderSidebar();
+  if(state.currentRole==='admin'){navigateTo('admin-panel');}
+  else if(state.currentRole==='vendedor'){navigateTo('vendedor-dashboard');}
+  else{navigateTo('inversor-marketplace');}
+}
+
+function renderTopbar(){
+  var user=state.currentUser;
+  document.getElementById('top-avatar').textContent=(user.name||'U').charAt(0).toUpperCase();
+  var rs=document.getElementById('role-selector');
+  if(user.roles&&user.roles.length>1&&!user.roles.includes('admin')){
+    var html='';
+    user.roles.forEach(function(r){
+      html+='<button class="role-btn'+(state.currentRole===r?' active':'')+'" onclick="switchRole(\''+r+'\')">'+capitalize(r)+'</button>';
+    });
+    rs.innerHTML=html;
+    rs.style.display='';
+  }else{
+    rs.style.display='none';
+  }
+}
+
+function switchRole(r){
+  state.currentRole=r;
+  renderTopbar();
+  renderSidebar();
+  if(r==='vendedor')navigateTo('vendedor-dashboard');
+  else navigateTo('inversor-marketplace');
+}
+
+function renderSidebar(){
+  var r=state.currentRole;
+  var html='';
+  if(r==='admin'){
+    html+='<div class="sidebar-section">Panel Admin</div>';
+    html+=navItem('admin-panel','📊','Panel General');
+    html+=navItem('admin-tasas','📈','Motor de Tasas');
+    html+=navItem('admin-scoring','🧮','Motor de Scoring');
+    html+=navItem('admin-usuarios','👥','Usuarios');
+  }else if(r==='vendedor'){
+    html+='<div class="sidebar-section">Vendedor</div>';
+    html+=navItem('vendedor-dashboard','📋','Dashboard');
+    html+=navItem('vendedor-cargar','➕','Cargar eCheck');
+    html+=navItem('vendedor-negociaciones','🤝','Negociaciones');
+    html+=navItem('vendedor-calc','🧮','Calculadora');
+  }else{
+    html+='<div class="sidebar-section">Inversor</div>';
+    html+=navItem('inversor-marketplace','🏪','Marketplace');
+    html+=navItem('inversor-cartera','💼','Mi Cartera');
+    html+=navItem('inversor-ofertas','📤','Mis Ofertas');
+    html+=navItem('inversor-calc','🧮','Calculadora');
+  }
+  document.getElementById('sidebar').innerHTML=html;
+}
+
+function navItem(page,icon,label){
+  return '<button class="nav-item'+(state.currentPage===page?' active':'')+'" onclick="navigateTo(\''+page+'\')"><span class="nav-icon">'+icon+'</span>'+label+'</button>';
+}
+
+function navigateTo(page){
+  state.currentPage=page;
+  renderSidebar();
+  var mc=document.getElementById('main-content');
+  if(page==='vendedor-dashboard')mc.innerHTML=renderVendedorDashboard();
+  else if(page==='vendedor-cargar')mc.innerHTML=renderCargarEcheck();
+  else if(page==='vendedor-negociaciones')mc.innerHTML=renderNegociaciones();
+  else if(page==='vendedor-calc'||page==='inversor-calc')mc.innerHTML=renderCalculadora();
+  else if(page==='inversor-marketplace')mc.innerHTML=renderMarketplace();
+  else if(page==='inversor-cartera')mc.innerHTML=renderCarteraInversor();
+  else if(page==='inversor-ofertas')mc.innerHTML=renderMisOfertas();
+  else if(page==='admin-panel')mc.innerHTML=renderAdminPanel();
+  else if(page==='admin-tasas')mc.innerHTML=renderAdminTasas();
+  else if(page==='admin-scoring'){mc.innerHTML=renderAdminScoring();initScoringAdminContent();}
+  else if(page==='admin-usuarios')mc.innerHTML=renderAdminUsuarios();
+}
+
+// ============================================================
+// VENDEDOR DASHBOARD
+// ============================================================
+function renderVendedorDashboard(){
+  var user=state.currentUser;
+  var checks=getChecks().filter(function(c){return c.ownerId===user.id;});
+  var pub=checks.filter(function(c){return c.status==='publicado';});
+  var neg=checks.filter(function(c){return c.status==='negociacion';});
+  var cart=checks.filter(function(c){return c.status==='cartera';});
+  var acord=checks.filter(function(c){return c.status==='acordado';});
+  var totalMonto=checks.reduce(function(s,c){return s+c.monto;},0);
+  var montoPublicado=pub.concat(neg).reduce(function(s,c){return s+c.monto;},0);
+  var offers=getOffers().filter(function(o){
+    return checks.find(function(c){return c.id===o.checkId;})&&o.status==='pendiente';
+  });
+
+  var html='<div class="page-header"><h1>Dashboard</h1><p>Bienvenido, '+user.name+'</p></div>';
+
+  // Stats
+  html+='<div class="stats-grid">';
+  html+=statCard('En cartera',cart.length,'Sin publicar','neutral');
+  html+=statCard('Publicados',pub.length,'En marketplace','up');
+  html+=statCard('En negociacion',neg.length,'Con inversores','up');
+  html+=statCard('Acordados',acord.length,'Operaciones cerradas','up');
+  html+=statCard('Monto total',formatMoney(totalMonto),'En todos los estados','neutral');
+  html+=statCard('Monto publicado',formatMoney(montoPublicado),'Publicado + negociacion','up');
+  html+='</div>';
+
+  // Notifications
+  if(offers.length>0||neg.length>0){
+    html+='<div class="card" style="margin-bottom:16px;border-left:3px solid var(--g)">';
+    html+='<div class="card-header"><div class="card-title flex gap-8 items-center"><span class="notif-dot"></span>Notificaciones</div></div>';
+    if(offers.length>0){
+      html+='<div class="alert alert-success" style="margin-bottom:8px"><span>💬</span><div><div class="bold">'+offers.length+' oferta'+(offers.length>1?'s':'')+' pendiente'+(offers.length>1?'s':'')+' de respuesta</div><div style="font-size:12px">Revisalas en Negociaciones</div></div><button class="btn btn-primary btn-sm" onclick="navigateTo(\'vendedor-negociaciones\')" style="margin-left:auto">Ver ofertas</button></div>';
+    }
+    if(neg.length>0){
+      html+='<div class="alert alert-info"><span>🤝</span><div><div class="bold">'+neg.length+' cheque'+(neg.length>1?'s':'')+' en negociacion activa</div></div></div>';
+    }
+    html+='</div>';
+  }
+
+  // Two columns: progress + activity
+  html+='<div class="grid-2 gap-16" style="margin-bottom:16px">';
+
+  // Estado breakdown
+  html+='<div class="card"><div class="card-header"><div class="card-title">Estado de operaciones</div></div>';
+  var total=checks.length||1;
+  html+=progressRow('En cartera',cart.length,total,'var(--t3)');
+  html+=progressRow('Publicados',pub.length,total,'var(--gm)');
+  html+=progressRow('En negociacion',neg.length,total,'var(--bd)');
+  html+=progressRow('Acordados',acord.length,total,'var(--g)');
+  html+='</div>';
+
+  // Recent activity
+  html+='<div class="card"><div class="card-header"><div class="card-title">Actividad reciente</div></div>';
+  var logs=getLogs().slice(0,8);
+  if(!logs.length){
+    html+='<div style="color:var(--t3);font-size:13px;text-align:center;padding:20px">Sin actividad reciente</div>';
+  } else {
+    var logColors={auth:'var(--bd)',check:'var(--g)',offer:'var(--am)',system:'var(--t3)'};
+    logs.forEach(function(l){
+      html+='<div class="log-entry"><div class="log-dot" style="background:'+(logColors[l.type]||'var(--t3)')+'"></div><div style="flex:1"><div class="log-text">'+l.msg+'</div><div class="log-time">'+new Date(l.ts).toLocaleString('es-AR')+'</div></div></div>';
+    });
+  }
+  html+='</div>';
+  html+='</div>';
+
+  // Table
+  html+='<div class="card"><div class="card-header"><div class="card-title">Mis cheques</div><button class="btn btn-primary btn-sm" onclick="navigateTo(\'vendedor-cargar\')">+ Cargar eCheck</button></div>';
+  html+='<div class="filter-bar">';
+  var filters=['todos','cartera','publicado','negociacion','acordado'];
+  filters.forEach(function(f){html+='<div class="filter-chip'+(f==='todos'?' active':'')+'" onclick="filterChecksTable(\''+f+'\',this)">'+capitalize(f)+'</div>';});
+  html+='</div>';
+  html+='<div class="table-wrap"><table id="checks-table"><thead><tr><th>Librador</th><th>CUIT</th><th>Monto</th><th>Vencimiento</th><th>Dias</th><th>Banco</th><th>Cat.</th><th>Tasa</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="checks-tbody">';
+  html+=renderChecksRows(checks,'todos');
+  html+='</tbody></table></div></div>';
+  return html;
+}
+
+function statCard(label,value,sub,type){
+  return '<div class="stat-card"><div class="stat-label">'+label+'</div><div class="stat-value">'+value+'</div><div class="stat-sub">'+sub+'</div></div>';
+}
+
+function progressRow(label,val,total,color){
+  var pct=Math.round((val/total)*100);
+  return '<div style="margin-bottom:12px"><div class="flex justify-between" style="font-size:13px;margin-bottom:4px"><span>'+label+'</span><span class="bold">'+val+'</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%;background:'+color+'"></div></div></div>';
+}
+
+function renderChecksRows(checks,filter){
+  var filtered=filter==='todos'?checks:checks.filter(function(c){return c.status===filter;});
+  if(!filtered.length)return '<tr><td colspan="10" class="text-center" style="padding:32px;color:var(--t3)">No hay cheques</td></tr>';
+  return filtered.map(function(c){
+    var cat=c.scoring?c.scoring.cat:'—';
+    var badgeCls=c.scoring?'badge-'+cat:'';
+    var dias=getDays(c.fechaPago);
+    var actions='';
+    if(c.status==='cartera'){
+      actions='<button class="btn btn-primary btn-sm" onclick="openPublishWizard(\''+c.id+'\')">Publicar</button>';
+    }else if(c.status==='publicado'||c.status==='negociacion'){
+      actions='<button class="btn btn-outline btn-sm" onclick="openScoringDetail(\''+c.id+'\')">Ver scoring</button>';
+    }else{
+      actions='<span style="color:var(--t3);font-size:12px">Acordado</span>';
+    }
+    return '<tr><td><div class="bold" style="font-size:13px">'+c.razonLibrador+'</div></td>'+
+      '<td class="mono" style="font-size:11px;color:var(--t3)">'+formatCuit(c.cuitLibrador)+'</td>'+
+      '<td class="mono bold">'+formatMoney(c.monto)+'</td>'+
+      '<td style="font-size:12px">'+c.fechaPago+'</td>'+
+      '<td class="mono" style="font-size:12px;color:'+(dias<=7?'var(--rm)':dias<=30?'var(--am)':'var(--t2)')+'">'+dias+'d</td>'+
+      '<td><span class="bank-chip">'+getBankName(c.banco)+'</span></td>'+
+      '<td>'+(c.scoring?'<span class="badge '+badgeCls+'">'+cat+'</span>':'<span style="color:var(--t3);font-size:12px">—</span>')+'</td>'+
+      '<td class="mono">'+(c.tasa?c.tasa.toFixed(1)+'%':'—')+'</td>'+
+      '<td><span class="badge badge-'+getStatusBadge(c.status)+'">'+c.status+'</span></td>'+
+      '<td>'+actions+'</td></tr>';
+  }).join('');
+}
+
+function filterChecksTable(filter,el){
+  document.querySelectorAll('#main-content .filter-chip').forEach(function(x){x.classList.remove('active');});
+  el.classList.add('active');
+  var user=state.currentUser;
+  var checks=getChecks().filter(function(c){return c.ownerId===user.id;});
+  document.getElementById('checks-tbody').innerHTML=renderChecksRows(checks,filter);
+}
+
+function getStatusBadge(s){
+  if(s==='publicado')return 'A2';
+  if(s==='negociacion')return 'B1';
+  if(s==='acordado')return 'A1';
+  return 'B2';
+}
+
+// ============================================================
+// CARGAR ECHEQUE
+// ============================================================
+function renderCargarEcheck(){
+  var bankOpts=Object.keys(BANKS).map(function(k){return '<option value="'+k+'">'+BANKS[k]+' (Cod. '+k+')</option>';}).join('');
+  return '<div class="page-header"><h1>Cargar eCheck</h1><p>Ingresa los datos del cheque electronico para cargarlo a tu cartera</p></div>'+
+  '<div style="max-width:600px">'+
+  '<div class="card">'+
+  '<div class="grid-2"><div class="field"><label>Tipo de cheque</label><select id="c-tipo"><option value="terceros">De terceros</option><option value="propio">Propio</option></select></div>'+
+  '<div class="field"><label>Banco librador</label><select id="c-banco">'+bankOpts+'</select></div></div>'+
+  '<div class="field"><label>CUIT Librador</label>'+
+  '<div style="display:flex;gap:8px">'+
+  '<input type="text" id="c-cuit" placeholder="30-70893479-4" style="flex:1;border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 12px;font-size:14px;font-family:var(--mono);outline:none" oninput="lookupRazonSocial()">'+
+  '<button class="btn btn-secondary btn-sm" onclick="lookupRazonSocial()">Buscar</button>'+
+  '</div>'+
+  '<div id="razon-social-result" style="margin-top:6px;font-size:12px;color:var(--t2)"></div>'+
+  '</div>'+
+  '<div class="field"><label>Razon social (librador)</label><input type="text" id="c-razon" placeholder="Se completa automaticamente con el CUIT" style="border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 12px;font-size:14px;width:100%;outline:none"></div>'+
+  '<div class="field"><label>Numero ECHEQ</label><input type="text" id="c-nro" placeholder="ECH-0000000000" maxlength="20" style="border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 12px;font-size:14px;font-family:var(--mono);width:100%;outline:none"></div>'+
+  '<div class="field"><label>Monto Nominal ($)</label><input type="number" id="c-monto" placeholder="1.000.000" min="1" style="border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 12px;font-size:14px;width:100%;outline:none"></div>'+
+  '<div class="grid-2"><div class="field"><label>Fecha de emision</label><input type="date" id="c-emision" style="border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 12px;font-size:14px;width:100%;outline:none"></div>'+
+  '<div class="field"><label>Fecha de pago</label><input type="date" id="c-pago" style="border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 12px;font-size:14px;width:100%;outline:none"></div></div>'+
+  '<div style="background:var(--al);border-radius:var(--r);padding:12px;font-size:12px;color:var(--am);margin-bottom:16px"><strong>Importante:</strong> El scoring Nosis se consulta al publicar. El cheque queda en cartera hasta entonces.</div>'+
+  '<div id="carga-err" class="alert alert-error hidden"></div>'+
+  '<div class="flex gap-8"><button class="btn btn-primary" onclick="doCargarEcheck()">Guardar en cartera</button><button class="btn btn-secondary" onclick="navigateTo(\'vendedor-dashboard\')">Cancelar</button></div>'+
+  '</div></div>';
+}
+
+function lookupRazonSocial(){
+  var cuit=document.getElementById('c-cuit').value.trim().replace(/-/g,'').replace(/\./g,'');
+  var result=document.getElementById('razon-social-result');
+  var razonInput=document.getElementById('c-razon');
+  if(!cuit||cuit.length<10){result.textContent='';return;}
+  var demo=DEMO_NOSIS[cuit];
+  if(demo){
+    result.innerHTML='<span style="color:var(--g)">✅ Encontrado en base demo:</span> <strong>'+demo.razon+'</strong>';
+    razonInput.value=demo.razon;
+  } else {
+    result.innerHTML='<span style="color:var(--t3)">CUIT no encontrado en demo — ingresa la razon social manualmente</span>';
+  }
+}
+
+function doCargarEcheck(){
+  var tipo=document.getElementById('c-tipo').value;
+  var banco=parseInt(document.getElementById('c-banco').value);
+  var cuit=document.getElementById('c-cuit').value.trim().replace(/-/g,'').replace(/\./g,'');
+  var razon=document.getElementById('c-razon').value.trim();
+  var nro=document.getElementById('c-nro').value.trim();
+  var monto=parseFloat(document.getElementById('c-monto').value);
+  var emision=document.getElementById('c-emision').value;
+  var pago=document.getElementById('c-pago').value;
+  var err='';
+  var today=new Date().toISOString().split('T')[0];
+  if(!cuit)err='Ingresa el CUIT del librador.';
+  else if(!nro)err='Ingresa el numero de ECHEQ.';
+  else if(!monto||monto<=0)err='Ingresa un monto valido.';
+  else if(!emision)err='Ingresa la fecha de emision.';
+  else if(!pago)err='Ingresa la fecha de pago.';
+  else if(emision>today)err='La fecha de emision no puede ser futura.';
+  else if(pago<=emision)err='La fecha de pago debe ser posterior a la emision.';
+  if(err){var el=document.getElementById('carga-err');el.textContent=err;el.classList.remove('hidden');return;}
+  var demoNosis=DEMO_NOSIS[cuit];
+  var razonFinal=razon||(demoNosis?demoNosis.razon:('CUIT '+formatCuit(cuit)));
+  var checks=getChecks();
+  var newCheck={
+    id:'ck'+Date.now(),
+    ownerId:state.currentUser.id,
+    tipo:tipo,
+    cuitLibrador:cuit,
+    razonLibrador:razonFinal,
+    monto:monto,
+    fechaEmision:emision,
+    fechaPago:pago,
+    banco:banco,
+    nroEcheq:nro,
+    status:'cartera',
+    scoring:null,
+    tasa:null,
+    createdAt:Date.now()
+  };
+  checks.push(newCheck);
+  setChecks(checks);
+  addLog('Cheque cargado: '+razonFinal+' $'+formatMoney(monto),'check');
+  showToast('eCheck guardado en cartera','success');
+  navigateTo('vendedor-dashboard');
+}
+
+// ============================================================
+// PUBLISH WIZARD
+// ============================================================
+function openPublishWizard(checkId){
+  var checks=getChecks();
+  var check=checks.find(function(c){return c.id===checkId;});
+  if(!check)return;
+  var html='<div class="modal-header"><h3>Publicar eCheck</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+  html+='<div class="modal-body">';
+  html+='<div class="step-indicator"><div class="step-dot active" id="pw-d1">1</div><div class="step-line"></div><div class="step-dot" id="pw-d2">2</div><div class="step-line"></div><div class="step-dot" id="pw-d3">3</div><div class="step-line"></div><div class="step-dot" id="pw-d4">4</div><div class="step-line"></div><div class="step-dot" id="pw-d5">5</div></div>';
+  html+='<div id="pw-content">'+renderPWStep1(check)+'</div>';
+  html+='</div>';
+  showModal(html);
+  window._pwCheck=check;
+  window._pwStep=1;
+  window._pwNosis=null;
+  window._pwScoring=null;
+  window._pwTasa=null;
+}
+
+function renderPWStep1(check){
+  return '<div class="text-center" style="padding:16px 0"><div style="font-size:40px">🏦</div><div class="bold text-lg" style="margin-top:8px">Consulta BCRA</div><div style="color:var(--t2);font-size:13px;margin:8px 0 20px">Verificando cheque '+check.nroEcheq+' en el registro de denunciados del BCRA...</div><button class="btn btn-primary" onclick="doBCRACheck()">Consultar BCRA</button></div>';
+}
+
+function doBCRACheck(){
+  var check=window._pwCheck;
+  document.getElementById('pw-content').innerHTML='<div class="text-center" style="padding:32px"><div class="spinner spinner-green" style="width:36px;height:36px;margin:0 auto"></div><div style="margin-top:12px;color:var(--t2)">Consultando BCRA...</div></div>';
+  var url=BCRA_URL+'/'+check.banco+'/'+check.nroEcheq;
+  fetch(url).then(function(r){
+    // 404 = cheque no encontrado en el registro = NO denunciado (respuesta normal de BCRA)
+    if(r.status===404){
+      showBCRAResult(false,false);
+      return;
+    }
+    // 200 = encontrado, parsear para ver si hay denuncias
+    if(r.status===200){
+      r.json().then(function(data){
+        var denunciado=data.results&&data.results.length>0;
+        showBCRAResult(denunciado,false);
+      }).catch(function(){
+        showBCRAResult(false,true);
+      });
+      return;
+    }
+    // Cualquier otro status (500, CORS, etc) → fallback demo
+    showBCRAResult(false,true);
+  }).catch(function(){
+    // Error de red / CORS → fallback demo
+    showBCRAResult(false,true);
+  });
+}
+
+function showBCRAResult(denunciado,isDemo){
+  if(denunciado){
+    document.getElementById('pw-content').innerHTML='<div class="alert alert-error"><span>🚫</span><div><div class="bold">Cheque denunciado</div><div>Este cheque figura en el registro de denunciados del BCRA. No puede ser publicado.</div></div></div><button class="btn btn-secondary" onclick="closeModal()">Cerrar</button>';
+    return;
+  }
+  var fuente=isDemo
+    ?'<span style="font-size:11px;background:var(--al);color:var(--am);padding:2px 7px;border-radius:4px;margin-left:6px">Demo — API no disponible</span>'
+    :'<span style="font-size:11px;background:var(--gl);color:var(--gd);padding:2px 7px;border-radius:4px;margin-left:6px">API BCRA real</span>';
+  var html='<div class="alert alert-success"><span>✅</span><div><div class="bold" style="display:flex;align-items:center">Cheque sin denuncias'+fuente+'</div><div style="margin-top:4px">No figura en el registro de cheques denunciados del BCRA.</div></div></div>';
+  html+='<div class="text-center mt-16"><button class="btn btn-primary" onclick="pwGoStep2()">Continuar → Scoring Nosis</button></div>';
+  document.getElementById('pw-content').innerHTML=html;
+}
+
+// ============================================================
+// BCRA — CENTRAL DE DEUDORES (endeudamiento + cheques rechazados del vendedor)
+// Documentación oficial: api.bcra.gob.ar/CentralDeDeudores/v1.0
+// ============================================================
+async function consultarDeudorBCRA(cuit) {
+  var cuitLimpio=String(cuit).replace(/[-. ]/g,'').trim();
+  try {
+    var r=await fetch(BCRA_DEUDAS_URL+'/'+cuitLimpio,{method:'GET',headers:{'Accept':'application/json'}});
+    if(r.status===404)return{ok:true,sinDatos:true,entidades:[],totalDeuda:0,situacionMax:1,diasAtrasoMax:0};
+    if(!r.ok)return{ok:false,error:'HTTP '+r.status};
+    var data=await r.json();
+    if(!data||!data.results)return{ok:false,error:'Sin results'};
+    var totalDeuda=0,situacionMax=1,diasAtrasoMax=0,entidades=[];
+    var periodos=data.results.periodos||[];
+    // Solo el período más reciente (primero en el array)
+    if(periodos.length>0){
+      (periodos[0].entidades||[]).forEach(function(e){
+        totalDeuda+=(e.monto||0)*1000; // monto viene en miles de pesos
+        if(e.situacion>situacionMax)situacionMax=e.situacion;
+        if(e.diasAtrasoPago>diasAtrasoMax)diasAtrasoMax=e.diasAtrasoPago;
+        entidades.push({entidad:e.entidad,situacion:e.situacion,monto:(e.monto||0)*1000,dias:e.diasAtrasoPago||0});
+      });
+    }
+    return{ok:true,sinDatos:false,entidades:entidades,totalDeuda:totalDeuda,situacionMax:situacionMax,diasAtrasoMax:diasAtrasoMax};
+  }catch(e){return{ok:false,error:e.message};}
+}
+
+async function consultarRechazadosBCRA(cuit) {
+  var cuitLimpio=String(cuit).replace(/[-. ]/g,'').trim();
+  try {
+    var r=await fetch(BCRA_RECHAZADOS_URL+'/'+cuitLimpio,{method:'GET',headers:{'Accept':'application/json'}});
+    if(r.status===404)return{ok:true,sinDatos:true,total:0,sinFondos:0,impagos:0,rechazos:[]};
+    if(!r.ok)return{ok:false,error:'HTTP '+r.status};
+    var data=await r.json();
+    if(!data||!data.results)return{ok:false,error:'Sin results'};
+    var total=0,sinFondos=0,impagos=0,rechazos=[];
+    (data.results.causales||[]).forEach(function(causal){
+      (causal.entidades||[]).forEach(function(entidad){
+        (entidad.detalle||[]).forEach(function(d){
+          total++;
+          if((causal.causal||'').toUpperCase().indexOf('SIN FONDOS')>=0)sinFondos++;
+          if(d.estadoMulta==='IMPAGA')impagos++;
+          rechazos.push({nro:d.nroCheque,fecha:d.fechaRechazo,monto:d.monto,causal:causal.causal,estadoMulta:d.estadoMulta,fechaPago:d.fechaPago});
+        });
+      });
+    });
+    return{ok:true,sinDatos:total===0,total:total,sinFondos:sinFondos,impagos:impagos,rechazos:rechazos};
+  }catch(e){return{ok:false,error:e.message};}
+}
+
+// Convierte resultado BCRA deudas → puntos 0-100 para scoring del vendedor
+// Situación BCRA: 1=normal, 2=seguimiento especial, 3=problemas, 4=alto riesgo, 5=irrecuperable
+function puntosDeudaVendedorBCRA(res){
+  if(!res||!res.ok||res.sinDatos)return 100;
+  var sitMap={1:100,2:70,3:40,4:10,5:0};
+  var pts=sitMap[res.situacionMax]!==undefined?sitMap[res.situacionMax]:0;
+  if(res.diasAtrasoMax>90)pts=Math.min(pts,20);
+  else if(res.diasAtrasoMax>30)pts=Math.min(pts,50);
+  return pts;
+}
+
+// Convierte resultado BCRA rechazados → puntos 0-100 para scoring del vendedor
+function puntosRechazosVendedorBCRA(res){
+  if(!res||!res.ok||res.sinDatos||res.total===0)return 100;
+  if(res.impagos>=3)return 0;
+  if(res.impagos>=1)return 20;
+  if(res.sinFondos>=3)return 30;
+  if(res.sinFondos>=1)return 50;
+  if(res.total>=5)return 60;
+  if(res.total>=1)return 80;
+  return 100;
+}
+
+function pwGoStep2(){
+  setPWStep(2);
+  document.getElementById('pw-content').innerHTML='<div class="text-center" style="padding:16px 0"><div style="font-size:40px">🔍</div><div class="bold text-lg" style="margin-top:8px">Consulta Nosis</div><div style="color:var(--t2);font-size:13px;margin:8px 0 20px">Consultando datos crediticios del librador CUIT '+formatCuit(window._pwCheck.cuitLibrador)+'...</div><button class="btn btn-primary" onclick="doNosisCheck()">Consultar Nosis</button></div>';
+}
+
+async function doNosisCheck(){
+  document.getElementById('pw-content').innerHTML='<div class="text-center" style="padding:32px"><div class="spinner spinner-green" style="width:36px;height:36px;margin:0 auto"></div><div style="margin-top:12px;color:var(--t2)">Consultando Nosis...</div></div>';
+  var cuit=window._pwCheck.cuitLibrador;
+  // Try demo data first
+  var demo=DEMO_NOSIS[cuit];
+  if(demo){
+    await showNosisResult(demo,true);
+    return;
+  }
+  // Try real API
+  try {
+    var res=await consultarNosis(cuit);
+    if(res.ok){
+      var nd=mapearNosis(res.data);
+      nd.antiguedad_meses=Math.round(nd.antiguedad*12);
+      await showNosisResult(nd,false);
+    }else{
+      var demoData={score:Math.floor(400+Math.random()*300),deuda:Math.floor(Math.random()*200000000),antiguedad_meses:Math.floor(24+Math.random()*120),bancos:Math.floor(1+Math.random()*4),consultas:Math.floor(Math.random()*25),rechazos24m:0,rechazos6m:0,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false};
+      await showNosisResult(demoData,true);
+    }
+  }catch(e){
+    var demoData={score:Math.floor(400+Math.random()*300),deuda:Math.floor(Math.random()*200000000),antiguedad_meses:Math.floor(24+Math.random()*120),bancos:Math.floor(1+Math.random()*4),consultas:Math.floor(Math.random()*25),rechazos24m:0,rechazos6m:0,juicios:0,concursos:0,deudaFiscal:false,inhabilitado:false};
+    await showNosisResult(demoData,true);
+  }
+}
+
+async function showNosisResult(nd,isDemo){
+  window._pwNosis=nd;
+  var ndForCat = {
+    score: nd.score||0,
+    deuda: nd.deuda||0,
+    antiguedad: nd.antiguedad !== undefined ? nd.antiguedad : (nd.antiguedad_meses||0)/12,
+    bancos: nd.bancos||0,
+    consultas: nd.consultas||0,
+    rechazos24m: nd.rechazos24m||0,
+    rechazos6m: nd.rechazos6m||0,
+    juicios: nd.juicios||0,
+    concursos: nd.concursos||0,
+    deudaFiscal: nd.deudaFiscal||false,
+    inhabilitado: nd.inhabilitado||false
+  };
+  var catResult = calcularCategoria(ndForCat);
+
+  // Mostrar spinner mientras se consulta BCRA Central de Deudores (vendedor)
+  var cuitVendedor=state.currentUser&&state.currentUser.cuit?state.currentUser.cuit:'';
+  if(cuitVendedor){
+    document.getElementById('pw-content').innerHTML='<div class="text-center" style="padding:20px"><div class="spinner spinner-green" style="width:28px;height:28px;margin:0 auto"></div><div style="margin-top:10px;font-size:13px;color:var(--t2)">Consultando BCRA Central de Deudores del vendedor...</div></div>';
+  }
+
+  var scoring = await calcScoring(ndForCat, window._pwCheck);
+  // Merge: calcularCategoria usa scoringVars editables para cat+puntaje
+  scoring.cat = catResult.cat;
+  scoring.pts = catResult.puntaje || scoring.pts;
+  window._pwScoring = scoring;
+  setPWStep(3);
+  var ag = ndForCat.antiguedad;
+  var html='<div class="alert alert-info" style="margin-bottom:16px"><span>📊</span><div>Datos Nosis '+(isDemo?'<strong>(Demo — simulado)</strong>':'<strong>(Tiempo real)</strong>')+'<br>CUIT: '+formatCuit(window._pwCheck.cuitLibrador)+'</div></div>';
+  // Badge de fuente BCRA vendedor
+  if(scoring.desglose&&scoring.desglose.endeud_v){
+    var fv=scoring.desglose.endeud_v.fuente;
+    html+='<div style="margin-bottom:12px">';
+    html+=fv==='bcra_real'
+      ?'<span style="font-size:11px;background:var(--gl);color:var(--gd);padding:2px 8px;border-radius:4px">🏦 Vendedor consultado via BCRA Central de Deudores</span>'
+      :'<span style="font-size:11px;background:var(--al);color:var(--am);padding:2px 8px;border-radius:4px">⚠️ Vendedor: BCRA no disponible — score neutro aplicado</span>';
+    html+='</div>';
+  }
+  html+='<div class="grid-2 gap-8" style="margin-bottom:16px">';
+  html+=nosisItem('Score Nosis',nd.score,'pts');
+  html+=nosisItem('Endeudamiento',formatMoney(nd.deuda||0),'');
+  html+=nosisItem('Antiguedad CUIT',ag>=1?Math.round(ag)+' anos':Math.round(ag*12)+' meses','');
+  html+=nosisItem('Bancos activos',nd.bancos||0,'');
+  html+=nosisItem('Consultas 12m',nd.consultas||0,'');
+  html+=nosisItem('Rechazos 24m',nd.rechazos24m||0,'');
+  html+=nosisItem('Rechazos 6m',nd.rechazos6m||0,'');
+  html+=nosisItem('Juicios 24m',nd.juicios||0,'');
+  html+='</div>';
+  if(catResult.cat==='C2'&&catResult.razon){
+    html+='<div class="alert alert-error"><span>🚫</span><div><div class="bold">C2 directo</div><div>'+catResult.razon+'</div></div></div>';
+  }
+  html+='<div class="text-center"><button class="btn btn-primary" onclick="pwGoStep4()">Ver Scoring →</button></div>';
+  document.getElementById('pw-content').innerHTML=html;
+}
+
+function nosisItem(label,val,unit){
+  return '<div style="background:var(--s2);border-radius:var(--r);padding:10px 12px"><div style="font-size:11px;color:var(--t3);font-weight:600;margin-bottom:4px">'+label+'</div><div class="bold mono">'+val+(unit?' '+unit:'')+'</div></div>';
+}
+
+function pwGoStep4(){
+  var scoring=window._pwScoring;
+  if(scoring.cat==='C2'){
+    document.getElementById('pw-content').innerHTML='<div class="alert alert-error"><span>🚫</span><div><div class="bold">Scoring C2 — No publicable</div><div>El librador no cumple los requisitos mínimos de calificación para publicar en el marketplace.</div></div></div><div class="mt-12"><div style="font-size:13px;color:var(--t2)">Razones:</div><ul style="margin-top:8px;padding-left:20px;font-size:13px">'+scoring.c2Reasons.map(function(r){return '<li>'+r+'</li>';}).join('')+'</ul></div><button class="btn btn-secondary mt-16" onclick="closeModal()">Cerrar</button>';
+    return;
+  }
+  setPWStep(4);
+  var cat=scoring.cat;
+  var sp=getSpreads()[cat]||SPREADS[cat];
+  var tamar=getTamar();
+  var dias=getDays(window._pwCheck.fechaPago);
+  var tasaMin=tamar+sp.min+(sp.plazo*(dias/30));
+  var tasaMax=tamar+sp.max+(sp.plazo*(dias/30));
+  var tasaMid=((tasaMin+tasaMax)/2);
+  window._pwTasaMin=tasaMin;window._pwTasaMax=tasaMax;window._pwTasaSug=tasaMid;
+  var html='<div class="scoring-card '+cat+'" style="margin-bottom:16px"><div class="flex justify-between items-center" style="margin-bottom:12px"><div class="flex gap-8 items-center"><span style="font-size:28px">'+CAT_EMOJI[cat]+'</span><div><div class="bold text-xl">'+cat+'</div><div style="font-size:13px;color:var(--t2)">'+scoring.pts+' puntos</div></div></div><span class="badge badge-'+cat+'">'+cat+'</span></div>';
+  html+='<div class="grid-2 gap-8" style="margin-bottom:10px"><div><div class="text-sm" style="color:var(--t2)">Factores favorables</div>';
+  html+=scoring.factores.map(function(f){return '<div style="font-size:12px;margin-top:4px">✅ '+f+'</div>';}).join('');
+  html+='</div><div><div class="text-sm" style="color:var(--t2)">Puntos de atención</div>';
+  html+=scoring.atencion.map(function(a){return '<div style="font-size:12px;margin-top:4px">⚠️ '+a+'</div>';}).join('');
+  html+='</div></div>';
+  if(scoring.desglose){
+    html+='<div class="divider"></div><div style="font-size:11px;color:var(--t2);margin-bottom:4px;font-weight:600">DESGLOSE POR VARIABLE</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+    var dg=scoring.desglose;
+    var shortN={score_nosis:'Score',endeudamiento:'Endeud.',antiguedad:'Antigüedad',perfil_legal:'Legal',bancos:'Bancos',consultas:'Consultas',endeud_v:'EndeudV',rechazos_v:'Rechazos'};
+    Object.keys(dg).forEach(function(k){
+      var v=dg[k];
+      html+='<div style="background:rgba(255,255,255,.5);border-radius:6px;padding:3px 7px;font-size:11px"><span style="color:var(--t2)">'+shortN[k]+'</span> <span class="mono bold">'+v.aporte+'</span></div>';
+    });
+    html+='</div>';
+  }
+  html+='<div style="font-size:12px;font-style:italic;color:var(--t2)">'+scoring.rec+'</div>';
+  html+='</div>';
+  html+='<div class="field"><label>Tasa TNA (%) — Rango sugerido: '+tasaMin.toFixed(1)+'% a '+tasaMax.toFixed(1)+'%</label>';
+  html+='<input type="number" id="pw-tasa" step="0.1" value="'+tasaMid.toFixed(1)+'" min="'+tasaMin.toFixed(1)+'" max="'+tasaMax.toFixed(1)+'"></div>';
+  html+='<div class="rate-range-bar"><div class="rate-range-fill" style="left:0;right:0"></div></div>';
+  html+='<div class="flex justify-between text-sm" style="color:var(--t3)"><span>'+tasaMin.toFixed(1)+'%</span><span>Rango Motor 3.1</span><span>'+tasaMax.toFixed(1)+'%</span></div>';
+  html+='<div class="text-center mt-16"><button class="btn btn-primary" onclick="pwGoStep5()">Confirmar y publicar →</button></div>';
+  document.getElementById('pw-content').innerHTML=html;
+}
+
+function pwGoStep5(){
+  var tasa=parseFloat(document.getElementById('pw-tasa').value);
+  if(isNaN(tasa)||tasa<=0){showToast('Ingresá una tasa válida','error');return;}
+  setPWStep(5);
+  var check=window._pwCheck;
+  var scoring=window._pwScoring;
+  var dias=getDays(check.fechaPago);
+  var descuento=check.monto*(tasa/100)*(dias/365);
+  var comision=check.monto*0.01;
+  var neto=check.monto-descuento-comision;
+  var html='<div class="alert alert-success"><span>✅</span><div><div class="bold">Todo listo para publicar</div></div></div>';
+  html+='<div class="card" style="margin:16px 0"><div class="grid-2 gap-8">';
+  html+=nosisItem('Monto',formatMoney(check.monto),'');
+  html+=nosisItem('Categoría',scoring.cat,'');
+  html+=nosisItem('Tasa TNA',tasa.toFixed(1)+'%','');
+  html+=nosisItem('Días al vencimiento',dias,'');
+  html+=nosisItem('Descuento estimado',formatMoney(descuento),'');
+  html+=nosisItem('Neto estimado',formatMoney(neto),'');
+  html+='</div></div>';
+  html+='<div class="flex gap-8" style="justify-content:flex-end"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="confirmPublish('+tasa+')">Confirmar publicación</button></div>';
+  document.getElementById('pw-content').innerHTML=html;
+  window._pwTasa=tasa;
+}
+
+function confirmPublish(tasa){
+  var checks=getChecks();
+  var idx=checks.findIndex(function(c){return c.id===window._pwCheck.id;});
+  if(idx<0)return;
+  checks[idx].status='publicado';
+  checks[idx].scoring=window._pwScoring;
+  checks[idx].tasa=tasa;
+  setChecks(checks);
+  addLog('Cheque publicado: '+checks[idx].razonLibrador+' $'+formatMoney(checks[idx].monto)+' '+window._pwScoring.cat,'check');
+  closeModal();
+  showToast('Cheque publicado en el marketplace','success');
+  navigateTo('vendedor-dashboard');
+}
+
+function setPWStep(n){
+  window._pwStep=n;
+  for(var i=1;i<=5;i++){
+    var d=document.getElementById('pw-d'+i);
+    if(!d)continue;
+    d.classList.remove('done','active');
+    if(i<n)d.classList.add('done');
+    else if(i===n)d.classList.add('active');
+  }
+}
+
+// ============================================================
+// NOSIS — INTEGRACION REAL (ported from reference)
+// ============================================================
+async function consultarNosis(cuit) {
+  var cuitLimpio = cuit.split('-').join('').split('.').join('').trim();
+  // Usar proxy Netlify Function para evitar CORS
+  var proxyUrl = '/.netlify/functions/nosis?cuit=' + cuitLimpio;
+  try {
+    var r = await fetch(proxyUrl, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    var rawText = await r.text();
+    console.log('Nosis proxy status:', r.status, '| Body:', rawText.substring(0,300));
+    if (!rawText || rawText.trim() === '{}' || rawText.trim() === 'null') {
+      return { ok: false, error: 'Respuesta vacía', cuit_enviado: cuitLimpio };
+    }
+    if (!r.ok) {
+      return { ok: false, error: 'HTTP ' + r.status + ': ' + rawText.substring(0,200), cuit_enviado: cuitLimpio };
+    }
+    try {
+      var data = JSON.parse(rawText);
+      if (!data || Object.keys(data).length === 0) {
+        return { ok: false, error: 'JSON vacío', cuit_enviado: cuitLimpio };
+      }
+      // Verificar que Nosis devolvió estado 200
+      var estado = data.Contenido && data.Contenido.Resultado && data.Contenido.Resultado.Estado;
+      if (estado && estado !== '200' && estado !== 200) {
+        return { ok: false, error: 'Nosis error ' + estado + ': ' + (data.Contenido.Resultado.Novedad||''), cuit_enviado: cuitLimpio };
+      }
+      return { ok: true, data: data, url: proxyUrl };
+    } catch(pe) {
+      return { ok: false, error: 'JSON inválido: ' + rawText.substring(0,100), cuit_enviado: cuitLimpio };
+    }
+  } catch(e) {
+    return { ok: false, error: e.message, cuit_enviado: cuitLimpio };
+  }
+}
+
+function mapearNosis(data) {
+  // La respuesta real de Nosis tiene estructura:
+  // data.Contenido.Datos.Variables.Variable[] con Nombre y Valor
+  var variables = [];
+  try {
+    variables = data.Contenido.Datos.Variables.Variable || [];
+  } catch(e) {
+    console.log('mapearNosis: estructura inesperada', e);
+    return {};
+  }
+  var g = function(nombre) {
+    var v = variables.find(function(x) { return x.Nombre === nombre; });
+    return v ? v.Valor : null;
+  };
+  var antiguedadMeses = parseInt(g('CI_Antiguedad')) || 0;
+  return {
+    score:        parseFloat(g('SCO_Vig')) || 0,
+    deuda:        parseFloat(g('CI_Vig_Total_Monto')) || 0,
+    antiguedad:   antiguedadMeses / 12,
+    bancos:       parseInt(g('CI_Vig_Total_CantBcos')) || 0,
+    consultas:    parseInt(g('CO_12m_Cant')) || 0,
+    rechazos24m:  parseInt(g('HC_24m_SF_NoPag_Cant')) || 0,
+    rechazos6m:   parseInt(g('HC_6m_SF_NoPag_Cant')) || 0,
+    juicios:      parseInt(g('JU_24m_Cant')) || 0,
+    concursos:    parseInt(g('CQ_24m_Cant')) || 0,
+    deudaFiscal:  g('DF_Tiene') === 'S' || g('DF_Tiene') === 'Si' || g('DF_Tiene') === true,
+    inhabilitado: g('IN_Tiene') === 'S' || g('IN_Tiene') === 'Si' || g('IN_Tiene') === true,
+    razonSocial:  g('VI_RazonSocial') || g('VI_Nombre') || ''
+  };
+}
+
+function calcularCategoria(vars) {
+  // Usar scoringVars editables si estan disponibles
+  function ptsByRangos(rangos, valor) {
+    for (var i = 0; i < rangos.length; i++) {
+      var r = rangos[i];
+      if (r.desc !== undefined) continue; // skip descriptive ranges
+      var min = r.d !== undefined ? r.d : 0;
+      var max = r.h;
+      if (valor >= min && (max === null || valor <= max)) return r.p;
+    }
+    return 0;
+  }
+  // C2 directos activos
+  var activeC2 = c2List.filter(function(c) { return c.activa; });
+  if (vars.rechazos6m > 0 && activeC2.find(function(c){return c.campo.indexOf('HC_6m')>=0;}))
+    return { cat:'C2', puntaje:0, razon:'Rechazos de cheques en los ultimos 6 meses' };
+  if (vars.antiguedad < 0.5 && activeC2.find(function(c){return c.campo.indexOf('Antiguedad')>=0||c.campo.indexOf('AFIP')>=0;}))
+    return { cat:'C2', puntaje:0, razon:'Antiguedad del CUIT menor a 6 meses' };
+  if (vars.concursos > 0 && activeC2.find(function(c){return c.campo.indexOf('CQ_24m')>=0;}))
+    return { cat:'C2', puntaje:0, razon:'Concurso preventivo o quiebra registrada' };
+  if (vars.inhabilitado && activeC2.find(function(c){return c.campo.indexOf('IN_Tiene')>=0;}))
+    return { cat:'C2', puntaje:0, razon:'Inhabilitacion vigente por BCRA' };
+
+  // Calcular puntaje usando scoringVars
+  var puntaje = 0;
+  var activeVars = scoringVars.filter(function(v) { return v.activa; });
+  activeVars.forEach(function(v) {
+    var val = 0;
+    if (v.campo.indexOf('SCO_Vig') >= 0)              val = vars.score;
+    else if (v.campo.indexOf('CI_Vig_Total_Monto') >= 0 && v.campo.indexOf('vendedor') < 0) val = vars.deuda;
+    else if (v.campo.indexOf('Antiguedad') >= 0 || v.campo.indexOf('AFIP') >= 0) val = vars.antiguedad;
+    else if (v.campo.indexOf('CantBcos') >= 0)        val = vars.bancos;
+    else if (v.campo.indexOf('CO_12m') >= 0)          val = vars.consultas;
+    else if (v.campo.indexOf('vendedor') >= 0)        val = 100; // asumido OK
+    else if (v.campo.indexOf('HC_vend') >= 0)         val = 100; // asumido OK
+    else if (v.campo.indexOf('DF_Tiene') >= 0)        val = vars.deudaFiscal ? 40 : 100;
+    // Find points for this value in rangos
+    var pts = ptsByRangos(v.rangos, val);
+    if (pts === 'C2') return; // skip, already handled above
+    puntaje += (parseFloat(pts) || 0) * (v.peso / 100);
+  });
+
+  // Penalizaciones activas
+  penRechazos.forEach(function(p) {
+    if (!p.activa) return;
+    if (p.tipo === 'c2_directo') return; // ya manejado
+    if (p.reduccion && vars.rechazos24m > 0) puntaje *= (1 - p.reduccion/100);
+  });
+  penSF.forEach(function(p) {
+    if (!p.activa) return;
+    if (vars.sf_sin_multa) puntaje *= (1 - p.reduccion/100);
+  });
+  if (vars.deudaFiscal) {
+    var pen = penFiscal.find(function(p) { return p.activa; });
+    if (pen) puntaje *= (1 - pen.reduccion/100);
+  }
+
+  puntaje = Math.min(100, Math.max(0, puntaje));
+
+  // Determinar categoria usando catList
+  var cat = 'C2';
+  for (var i = 0; i < catList.length; i++) {
+    var c = catList[i];
+    if (c.cat === 'C2') continue;
+    if (puntaje >= c.pMin && puntaje <= c.pMax) { cat = c.cat; break; }
+  }
+  // Aplicar piso de categoria
+  var catConf = catList.find(function(c) { return c.cat === cat; });
+  if (catConf && catConf.piso && puntaje < catConf.piso) puntaje = catConf.piso;
+
+  return { cat: cat, puntaje: Math.round(puntaje * 10) / 10 };
+}
+
+function tasasSugeridas(cat, dias) {
+  var tamar = getTamar();
+  var spreads = getSpreads();
+  var sp = spreads[cat] || SPREADS[cat] || {min:0,max:0,plazo:0};
+  var spA = sp.plazo * (dias / 30);
+  return {
+    min: +(tamar + sp.min + spA).toFixed(1),
+    max: +(tamar + sp.max + spA).toFixed(1)
+  };
+}
+
+// Recalc para tabla de spreads admin
+function recalcSpr(inp) { recalcRow(inp.closest('tr')); }
+function recalcRow(tr) {
+  var ins = tr.querySelectorAll('.spr-in');
+  if (ins.length < 3) return;
+  var sm = parseFloat(ins[0].value) || 0;
+  var sx = parseFloat(ins[1].value) || 0;
+  var sp = parseFloat(ins[2].value) || 0;
+  var dias = parseInt(tr.dataset.p) || 30;
+  var spA = sp * (dias / 30);
+  var tamar = getTamar();
+  var rmEl = tr.querySelector('.rm-v');
+  var rxEl = tr.querySelector('.rx-v');
+  if (rmEl) rmEl.textContent = (tamar + sm + spA).toFixed(1) + '%';
+  if (rxEl) rxEl.textContent = (tamar + sx + spA).toFixed(1) + '%';
+}
+
+async function testNosis() {
+  var cuit = document.getElementById('nosis-cuit-test').value.trim();
+  var status = document.getElementById('nosis-status');
+  var result = document.getElementById('nosis-result');
+  if (!cuit) { showToast('Ingresa un CUIT','error'); return; }
+  status.textContent = 'Consultando...';
+  status.style.color = 'var(--t3)';
+  result.style.display = 'none';
+  var res = await consultarNosis(cuit);
+  if (res.ok) {
+    status.textContent = 'OK (directo)';
+    status.style.color = 'var(--g)';
+    result.style.display = 'block';
+    var vars = mapearNosis(res.data);
+    var scoring = calcularCategoria(vars);
+    var tasas = tasasSugeridas(scoring.cat, 30);
+    result.textContent = '=== URL CONSULTADA ===\n' + (res.url||'?') +
+      '\n\n=== RESPUESTA RAW NOSIS ===\n' + JSON.stringify(res.data, null, 2) +
+      '\n\n=== MAPEO OPENCHECK ===\n' + JSON.stringify({
+        score_nosis: vars.score, deuda_total: vars.deuda,
+        antiguedad_anos: vars.antiguedad.toFixed ? vars.antiguedad.toFixed(1) : vars.antiguedad,
+        bancos: vars.bancos, consultas_12m: vars.consultas,
+        rechazos6m: vars.rechazos6m, rechazos24m: vars.rechazos24m,
+        categoria: scoring.cat, puntaje: scoring.puntaje,
+        tasa_min: tasas.min, tasa_max: tasas.max
+      }, null, 2);
+  } else {
+    status.textContent = 'Error: ' + res.error;
+    status.style.color = 'var(--rm)';
+    result.style.display = 'block';
+    result.textContent = 'Error al consultar Nosis:\n' + res.error + '\nCUIT enviado: ' + res.cuit_enviado;
+  }
+}
+
+function getScoringWeights(){
+  return lsGet('scoring_weights')||{
+    SCO_Vig:35, CI_Vig_Total_Monto:20, CI_Antiguedad:15,
+    perfil_legal:10, CI_Vig_Total_CantBcos:5,
+    CO_12m_Cant:5, endeud_vendedor:5, HC_vendedor:5
+  };
+}
+function setScoringWeights(w){lsSet('scoring_weights',w);}
+
+function getScoringPenalties(){
+  return lsGet('scoring_penalties')||{
+    rechazo_6m:'C2', rechazo_6_12m:-50, rechazo_12_24m:-20, rechazo_24m_plus:-10,
+    sf_sin_multa:-20,
+    df_lt1:-2, df_1_5:-5, df_5_10:-8, df_10_20:-12, df_gt20:-15
+  };
+}
+function setScoringPenalties(p){lsSet('scoring_penalties',p);}
+
+// Conversion tables
+function convScore(sc){
+  return sc>=800?100:sc>=700?90:sc>=600?80:sc>=500?60:sc>=400?40:sc>=300?30:sc>=200?20:sc>=100?10:sc>=1?5:0;
+}
+function convDeuda(d){
+  return d>=100000000?100:d>=50000000?80:d>=25000000?60:d>=5000000?40:d>=1000000?20:0;
+}
+function convAntiguedad(meses){
+  var ag=meses/12;
+  return ag>=10?100:ag>=7?80:ag>=5?60:ag>=3?40:ag>=1?20:ag>=0.5?10:-1;
+}
+function convBancos(bc){
+  return bc>=5?100:bc===4?80:bc===3?60:bc===2?40:bc===1?20:0;
+}
+function convConsultas(co){
+  return co>=40?100:co>=30?90:co>=20?80:co>=10?60:co>=5?40:co>=1?20:0;
+}
+function convRechazosVendedor(r){
+  return r===0?100:r<=3?80:r<=8?50:r<=15?20:0;
+}
+
+// Matriz de atrasos (16 combinaciones) — retorna penalización % o 'C2'
+function calcAtrasosPenalty(sc,monto,diasAtraso){
+  // diasAtraso = dias promedio de atraso en mora vigente (0 si sin atrasos)
+  if(diasAtraso===0)return 0;
+  var lte50k=monto<50000;
+  var m50_150=monto>=50000&&monto<=150000;
+  var gt150=monto>150000;
+  var gt500k=monto>500000;
+  // C2 universal
+  if(gt500k&&diasAtraso>=60)return 'C2';
+  if(sc>=600){
+    if(lte50k)return 0;
+    if(m50_150&&diasAtraso<60)return 0;
+    if(m50_150&&diasAtraso>=60)return -5;
+    if(gt150&&diasAtraso<=60)return 0;
+    if(gt150&&diasAtraso>60)return -10;
+  }else if(sc>=400){
+    if(lte50k)return 0;
+    if(m50_150&&diasAtraso<60)return 0;
+    if(m50_150&&diasAtraso>=60)return -10;
+    if(gt150&&diasAtraso<=60)return 0;
+    if(gt150&&diasAtraso>60)return -15;
+  }else{
+    if(lte50k)return -5;
+    if(m50_150&&diasAtraso<60)return -10;
+    if(m50_150&&diasAtraso>=60)return 'C2';
+    if(gt150&&diasAtraso<=60)return -10;
+    if(gt150&&diasAtraso>60)return 'C2';
+  }
+  return 0;
+}
+
+// Factor antigüedad del atraso
+function factorAntiguedadAtraso(mesesAtrasoDesde){
+  if(mesesAtrasoDesde<3)return 20;
+  if(mesesAtrasoDesde<6)return 15;
+  if(mesesAtrasoDesde<12)return 10;
+  if(mesesAtrasoDesde<24)return 5;
+  return 0;
+}
+
+// Factor recurrencia
+function factorRecurrencia(cantAtrasos){
+  if(cantAtrasos<=1)return 0;
+  if(cantAtrasos===2)return 5;
+  if(cantAtrasos===3)return 10;
+  return 15;
+}
+
+// Techos post-penalización (piso mínimo por cat)
+var CAT_FLOORS={A1:80,A2:66,B1:50,B2:30,C1:20};
+
+async function calcScoring(nd,check){
+  var w=getScoringWeights();
+  var pen=getScoringPenalties();
+  var c2Reasons=[];
+  var factores=[];
+  var atencion=[];
+
+  // ---- C2 DIRECTOS ----
+  var ag_anos=nd.antiguedad_meses/12;
+  if(ag_anos<0.5)c2Reasons.push('Antigüedad CUIT del librador menor a 6 meses');
+  var rechazos6m=nd.rechazos6m||(nd.rechazos24m>0&&nd.rechazos12m>0?nd.rechazos12m:0);
+  if(rechazos6m>0)c2Reasons.push('Rechazos del librador en los últimos 6 meses ('+rechazos6m+')');
+  if(nd.concursos>0)c2Reasons.push('Concurso preventivo o quiebra registrada');
+  if(nd.inhabilitado)c2Reasons.push('Inhabilitación vigente por BCRA u organismo oficial');
+  if(nd.situacionBCRA&&nd.situacionBCRA>=3)c2Reasons.push('Situación BCRA '+nd.situacionBCRA+' registrada');
+  if(c2Reasons.length){
+    return{cat:'C2',pts:0,factores:[],atencion:c2Reasons,rec:'No publicable — condición C2 directa',c2Reasons:c2Reasons,desglose:null};
+  }
+
+  // Antigüedad C2 por tabla
+  var ptsAg=convAntiguedad(nd.antiguedad_meses);
+  if(ptsAg===-1){
+    return{cat:'C2',pts:0,factores:[],atencion:['Antigüedad CUIT menor a 6 meses'],rec:'No publicable',c2Reasons:['Antigüedad CUIT menor a 6 meses'],desglose:null};
+  }
+
+  // ---- DATOS VENDEDOR VIA BCRA CENTRAL DE DEUDORES ----
+  // Consulta las dos APIs reales; si hay CORS/error de red usa fallback 100 (sin penalización)
+  var ptsDeudaV=100;
+  var ptsRv=100;
+  var vendedorBCRAInfo={deuda:null,rechazos:null,fuente:'fallback'};
+  var cuitVendedor=state.currentUser&&state.currentUser.cuit?state.currentUser.cuit:'';
+  if(cuitVendedor){
+    try{
+      var resDeuda=await consultarDeudorBCRA(cuitVendedor);
+      var resRechazos=await consultarRechazadosBCRA(cuitVendedor);
+      ptsDeudaV=puntosDeudaVendedorBCRA(resDeuda);
+      ptsRv=puntosRechazosVendedorBCRA(resRechazos);
+      vendedorBCRAInfo={deuda:resDeuda,rechazos:resRechazos,fuente:resDeuda.ok?'bcra_real':'fallback'};
+    }catch(e){
+      console.log('BCRA Central de Deudores error:',e.message);
+    }
+  }
+
+  // ---- PUNTAJE BASE ----
+  var wTotal=(w.SCO_Vig+w.CI_Vig_Total_Monto+w.CI_Antiguedad+w.perfil_legal+w.CI_Vig_Total_CantBcos+w.CO_12m_Cant+w.endeud_vendedor+w.HC_vendedor)||100;
+
+  var sc=nd.score;
+  var d=nd.deuda;
+  var bc=nd.bancos;
+  var co=nd.consultas;
+
+  var ptsSc=convScore(sc);
+  var ptsD=convDeuda(d);
+  var ptsBc=convBancos(bc);
+  var ptsCo=convConsultas(co);
+  var ptsLegal=(nd.juicios===0&&nd.concursos===0)?80:(nd.juicios<3?40:20);
+
+  var s=(ptsSc*(w.SCO_Vig/100))+(ptsD*(w.CI_Vig_Total_Monto/100))+(ptsAg*(w.CI_Antiguedad/100))+(ptsLegal*(w.perfil_legal/100))+(ptsBc*(w.CI_Vig_Total_CantBcos/100))+(ptsCo*(w.CO_12m_Cant/100))+(ptsDeudaV*(w.endeud_vendedor/100))+(ptsRv*(w.HC_vendedor/100));
+  // Normalize por el total de pesos (en caso de que no sumen 100)
+  s=s*(100/wTotal)*100;
+  s=Math.min(100,Math.max(0,s));
+
+  var desglose={
+    score_nosis:{pts:ptsSc,peso:w.SCO_Vig,aporte:+(ptsSc*(w.SCO_Vig/100)).toFixed(1)},
+    endeudamiento:{pts:ptsD,peso:w.CI_Vig_Total_Monto,aporte:+(ptsD*(w.CI_Vig_Total_Monto/100)).toFixed(1)},
+    antiguedad:{pts:ptsAg,peso:w.CI_Antiguedad,aporte:+(ptsAg*(w.CI_Antiguedad/100)).toFixed(1)},
+    perfil_legal:{pts:ptsLegal,peso:w.perfil_legal,aporte:+(ptsLegal*(w.perfil_legal/100)).toFixed(1)},
+    bancos:{pts:ptsBc,peso:w.CI_Vig_Total_CantBcos,aporte:+(ptsBc*(w.CI_Vig_Total_CantBcos/100)).toFixed(1)},
+    consultas:{pts:ptsCo,peso:w.CO_12m_Cant,aporte:+(ptsCo*(w.CO_12m_Cant/100)).toFixed(1)},
+    endeud_v:{pts:ptsDeudaV,peso:w.endeud_vendedor,aporte:+(ptsDeudaV*(w.endeud_vendedor/100)).toFixed(1),fuente:vendedorBCRAInfo.fuente},
+    rechazos_v:{pts:ptsRv,peso:w.HC_vendedor,aporte:+(ptsRv*(w.HC_vendedor/100)).toFixed(1),fuente:vendedorBCRAInfo.fuente}
+  };
+
+  // ---- PENALIZACIONES ----
+  var penAplicadas=[];
+
+  // Rechazos librador — antigüedad del rechazo más reciente
+  var rechazos12m=nd.rechazos12m||0;
+  if(nd.rechazos24m>0){
+    if(rechazos12m>0){
+      // Entre 6 y 12m
+      var pctRech=pen.rechazo_6_12m||(-50);
+      s=s*(1+pctRech/100);
+      penAplicadas.push('Rechazos librador últimos 12m: '+pctRech+'%');
+      // Recurrencia
+      var addRec=factorRecurrencia(rechazos12m);
+      if(addRec>0){s=s*(1-addRec/100);penAplicadas.push('Factor recurrencia ('+rechazos12m+' rechazos): -'+addRec+'%');}
+    }else{
+      // Entre 12 y 24m
+      var pctRech2=pen.rechazo_12_24m||(-20);
+      s=s*(1+pctRech2/100);
+      penAplicadas.push('Rechazos librador últimos 24m: '+pctRech2+'%');
+    }
+  }
+
+  // Deuda fiscal
+  if(nd.deudaFiscal){
+    var dfPct=nd.deudaFiscalPct||0;
+    var dfPen=dfPct<1?(pen.df_lt1||(-2)):dfPct<5?(pen.df_1_5||(-5)):dfPct<10?(pen.df_5_10||(-8)):dfPct<20?(pen.df_10_20||(-12)):(pen.df_gt20||(-15));
+    s=s*(1+dfPen/100);
+    penAplicadas.push('Deuda fiscal ('+dfPct+'%): '+dfPen+'%');
+  }
+
+  // SF sin multa
+  if(nd.sf_sin_multa){
+    var sfPen=pen.sf_sin_multa||(-20);
+    s=s*(1+sfPen/100);
+    penAplicadas.push('Suspension financiera sin multa: '+sfPen+'%');
+  }
+
+  // Matriz de atrasos
+  var diasAtraso=nd.diasAtraso||0;
+  var montoAtraso=nd.montoAtraso||(check?check.monto:0);
+  var atrasoResult=calcAtrasosPenalty(sc,montoAtraso,diasAtraso);
+  if(atrasoResult==='C2'){
+    return{cat:'C2',pts:0,factores:[],atencion:['Matriz de atrasos: monto>$500K con mora ≥60 días'],rec:'No publicable — condición C2 por matriz de atrasos',c2Reasons:['Matriz de atrasos da C2 directo'],desglose:desglose};
+  }else if(atrasoResult<0){
+    // Aplicar factor de antigüedad del atraso
+    var mesesDesde=nd.mesesDesdeAtraso||0;
+    var factorAnt=factorAntiguedadAtraso(mesesDesde);
+    var penAtraso=atrasoResult+factorAnt;
+    s=s*(1+penAtraso/100);
+    penAplicadas.push('Atraso en mora ('+diasAtraso+' días): '+penAtraso+'%');
+  }
+
+  s=Math.min(100,Math.max(0,s));
+
+  // ---- DETERMINAR CATEGORÍA ----
+  var cat='C2';
+  if(s>=85)cat='A1';
+  else if(s>=70)cat='A2';
+  else if(s>=55)cat='B1';
+  else if(s>=40)cat='B2';
+  else if(s>=25)cat='C1';
+
+  // Aplicar techo de categoría (piso mínimo para la cat)
+  // Si penalizaciones empujan el score debajo del piso de la cat anterior, baja de cat pero no rompe el piso de la nueva cat
+  var floor=CAT_FLOORS[cat]||0;
+  if(s<floor){s=floor;}
+
+  // ---- FACTORES NARRATIVOS ----
+  if(ptsSc>=80)factores.push('Score Nosis excelente ('+sc+')');
+  else if(ptsSc>=60)factores.push('Score Nosis bueno ('+sc+')');
+  else atencion.push('Score Nosis moderado/bajo ('+sc+')');
+
+  if(ptsD>=80)factores.push('Endeudamiento bancario alto ('+formatMoney(d)+')');
+  else if(ptsD>=40)factores.push('Endeudamiento bancario moderado ('+formatMoney(d)+')');
+  else atencion.push('Endeudamiento bancario bajo ('+formatMoney(d)+')');
+
+  if(ag_anos>=10)factores.push('Antigüedad CUIT: '+Math.round(ag_anos)+' años (excelente)');
+  else if(ag_anos>=5)factores.push('Antigüedad CUIT: '+Math.round(ag_anos)+' años');
+  else if(ag_anos>=3)atencion.push('Antigüedad moderada: '+Math.round(ag_anos)+' años');
+  else atencion.push('Antigüedad baja: '+ag_anos.toFixed(1)+' años');
+
+  if(bc>=5)factores.push(bc+' bancos activos (diversificación alta)');
+  else if(bc>=3)factores.push(bc+' bancos activos');
+  else if(bc<=1)atencion.push('Alta concentración bancaria ('+bc+' banco)');
+
+  if(nd.juicios===0&&nd.concursos===0)factores.push('Sin juicios ni concursos registrados');
+  else atencion.push('Juicios/concursos en 24m: '+(nd.juicios||0)+' / '+(nd.concursos||0));
+
+  if(co>=20)factores.push('Alta actividad financiera ('+co+' consultas 12m)');
+  else if(co>=5)factores.push(co+' consultas financieras en 12m');
+  else atencion.push('Baja actividad financiera ('+co+' consultas)');
+
+  if((nd.rechazos24m||0)===0)factores.push('Sin rechazos de cheques en 24 meses');
+  else atencion.push('Rechazos en 24m: '+(nd.rechazos24m||0));
+
+  // Factores del vendedor (BCRA Central de Deudores)
+  if(vendedorBCRAInfo.fuente==='bcra_real'){
+    var rd=vendedorBCRAInfo.deuda;
+    var rr=vendedorBCRAInfo.rechazos;
+    if(rd&&!rd.sinDatos){
+      if(rd.situacionMax===1)factores.push('Vendedor: situación BCRA normal (sit.'+rd.situacionMax+')');
+      else atencion.push('Vendedor: situación BCRA '+rd.situacionMax+' ('+['','Normal','Seguimiento','Problemas','Alto riesgo','Irrecuperable'][rd.situacionMax]+')');
+    }else if(rd&&rd.sinDatos){
+      factores.push('Vendedor: sin deudas en Central de Deudores BCRA');
+    }
+    if(rr&&!rr.sinDatos&&rr.total>0){
+      atencion.push('Vendedor: '+rr.total+' cheque'+(rr.total>1?'s':'')+' rechazado'+(rr.total>1?'s':'')+' en BCRA'+(rr.impagos>0?' ('+rr.impagos+' multa'+( rr.impagos>1?'s':'')+' impaga'+(rr.impagos>1?'s':'')+')':''));
+    }else if(rr&&(rr.sinDatos||rr.total===0)){
+      factores.push('Vendedor: sin rechazos en Central de Cheques BCRA');
+    }
+  }else if(cuitVendedor){
+    atencion.push('Vendedor: consulta BCRA no disponible (CORS/red) — score vendedor con valor neutro');
+  }
+
+  if(penAplicadas.length)atencion=atencion.concat(penAplicadas.map(function(p){return 'Penalización: '+p;}));
+
+  var recs={A1:'Operación altamente recomendada — riesgo muy bajo',A2:'Operación favorable — riesgo bajo',B1:'Operación aceptable con monitoreo — riesgo moderado',B2:'Operación de mediano riesgo — evaluar exposición',C1:'Operación de alto riesgo — requiere garantías adicionales',C2:'No publicable'};
+  return{cat:cat,pts:Math.round(s),factores:factores,atencion:atencion,rec:recs[cat]||'—',c2Reasons:[],desglose:desglose,penAplicadas:penAplicadas};
+}
+
+// ============================================================
+// NEGOCIACIONES (VENDEDOR)
+// ============================================================
+function renderNegociaciones(){
+  var user=state.currentUser;
+  var checks=getChecks().filter(function(c){return c.ownerId===user.id&&(c.status==='publicado'||c.status==='negociacion');});
+  var offers=getOffers();
+  var html='<div class="page-header"><h1>Negociaciones</h1><p>Ofertas recibidas de inversores</p></div>';
+  if(!checks.length){
+    html+='<div class="empty-state"><div class="empty-state-icon">🤝</div><h3>Sin cheques publicados</h3><p>Publicá cheques para recibir ofertas</p></div>';
+    return html;
+  }
+  checks.forEach(function(check){
+    var myOffers=offers.filter(function(o){return o.checkId===check.id&&o.status==='pendiente';});
+    html+='<div class="offer-row"><div class="flex justify-between items-center" style="margin-bottom:12px">';
+    html+='<div><div class="bold">'+check.razonLibrador+'</div><div class="text-sm mono" style="color:var(--t2)">'+formatMoney(check.monto)+' — Vence '+check.fechaPago+'</div></div>';
+    html+='<div class="flex gap-8 items-center"><span class="badge badge-'+(check.scoring?check.scoring.cat:'B2')+'">'+( check.scoring?check.scoring.cat:'—')+'</span><span class="bold mono" style="color:var(--g)">'+( check.tasa?check.tasa.toFixed(1)+'% TNA':'—')+'</span></div>';
+    html+='</div>';
+    if(!myOffers.length){
+      html+='<div style="color:var(--t3);font-size:13px">Sin ofertas pendientes</div>';
+    }else{
+      html+='<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">OFERTAS RECIBIDAS</div>';
+      myOffers.forEach(function(offer){
+        var users=getUsers();
+        var inv=users.find(function(u){return u.id===offer.investorId;})||{name:'Inversor'};
+        var outOfRange=check.tasa&&(offer.tasa<check.tasa-5||offer.tasa>check.tasa+5);
+        html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--s2);border-radius:var(--r);margin-bottom:6px">';
+        html+='<div><div style="font-size:13px;font-weight:600">'+inv.name+'</div>';
+        html+='<div class="mono" style="color:var(--g);font-size:15px;font-weight:700">'+offer.tasa.toFixed(1)+'% TNA</div>';
+        if(outOfRange)html+='<div style="font-size:11px;color:var(--am)">⚠️ Fuera del rango habitual</div>';
+        html+='</div>';
+        html+='<div class="flex gap-8">';
+        html+='<button class="btn btn-primary btn-sm" onclick="respondOffer(\''+offer.id+'\',\'aceptada\',\''+check.id+'\')">Aceptar</button>';
+        html+='<button class="btn btn-danger btn-sm" onclick="respondOffer(\''+offer.id+'\',\'rechazada\',\''+check.id+'\')">Rechazar</button>';
+        html+='<button class="btn btn-outline btn-sm" onclick="openCounteroffer(\''+offer.id+'\',\''+check.id+'\')">Contraofertar</button>';
+        html+='</div></div>';
+      });
+    }
+    html+='</div>';
+  });
+  return html;
+}
+
+function respondOffer(offerId,status,checkId){
+  var offers=getOffers();
+  var idx=offers.findIndex(function(o){return o.id===offerId;});
+  if(idx<0)return;
+  offers[idx].status=status;
+  setOffers(offers);
+  if(status==='aceptada'){
+    var checks=getChecks();
+    var ci=checks.findIndex(function(c){return c.id===checkId;});
+    if(ci>=0){checks[ci].status='acordado';checks[ci].acordadoCon=offers[idx].investorId;setChecks(checks);}
+    addLog('Oferta aceptada: cheque '+checkId,'offer');
+    showToast('Oferta aceptada — operación acordada','success');
+  }else{
+    addLog('Oferta rechazada: '+offerId,'offer');
+    showToast('Oferta rechazada','warning');
+  }
+  navigateTo('vendedor-negociaciones');
+}
+
+function openCounteroffer(offerId,checkId){
+  var offers=getOffers();
+  var offer=offers.find(function(o){return o.id===offerId;});
+  var checks=getChecks();
+  var check=checks.find(function(c){return c.id===checkId;});
+  if(!offer||!check)return;
+  var html='<div class="modal-header"><h3>Contraofertar</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+  html+='<div class="modal-body">';
+  html+='<div class="alert alert-info" style="margin-bottom:16px">Oferta recibida: <span class="bold mono">'+offer.tasa.toFixed(1)+'% TNA</span><br>Tu tasa publicada: <span class="bold mono">'+(check.tasa?check.tasa.toFixed(1):'—')+'% TNA</span></div>';
+  html+='<div class="field"><label>Tu contrapropuesta de tasa TNA (%)</label><input type="number" id="co-tasa" step="0.1" value="'+(check.tasa||30)+'"></div>';
+  html+='</div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="doCounteroffer(\''+offerId+'\')">Enviar contraoferta</button></div>';
+  showModal(html);
+}
+
+function doCounteroffer(offerId){
+  var tasa=parseFloat(document.getElementById('co-tasa').value);
+  if(isNaN(tasa)||tasa<=0){showToast('Tasa inválida','error');return;}
+  var offers=getOffers();
+  var idx=offers.findIndex(function(o){return o.id===offerId;});
+  if(idx>=0){offers[idx].tasa=tasa;offers[idx].counteroffered=true;setOffers(offers);}
+  addLog('Contraoferta enviada: '+tasa+'%','offer');
+  closeModal();
+  showToast('Contraoferta enviada','success');
+  navigateTo('vendedor-negociaciones');
+}
+
+// ============================================================
+// MARKETPLACE INVERSOR
+// ============================================================
+var mktFilter={cat:'todos',plazo:'todos',orden:'reciente'};
+
+function renderMarketplace(){
+  var checks=getChecks().filter(function(c){return c.status==='publicado'&&c.scoring;});
+  var tamar=getTamar();
+  var html='<div class="page-header"><h1>Marketplace de eCheques</h1><p>'+checks.length+' disponibles · TAMAR: <strong style="color:var(--g);font-family:var(--mono)">'+tamar.toFixed(1)+'%</strong></p></div>';
+  // Filters row
+  html+='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">';
+  html+='<input id="mkt-search" type="text" placeholder="Buscar por librador, CUIT..." style="flex:1;min-width:160px;padding:8px 12px;font-size:13px;border:1.5px solid var(--s3);border-radius:var(--r);outline:none" oninput="mktRender()">';
+  html+='<select id="mkt-cat" class="input-inline" style="padding:8px 12px;font-size:13px" onchange="mktRender()"><option value="todos">Todas las categorias</option><option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option><option value="B2">B2</option><option value="C1">C1</option></select>';
+  html+='<select id="mkt-plazo" class="input-inline" style="padding:8px 12px;font-size:13px" onchange="mktRender()"><option value="todos">Todos los plazos</option><option value="30">0-30 dias</option><option value="60">31-60 dias</option><option value="90">61-90 dias</option></select>';
+  html+='<select id="mkt-orden" class="input-inline" style="padding:8px 12px;font-size:13px" onchange="mktRender()"><option value="reciente">Mas reciente</option><option value="monto-desc">Mayor monto</option><option value="monto-asc">Menor monto</option><option value="tasa-desc">Mayor tasa</option><option value="tasa-asc">Menor tasa</option><option value="plazo-asc">Menor plazo</option></select>';
+  html+='</div>';
+  html+='<div class="market-grid" id="market-grid">'+renderMarketCards(checks)+'</div>';
+  return html;
+}
+
+function mktSetCat(cat,el){
+  mktFilter.cat=cat;
+  document.querySelectorAll('#main-content .filter-bar .filter-chip').forEach(function(x){x.classList.remove('active');});
+  el.classList.add('active');
+  mktRender();
+}
+
+function mktRender(){
+  var all=getChecks().filter(function(c){return c.status==='publicado'&&c.scoring;});
+  var catSel=document.getElementById('mkt-cat');
+  var plazoSel=document.getElementById('mkt-plazo');
+  var ordenSel=document.getElementById('mkt-orden');
+  var searchEl=document.getElementById('mkt-search');
+  var cat=catSel?catSel.value:(mktFilter.cat||'todos');
+  var plazo=plazoSel?plazoSel.value:'todos';
+  var orden=ordenSel?ordenSel.value:'reciente';
+  var search=searchEl?searchEl.value.toLowerCase().trim():'';
+  if(cat!=='todos')all=all.filter(function(c){return c.scoring&&c.scoring.cat===cat;});
+  if(plazo==='30')all=all.filter(function(c){var d=getDays(c.fechaPago);return d>=1&&d<=30;});
+  else if(plazo==='60')all=all.filter(function(c){var d=getDays(c.fechaPago);return d>=31&&d<=60;});
+  else if(plazo==='90')all=all.filter(function(c){var d=getDays(c.fechaPago);return d>=61&&d<=90;});
+  if(search)all=all.filter(function(c){return c.razonLibrador.toLowerCase().indexOf(search)>=0||c.cuitLibrador.indexOf(search)>=0;});
+  if(orden==='monto-asc')all.sort(function(a,b){return a.monto-b.monto;});
+  else if(orden==='monto-desc')all.sort(function(a,b){return b.monto-a.monto;});
+  else if(orden==='tasa-asc')all.sort(function(a,b){return (a.tasa||0)-(b.tasa||0);});
+  else if(orden==='tasa-desc')all.sort(function(a,b){return (b.tasa||0)-(a.tasa||0);});
+  else if(orden==='plazo-asc')all.sort(function(a,b){return getDays(a.fechaPago)-getDays(b.fechaPago);});
+  var grid=document.getElementById('market-grid');
+  if(grid)grid.innerHTML=renderMarketCards(all);
+}
+
+function renderMarketCards(checks){
+  if(!checks.length)return '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔍</div><h3>Sin resultados</h3><p>No hay cheques que coincidan con los filtros</p></div>';
+  return checks.map(function(c){
+    var dias=getDays(c.fechaPago);
+    var cat=c.scoring.cat;
+    var sp=getSpreads()[cat]||SPREADS[cat];
+    return '<div class="market-card" onclick="openOfferModal(\''+c.id+'\')"><div class="market-card-top"><span class="badge badge-'+cat+'">'+CAT_EMOJI[cat]+' '+cat+'</span><div class="bank-chip">'+getBankName(c.banco)+'</div></div><div class="market-amount">'+formatMoney(c.monto)+'</div><div class="market-meta"><div class="market-meta-item">Tasa TNA<span class="mono" style="color:var(--g)">'+c.tasa.toFixed(1)+'%</span></div><div class="market-meta-item">Plazo<span>'+dias+' días</span></div><div class="market-meta-item">Vence<span>'+c.fechaPago+'</span></div><div class="market-meta-item">Librador<span>'+c.razonLibrador.substring(0,18)+'</span></div></div></div>';
+  }).join('');
+}
+
+function openOfferModal(checkId){
+  var check=getChecks().find(function(c){return c.id===checkId;});
+  if(!check)return;
+  var dias=getDays(check.fechaPago);
+  var cat=check.scoring.cat;
+  var scoring=check.scoring;
+  var html='<div class="modal-header"><h3>Realizar oferta</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+  html+='<div class="modal-body">';
+  // Scoring card
+  html+='<div class="scoring-card '+cat+'" style="margin-bottom:16px">';
+  html+='<div class="flex justify-between items-center" style="margin-bottom:10px"><div class="flex gap-8 items-center"><span style="font-size:24px">'+CAT_EMOJI[cat]+'</span><div><div class="bold">'+cat+' — '+scoring.pts+' puntos</div><div class="text-sm" style="color:var(--t2)">'+check.razonLibrador+'</div></div></div></div>';
+  html+='<div class="grid-2 gap-8" style="margin-bottom:10px"><div><div style="font-size:11px;color:var(--t2)">Factores favorables</div>'+scoring.factores.map(function(f){return '<div style="font-size:11px;margin-top:3px">✅ '+f+'</div>';}).join('')+'</div><div><div style="font-size:11px;color:var(--t2)">Puntos de atención</div>'+scoring.atencion.map(function(a){return '<div style="font-size:11px;margin-top:3px">⚠️ '+a+'</div>';}).join('')+'</div></div>';
+  html+='<div style="font-size:12px;color:var(--t2)">'+scoring.rec+'</div>';
+  html+='</div>';
+  // Check details
+  html+='<div class="grid-2 gap-8" style="margin-bottom:16px">';
+  html+=nosisItem('Monto nominal',formatMoney(check.monto),'');
+  html+=nosisItem('Tasa publicada',check.tasa.toFixed(1)+'%','TNA');
+  html+=nosisItem('Vencimiento',check.fechaPago,'');
+  html+=nosisItem('Días',dias,'');
+  html+='</div>';
+  // Offer input
+  html+='<div class="field"><label>Tu oferta de tasa TNA (%)</label><input type="number" id="offer-tasa" step="0.1" value="'+check.tasa.toFixed(1)+'" oninput="calcOfferNeto(\''+check.id+'\')" style="font-size:18px;font-weight:700;text-align:center"></div>';
+  html+='<div class="calc-result" id="offer-calc">';
+  html+=renderOfferCalc(check.monto,check.tasa,dias);
+  html+='</div>';
+  html+='</div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary btn-lg" onclick="submitOffer(\''+checkId+'\')">Enviar oferta</button></div>';
+  showModal(html);
+}
+
+function calcOfferNeto(checkId){
+  var check=getChecks().find(function(c){return c.id===checkId;});
+  if(!check)return;
+  var tasa=parseFloat(document.getElementById('offer-tasa').value)||0;
+  var dias=getDays(check.fechaPago);
+  document.getElementById('offer-calc').innerHTML=renderOfferCalc(check.monto,tasa,dias);
+}
+
+function renderOfferCalc(monto,tasa,dias){
+  var tamar=getTamar();
+  var descuento=monto*(tasa/100)*(dias/365);
+  var comision=monto*0.01;
+  var netoVendedor=monto-descuento-comision;
+  var netoInversor=monto-descuento;
+  var retBruto=(descuento-comision)/netoInversor*100;
+  var html='<div class="bold text-sm" style="margin-bottom:8px;color:var(--t2)">CALCULADORA DE NETO</div>';
+  html+=calcRow('Monto nominal',formatMoney(monto),false);
+  html+=calcRow('Descuento','-'+formatMoney(descuento),false);
+  html+=calcRow('Comisión (1%)','-'+formatMoney(comision),false);
+  html+=calcRow('Neto vendedor',formatMoney(netoVendedor),true);
+  html+=calcRow('Neto inversor (paga)',formatMoney(netoInversor),false);
+  html+=calcRow('Retorno bruto',retBruto.toFixed(2)+'%',true);
+  return html;
+}
+
+function calcRow(label,val,highlight){
+  return '<div class="calc-result-row'+(highlight?' highlight':'')+'"><span>'+label+'</span><span class="mono bold">'+val+'</span></div>';
+}
+
+function submitOffer(checkId){
+  var tasa=parseFloat(document.getElementById('offer-tasa').value);
+  if(isNaN(tasa)||tasa<=0){showToast('Ingresá una tasa válida','error');return;}
+  var existing=getOffers().find(function(o){return o.checkId===checkId&&o.investorId===state.currentUser.id&&o.status==='pendiente';});
+  if(existing){showToast('Ya tenés una oferta pendiente para este cheque','warning');return;}
+  var offers=getOffers();
+  offers.push({id:'of'+Date.now(),checkId:checkId,investorId:state.currentUser.id,tasa:tasa,status:'pendiente',createdAt:Date.now()});
+  setOffers(offers);
+  // update check status
+  var checks=getChecks();
+  var idx=checks.findIndex(function(c){return c.id===checkId;});
+  if(idx>=0&&checks[idx].status==='publicado'){checks[idx].status='negociacion';setChecks(checks);}
+  addLog('Oferta enviada: '+tasa+'% TNA para cheque '+checkId,'offer');
+  closeModal();
+  showToast('Oferta enviada correctamente','success');
+}
+
+// ============================================================
+// CARTERA INVERSOR
+// ============================================================
+function renderCarteraInversor(){
+  var user=state.currentUser;
+  var offers=getOffers().filter(function(o){return o.investorId===user.id&&o.status==='aceptada';});
+  var checks=getChecks();
+  var acordados=checks.filter(function(c){return c.acordadoCon===user.id||offers.find(function(o){return o.checkId===c.id;});});
+  var totalInv=acordados.reduce(function(s,c){return s+c.monto;},0);
+  var html='<div class="page-header"><h1>Mi Cartera</h1><p>Operaciones acordadas e historial</p></div>';
+  html+='<div class="stats-grid">';
+  html+=statCard('Total invertido',formatMoney(totalInv),'Monto nominal total','neutral');
+  html+=statCard('Operaciones activas',acordados.length,'Acordadas','up');
+  var avgTasa=acordados.length?acordados.reduce(function(s,c){return s+(c.tasa||0);},0)/acordados.length:0;
+  html+=statCard('Tasa promedio',avgTasa.toFixed(1)+'%','TNA ponderada','up');
+  html+='</div>';
+  html+='<div class="card"><div class="card-header"><div class="card-title">Operaciones acordadas</div></div>';
+  if(!acordados.length){html+='<div class="empty-state"><div class="empty-state-icon">💼</div><h3>Sin operaciones</h3><p>Hacé ofertas en el marketplace para comenzar</p></div>';}
+  else{
+    html+='<div class="table-wrap"><table><thead><tr><th>Librador</th><th>Monto</th><th>Vencimiento</th><th>Cat.</th><th>Tasa TNA</th><th>Rendimiento</th></tr></thead><tbody>';
+    acordados.forEach(function(c){
+      var dias=getDays(c.fechaPago);
+      var desc=c.monto*(c.tasa/100)*(dias/365);
+      var com=c.monto*0.01;
+      var rend=((desc-com)/(c.monto-desc))*100;
+      var cat=c.scoring?c.scoring.cat:'—';
+      html+='<tr><td><div class="bold">'+c.razonLibrador+'</div></td><td class="mono bold">'+formatMoney(c.monto)+'</td><td>'+c.fechaPago+'</td><td><span class="badge badge-'+cat+'">'+cat+'</span></td><td class="mono">'+( c.tasa?c.tasa.toFixed(1)+'%':'—')+'</td><td class="mono" style="color:var(--g)">'+( c.tasa?rend.toFixed(2)+'%':'—')+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+  }
+  html+='</div>';
+  return html;
+}
+
+// ============================================================
+// MIS OFERTAS (INVERSOR)
+// ============================================================
+function renderMisOfertas(){
+  var user=state.currentUser;
+  var offers=getOffers().filter(function(o){return o.investorId===user.id;});
+  var checks=getChecks();
+  var html='<div class="page-header"><h1>Mis Ofertas</h1><p>Historial de todas tus ofertas</p></div>';
+  html+='<div class="card"><div class="table-wrap"><table><thead><tr><th>Cheque / Librador</th><th>Monto</th><th>Mi oferta TNA</th><th>Tasa publicada</th><th>Estado</th><th>Fecha</th></tr></thead><tbody>';
+  if(!offers.length){html+='<tr><td colspan="6" class="text-center" style="padding:32px;color:var(--t3)">Sin ofertas realizadas</td></tr>';}
+  offers.forEach(function(o){
+    var c=checks.find(function(x){return x.id===o.checkId;})||{razonLibrador:'—',monto:0,tasa:0};
+    var st={pendiente:'badge-B1',aceptada:'badge-A1',rechazada:'badge-C2'}[o.status]||'badge-B2';
+    html+='<tr><td class="bold">'+c.razonLibrador+'</td><td class="mono">'+formatMoney(c.monto)+'</td><td class="mono bold" style="color:var(--g)">'+o.tasa.toFixed(1)+'%</td><td class="mono">'+(c.tasa?c.tasa.toFixed(1)+'%':'—')+'</td><td><span class="badge '+st+'">'+o.status+'</span></td><td style="color:var(--t3)">'+new Date(o.createdAt).toLocaleDateString('es-AR')+'</td></tr>';
+  });
+  html+='</tbody></table></div></div>';
+  return html;
+}
+
+// ============================================================
+// CALCULADORA
+// ============================================================
+function renderCalculadora(){
+  var today=new Date();
+  var futureDate=new Date(today.getTime()+86400000*45);
+  return '<div class="page-header"><h1>Calculadora</h1><p>Calculá descuentos, comisiones y rendimientos</p></div><div style="max-width:540px"><div class="card"><div class="grid-2"><div class="field"><label>Monto nominal ($)</label><input type="number" id="calc-monto" value="1000000" oninput="doCalc()"></div><div class="field"><label>Tasa TNA (%)</label><input type="number" id="calc-tasa" step="0.1" value="33.5" oninput="doCalc()"></div></div><div class="field"><label>Fecha de vencimiento</label><input type="date" id="calc-fecha" value="'+futureDate.toISOString().split('T')[0]+'" oninput="doCalc()"></div><div class="calc-result" id="calc-result">'+doCalcHTML(1000000,33.5,45)+'</div></div></div>';
+}
+
+function doCalc(){
+  var m=parseFloat(document.getElementById('calc-monto').value)||0;
+  var t=parseFloat(document.getElementById('calc-tasa').value)||0;
+  var fecha=document.getElementById('calc-fecha').value;
+  var today=new Date();today.setHours(0,0,0,0);
+  var vence=new Date(fecha);
+  var dias=Math.max(0,Math.round((vence-today)/86400000));
+  document.getElementById('calc-result').innerHTML=doCalcHTML(m,t,dias);
+}
+
+function doCalcHTML(monto,tasa,dias){
+  var descuento=monto*(tasa/100)*(dias/365);
+  var comision=monto*0.01;
+  var netoV=monto-descuento-comision;
+  var netoI=monto-descuento;
+  var retBruto=netoI>0?(descuento-comision)/netoI*100:0;
+  var tea=netoI>0?(Math.pow(1+(descuento/netoI),365/dias)-1)*100:0;
+  var html='<div class="bold text-sm" style="margin-bottom:12px;color:var(--t2)">RESULTADO — '+dias+' días</div>';
+  html+=calcRow('Días al vencimiento',dias,'');
+  html+=calcRow('Descuento',formatMoney(descuento),false);
+  html+=calcRow('Comisión OpenCheck (1%)',formatMoney(comision),false);
+  html+=calcRow('Neto vendedor',formatMoney(netoV),true);
+  html+=calcRow('Neto inversor (paga)',formatMoney(netoI),false);
+  html+=calcRow('Retorno bruto',retBruto.toFixed(2)+'%',true);
+  html+=calcRow('TNA efectiva',tasa.toFixed(2)+'%',false);
+  html+=calcRow('TEA',tea.toFixed(2)+'%',false);
+  return html;
+}
+
+// ============================================================
+// ADMIN PANEL
+// ============================================================
+function renderAdminPanel(){
+  var users=getUsers();
+  var checks=getChecks();
+  var offers=getOffers().filter(function(o){return o.status==='aceptada';});
+  var vol=checks.reduce(function(s,c){return s+c.monto;},0);
+  var com=checks.filter(function(c){return c.status==='acordado';}).reduce(function(s,c){return s+c.monto*0.01;},0);
+  var logs=getLogs();
+  var html='<div class="page-header"><h1>Panel Administrativo</h1><p>Vista general del sistema OpenCheck</p></div>';
+  html+='<div class="stats-grid">';
+  html+=statCard('Usuarios activos',users.filter(function(u){return u.status==='active';}).length,'Registrados en el sistema','up');
+  html+=statCard('Operaciones',checks.length,'Total de cheques','neutral');
+  html+=statCard('Volumen total',formatMoney(vol),'Monto nominal acumulado','up');
+  html+=statCard('Comisiones',formatMoney(com),'Operaciones acordadas','up');
+  html+='</div>';
+  // Cat distribution
+  var catCounts={};
+  checks.filter(function(c){return c.scoring;}).forEach(function(c){catCounts[c.scoring.cat]=(catCounts[c.scoring.cat]||0)+1;});
+  html+='<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Distribución por categoría</div></div>';
+  html+='<div class="flex gap-8" style="flex-wrap:wrap">';
+  ['A1','A2','B1','B2','C1','C2'].forEach(function(c){
+    var cnt=catCounts[c]||0;
+    html+='<div style="flex:1;min-width:80px;text-align:center;background:var(--s2);border-radius:var(--rl2);padding:12px"><span class="badge badge-'+c+'">'+c+'</span><div class="bold text-xl" style="margin-top:6px">'+cnt+'</div><div class="text-sm" style="color:var(--t3)">cheques</div></div>';
+  });
+  html+='</div></div>';
+  // Activity log
+  html+='<div class="card"><div class="card-header"><div class="card-title">Log de actividad</div></div>';
+  html+='<div id="admin-logs">';
+  if(!logs.length)html+='<div class="empty-state"><div class="empty-state-icon">📋</div><h3>Sin actividad</h3></div>';
+  else logs.slice(0,20).forEach(function(l){
+    var colors={auth:'var(--bd)',check:'var(--g)',offer:'var(--am)',system:'var(--t3)'};
+    html+='<div class="log-entry"><div class="log-dot" style="background:'+(colors[l.type]||'var(--t3)')+'"></div><div style="flex:1"><div class="log-text">'+l.msg+'</div><div class="log-time">'+new Date(l.ts).toLocaleString('es-AR')+'</div></div></div>';
+  });
+  html+='</div></div>';
+  return html;
+}
+
+// ============================================================
+// ADMIN TASAS
+// ============================================================
+function renderAdminTasas(){
+  var tamar=getTamar();
+  var sp=getSpreads();
+  // Helper to get spread value
+  function sv(cat,key){return (sp[cat]&&sp[cat][key]!==undefined)?sp[cat][key]:(SPREADS[cat]?SPREADS[cat][key]:0);}
+  var catColors={A1:'var(--g)',A2:'var(--g)',B1:'#854F0B',B2:'#854F0B',C1:'var(--rm)'};
+
+  var html='<div class="page-header"><h1>Motor de Tasas</h1><p>TAMAR, spreads por categoria y plazo. Los cambios aplican a nuevos calculos.</p></div>';
+
+  // TAMAR banner
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--gl);border:1px solid var(--gb);border-radius:var(--rl2);margin-bottom:24px">';
+  html+='<div><div class="bold" style="color:var(--gd)">TAMAR vigente (BCRA)</div><div style="font-size:12px;color:var(--gd);margin-top:2px">Editable — afecta todos los rangos de tasas</div></div>';
+  html+='<div style="display:flex;align-items:center;gap:12px"><input type="number" id="tamar-val" step="0.1" value="'+tamar+'" style="font-size:24px;font-weight:700;color:var(--g);font-family:var(--mono);width:100px;border:1.5px solid var(--gb);border-radius:var(--r);padding:6px 10px;text-align:center;background:var(--s)" oninput="recalcAllSpr()"><span style="color:var(--gd);font-size:14px">% TNA</span><button class="btn btn-primary" onclick="saveTamar()">Guardar</button></div>';
+  html+='</div>';
+
+  // Spreads table
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Spreads por categoria y tramo de plazo</div><button class="btn btn-primary btn-sm" onclick="saveSpreadsTable()">Guardar spreads</button></div>';
+  html+='<div class="card" style="margin-bottom:24px"><div class="table-wrap"><table id="spreads-tb"><thead><tr><th>Categoria</th><th>Plazo (dias)</th><th>Spread riesgo min %</th><th>Spread riesgo max %</th><th>Spread plazo /30d</th><th>Tasa min resultante</th><th>Tasa max resultante</th><th>Activo</th></tr></thead><tbody>';
+
+  var rows=[
+    {cat:'A1',plazo:'1-30',p:30},{cat:'A1',plazo:'31-60',p:60},{cat:'A1',plazo:'61-90',p:90},
+    {cat:'A2',plazo:'1-30',p:30},{cat:'A2',plazo:'31-60',p:60},{cat:'A2',plazo:'61-90',p:90},
+    {cat:'B1',plazo:'1-90',p:90},
+    {cat:'B2',plazo:'1-90',p:90},
+    {cat:'C1',plazo:'1-90',p:90}
+  ];
+
+  rows.forEach(function(row,i){
+    var c=row.cat;
+    var color=catColors[c]||'var(--t)';
+    var sm=sv(c,'min');var sx=sv(c,'max');var spl=sv(c,'plazo');
+    var spA=spl*(row.p/30);
+    var tmin=(tamar+sm+spA).toFixed(1);
+    var tmax=(tamar+sx+spA).toFixed(1);
+    var badgeCls={A1:'badge-A1',A2:'badge-A2',B1:'badge-B1',B2:'badge-B2',C1:'badge-C1'}[c]||'badge-B2';
+    html+='<tr data-cat="'+c+'" data-p="'+row.p+'">';
+    html+='<td><span class="badge '+badgeCls+' mono">'+c+'</span></td>';
+    html+='<td class="mono" style="color:var(--t3)">'+row.plazo+'</td>';
+    html+='<td><input class="spr-in" type="number" step="0.1" value="'+sm+'" id="spr-'+i+'-min" onchange="recalcSpr(this)"></td>';
+    html+='<td><input class="spr-in" type="number" step="0.1" value="'+sx+'" id="spr-'+i+'-max" onchange="recalcSpr(this)"></td>';
+    html+='<td><input class="spr-in" type="number" step="0.1" value="'+spl+'" id="spr-'+i+'-plazo" onchange="recalcSpr(this)"></td>';
+    html+='<td class="rm-v mono bold" style="color:'+color+'">'+tmin+'%</td>';
+    html+='<td class="rx-v mono bold" style="color:'+color+'">'+tmax+'%</td>';
+    html+='<td><input type="checkbox" checked style="accent-color:var(--g);width:16px;height:16px"></td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+
+  // Historico
+  html+='<div class="card" style="margin-bottom:24px"><div class="card-header"><div class="card-title">Historico de tasas</div></div>';
+  html+='<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>CHQ</th><th>Cat.</th><th>Dias</th><th>TAMAR</th><th>Spread riesgo</th><th>Spread plazo</th><th>Tasa sugerida</th><th>Tasa publicada</th><th>Tasa acordada</th></tr></thead><tbody>';
+  var checks=getChecks().filter(function(c){return c.tasa&&c.scoring;}).slice(0,10);
+  checks.forEach(function(c){
+    var dias=getDays(c.fechaPago);
+    var cat=c.scoring.cat;
+    var badgeCls2={A1:'badge-A1',A2:'badge-A2',B1:'badge-B1',B2:'badge-B2',C1:'badge-C1',C2:'badge-C2'}[cat]||'badge-B2';
+    var tasas=tasasSugeridas(cat,dias);
+    html+='<tr><td class="mono">'+new Date(c.createdAt).toLocaleDateString('es-AR')+'</td>';
+    html+='<td class="mono" style="font-size:11px">'+c.nroEcheq+'</td>';
+    html+='<td><span class="badge '+badgeCls2+'">'+cat+'</span></td>';
+    html+='<td class="mono">'+dias+'</td>';
+    html+='<td class="mono">'+tamar.toFixed(1)+'%</td>';
+    html+='<td class="mono" style="font-size:12px">'+((getSpreads()[cat]||SPREADS[cat]||{min:0,max:0}).min)+'-'+((getSpreads()[cat]||SPREADS[cat]||{min:0,max:0}).max)+'%</td>';
+    html+='<td class="mono" style="font-size:12px">'+((getSpreads()[cat]||SPREADS[cat]||{plazo:0}).plazo)+'%/30d</td>';
+    html+='<td class="mono" style="color:var(--g)">'+tasas.min+'-'+tasas.max+'%</td>';
+    html+='<td class="mono">'+c.tasa.toFixed(1)+'%</td>';
+    html+='<td class="mono" style="color:var(--g);font-weight:600">'+(c.status==='acordado'?c.tasa.toFixed(1)+'%':'—')+'</td>';
+    html+='</tr>';
+  });
+  if(!checks.length)html+='<tr><td colspan="10" class="text-center" style="padding:24px;color:var(--t3)">Sin operaciones registradas</td></tr>';
+  html+='</tbody></table></div></div>';
+
+  // TestNosis panel
+  html+='<div class="card"><div class="card-header"><div class="card-title">Consulta Nosis manual</div><span style="font-size:12px;color:var(--t2)">Testear integracion API</span></div>';
+  html+='<div style="max-width:500px">';
+  html+='<div class="field"><label>CUIT a consultar</label><input class="field" type="text" id="nosis-cuit-test" placeholder="30-71581395-1" style="font-family:var(--mono);width:100%;border:1.5px solid var(--s3);border-radius:var(--r);padding:10px 12px;font-size:14px;outline:none"></div>';
+  html+='<div class="flex gap-8 items-center" style="margin-bottom:12px"><button class="btn btn-primary" onclick="testNosis()">Consultar Nosis</button><span style="font-size:11px;color:var(--t3)" id="nosis-status"></span></div>';
+  html+='<div id="nosis-result" style="display:none;font-size:12px;font-family:var(--mono);background:var(--s2);border-radius:var(--r);padding:12px;white-space:pre-wrap;overflow-x:auto;max-height:300px;overflow-y:auto;border:1px solid var(--s3)"></div>';
+  html+='</div></div>';
+  return html;
+}
+
+function recalcAllSpr(){
+  var tamarEl=document.getElementById('tamar-val');
+  if(!tamarEl)return;
+  document.querySelectorAll('#spreads-tb tbody tr').forEach(function(tr){recalcRow(tr);});
+}
+
+function saveSpreadsTable(){
+  // Read from table and save per-category (use first row of each cat as canonical)
+  var saved={};
+  document.querySelectorAll('#spreads-tb tbody tr').forEach(function(tr){
+    var cat=tr.dataset.cat;
+    if(!cat||saved[cat])return; // first row per cat
+    var ins=tr.querySelectorAll('.spr-in');
+    if(ins.length<3)return;
+    saved[cat]={min:parseFloat(ins[0].value)||0,max:parseFloat(ins[1].value)||0,plazo:parseFloat(ins[2].value)||0};
+  });
+  var spreads=getSpreads();
+  Object.keys(saved).forEach(function(k){spreads[k]=saved[k];});
+  setSpreads(spreads);
+  addLog('Spreads actualizados','system');
+  showToast('Spreads guardados correctamente','success');
+}
+
+function saveTamar(){
+  var v=parseFloat(document.getElementById('tamar-val').value);
+  if(isNaN(v)||v<=0){showToast('TAMAR invalida','error');return;}
+  setTamar(v);
+  addLog('TAMAR actualizada: '+v+'%','system');
+  showToast('TAMAR guardada: '+v+'%','success');
+  // Recalc spreads table in place if it's visible
+  document.querySelectorAll('#spreads-tb tbody tr').forEach(function(tr){recalcRow(tr);});
+}
+
+// saveCatSpread replaced by saveSpreadsTable
+
+// ============================================================
+// ADMIN SCORING — FULL ENGINE (ported from reference)
+// ============================================================
+
+// Scoring data structures (live state, persisted to localStorage)
+var scoringVars = [
+  {id:1,nm:'Score Nosis (librador)',campo:'SCO_Vig',peso:35,activa:true,
+   rangos:[{d:800,h:null,p:100},{d:700,h:799,p:90},{d:600,h:699,p:80},{d:500,h:599,p:60},{d:400,h:499,p:40},{d:300,h:399,p:30},{d:200,h:299,p:20},{d:100,h:199,p:10},{d:1,h:99,p:5},{d:0,h:0,p:0}]},
+  {id:2,nm:'Endeudamiento bancario (librador)',campo:'CI_Vig_Total_Monto',peso:20,activa:true,
+   rangos:[{d:100000000,h:null,p:100},{d:50000000,h:99999999,p:80},{d:25000000,h:49999999,p:60},{d:5000000,h:24999999,p:40},{d:1,h:4999999,p:20},{d:0,h:0,p:0}]},
+  {id:3,nm:'Antiguedad CUIT (librador)',campo:'VI_Inscrip_Afip_Antiguedad',peso:15,activa:true,
+   rangos:[{d:10,h:null,p:100},{d:7,h:9.99,p:80},{d:5,h:6.99,p:60},{d:3,h:4.99,p:40},{d:1,h:2.99,p:20},{d:0.5,h:0.99,p:10},{d:0,h:0.49,p:'C2'}]},
+  {id:4,nm:'Perfil legal y fiscal (librador)',campo:'DF_Tiene/JU_24m/CQ_24m',peso:10,activa:true,
+   rangos:[{desc:'Sin deuda fiscal, sin juicios, sin concursos',p:100},{desc:'Deuda fiscal menor a $100k y menos de 90 dias',p:80},{desc:'Deuda fiscal mayor a $100k o mas de 90 dias',p:60},{desc:'Deuda fiscal + embargos o juicios fiscales',p:40},{desc:'Concurso preventivo o quiebra',p:'C2'}]},
+  {id:5,nm:'Concentracion bancaria (librador)',campo:'CI_Vig_Total_CantBcos',peso:5,activa:true,
+   rangos:[{d:5,h:null,p:100},{d:4,h:4,p:80},{d:3,h:3,p:60},{d:2,h:2,p:40},{d:1,h:1,p:20},{d:0,h:0,p:0}]},
+  {id:6,nm:'Consultas financieras 12m (librador)',campo:'CO_12m_Cant',peso:5,activa:true,
+   rangos:[{d:40,h:null,p:100},{d:30,h:39,p:90},{d:20,h:29,p:80},{d:10,h:19,p:60},{d:5,h:9,p:40},{d:1,h:4,p:20},{d:0,h:0,p:0}]},
+  {id:7,nm:'Endeudamiento bancario (vendedor)',campo:'CI_Vig_Total_Monto_vendedor',peso:5,activa:true,
+   rangos:[{d:100000000,h:null,p:100},{d:50000000,h:99999999,p:80},{d:25000000,h:49999999,p:60},{d:5000000,h:24999999,p:40},{d:1,h:4999999,p:20},{d:0,h:0,p:0}]},
+  {id:8,nm:'Rechazos de cheques (vendedor)',campo:'HC_vendedor',peso:5,activa:true,
+   rangos:[{desc:'Sin rechazos',p:100},{desc:'Rechazos mayores a 24 meses',p:80},{desc:'Rechazos entre 12 y 24 meses',p:50},{desc:'Rechazos entre 6 y 12 meses',p:20},{desc:'Rechazos en los ultimos 6 meses',p:0}]}
+];
+
+var penRechazos = [
+  {id:1,cond:'Rechazos del librador en los ultimos 6 meses (1 o mas)',reduccion:'C2',tipo:'c2_directo',activa:true},
+  {id:2,cond:'Rechazos del librador entre 6 y 12 meses',reduccion:50,tipo:'penalizacion',activa:true},
+  {id:3,cond:'Rechazos del librador entre 12 y 24 meses',reduccion:20,tipo:'penalizacion',activa:true},
+  {id:4,cond:'Rechazos del librador mayores a 24 meses',reduccion:10,tipo:'penalizacion',activa:true}
+];
+
+var penSF = [
+  {id:1,cond:'Cheques SF sin pago de multa en los ultimos 24 meses',reduccion:20,activa:true}
+];
+
+var penFiscal = [
+  {id:1,desde:0,hasta:1,reduccion:2,activa:true,desc:'Relacion deuda fiscal/bancaria < 1%'},
+  {id:2,desde:1,hasta:5,reduccion:5,activa:true,desc:'Relacion 1% a 5%'},
+  {id:3,desde:5,hasta:10,reduccion:8,activa:true,desc:'Relacion 5% a 10%'},
+  {id:4,desde:10,hasta:20,reduccion:12,activa:true,desc:'Relacion 10% a 20%'},
+  {id:5,desde:20,hasta:null,reduccion:15,activa:true,desc:'Relacion >= 20%'}
+];
+
+var matrizBase = [
+  {id:1,scoreMin:600,scoreMax:null,montoMin:0,montoMax:49999,diasMin:0,diasMax:null,pen:0,activa:true,desc:'>=600 | <$50k | cualquier'},
+  {id:2,scoreMin:600,scoreMax:null,montoMin:50000,montoMax:150000,diasMin:0,diasMax:59,pen:0,activa:true,desc:'>=600 | $50k-$150k | <60d'},
+  {id:3,scoreMin:600,scoreMax:null,montoMin:50000,montoMax:150000,diasMin:60,diasMax:null,pen:5,activa:true,desc:'>=600 | $50k-$150k | >=60d'},
+  {id:4,scoreMin:600,scoreMax:null,montoMin:150001,montoMax:500000,diasMin:0,diasMax:60,pen:0,activa:true,desc:'>=600 | >$150k | <=60d'},
+  {id:5,scoreMin:600,scoreMax:null,montoMin:150001,montoMax:500000,diasMin:61,diasMax:null,pen:10,activa:true,desc:'>=600 | >$150k | >60d'},
+  {id:6,scoreMin:400,scoreMax:599,montoMin:0,montoMax:49999,diasMin:0,diasMax:null,pen:0,activa:true,desc:'400-599 | <$50k | cualquier'},
+  {id:7,scoreMin:400,scoreMax:599,montoMin:50000,montoMax:150000,diasMin:0,diasMax:59,pen:0,activa:true,desc:'400-599 | $50k-$150k | <60d'},
+  {id:8,scoreMin:400,scoreMax:599,montoMin:50000,montoMax:150000,diasMin:60,diasMax:null,pen:10,activa:true,desc:'400-599 | $50k-$150k | >=60d'},
+  {id:9,scoreMin:400,scoreMax:599,montoMin:150001,montoMax:500000,diasMin:0,diasMax:60,pen:0,activa:true,desc:'400-599 | >$150k | <=60d'},
+  {id:10,scoreMin:400,scoreMax:599,montoMin:150001,montoMax:500000,diasMin:61,diasMax:null,pen:15,activa:true,desc:'400-599 | >$150k | >60d'},
+  {id:11,scoreMin:0,scoreMax:399,montoMin:0,montoMax:49999,diasMin:0,diasMax:null,pen:5,activa:true,desc:'<400 | <$50k | cualquier'},
+  {id:12,scoreMin:0,scoreMax:399,montoMin:50000,montoMax:150000,diasMin:0,diasMax:59,pen:10,activa:true,desc:'<400 | $50k-$150k | <60d'},
+  {id:13,scoreMin:0,scoreMax:399,montoMin:50000,montoMax:150000,diasMin:60,diasMax:null,pen:'C2',activa:true,desc:'<400 | $50k-$150k | >=60d'},
+  {id:14,scoreMin:0,scoreMax:399,montoMin:150001,montoMax:500000,diasMin:0,diasMax:60,pen:10,activa:true,desc:'<400 | >$150k | <=60d'},
+  {id:15,scoreMin:0,scoreMax:399,montoMin:150001,montoMax:500000,diasMin:61,diasMax:null,pen:'C2',activa:true,desc:'<400 | >$150k | >60d'},
+  {id:16,scoreMin:0,scoreMax:null,montoMin:500001,montoMax:null,diasMin:60,diasMax:null,pen:'C2',activa:true,desc:'TODOS | >$500k | >=60d (C2 directo)'}
+];
+
+var matrizAntig = [
+  {id:1,mesesMin:0,mesesMax:3,factor:20,activa:true,desc:'Menos de 3 meses — penaliza mas'},
+  {id:2,mesesMin:3,mesesMax:6,factor:15,activa:true,desc:'3 a 6 meses'},
+  {id:3,mesesMin:6,mesesMax:12,factor:10,activa:true,desc:'6 a 12 meses'},
+  {id:4,mesesMin:12,mesesMax:24,factor:5,activa:true,desc:'12 a 24 meses'},
+  {id:5,mesesMin:24,mesesMax:null,factor:0,activa:true,desc:'Mas de 24 meses — no penaliza'}
+];
+
+var matrizRecurr = [
+  {id:1,periodosMin:1,periodosMax:1,factor:0,activa:true,desc:'1 periodo con atraso'},
+  {id:2,periodosMin:2,periodosMax:2,factor:5,activa:true,desc:'2 periodos con atraso'},
+  {id:3,periodosMin:3,periodosMax:3,factor:10,activa:true,desc:'3 periodos con atraso'},
+  {id:4,periodosMin:4,periodosMax:null,factor:15,activa:true,desc:'4 o mas periodos con atraso'}
+];
+
+var c2List = [
+  {id:1,cond:'Antiguedad del librador menor a 6 meses',campo:'VI_Inscrip_Afip_Antiguedad',desc:'CUIT inscripto hace menos de 6 meses en AFIP',activa:true},
+  {id:2,cond:'Rechazos del librador en los ultimos 6 meses (1 o mas)',campo:'HC_6m_SF_NoPag_Cant',desc:'1 o mas rechazos sin fondos en los ultimos 6 meses',activa:true},
+  {id:3,cond:'Concurso preventivo o quiebra registrada',campo:'CQ_24m_Cant',desc:'Concurso preventivo o quiebra en los ultimos 24 meses',activa:true},
+  {id:4,cond:'Inhabilitacion vigente por BCRA u organismo oficial',campo:'IN_Tiene + IN_Fecha_Hasta',desc:'Inhabilitacion con vigencia >= hoy',activa:true},
+  {id:5,cond:'Situacion BCRA 3, 4, 5 o 6 en el ultimo mes',campo:'CI_Sit_Mes_Actual',desc:'Atraso grave (sit.3), alto riesgo (sit.4/5/6)',activa:true},
+  {id:6,cond:'Matriz de atrasos da C2 directo',campo:'Matriz combinada score/monto/dias',desc:'Segun tabla de 16 combinaciones — ver Penalizaciones',activa:true}
+];
+
+var catList = [
+  {cat:'A1',pMin:85,pMax:100,piso:80,desc:'Riesgo muy bajo. Excelente historial crediticio y comercial.',pub:true},
+  {cat:'A2',pMin:70,pMax:84,piso:66,desc:'Riesgo bajo. Librador solido en todos los aspectos evaluados.',pub:true},
+  {cat:'B1',pMin:55,pMax:69,piso:50,desc:'Riesgo moderadamente bajo. Buen historial con algun factor menor.',pub:true},
+  {cat:'B2',pMin:40,pMax:54,piso:30,desc:'Riesgo moderado. Librador aceptable con puntos de atencion.',pub:true},
+  {cat:'C1',pMin:25,pMax:39,piso:20,desc:'Riesgo medio-alto. Historial irregular. Requiere garantias adicionales.',pub:true},
+  {cat:'C2',pMin:0,pMax:24,piso:0,desc:'Riesgo alto. No publicable. Historial deficiente o C2 directo.',pub:false}
+];
+
+function renderAdminScoring(){
+  var html='<div class="page-header"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h1>Motor de Scoring 2.4</h1><p>Variables, pesos, rangos y penalizaciones. Cambios aplican a nuevos calculos.</p></div><div class="flex gap-8"><button class="btn btn-secondary" onclick="resetScoringEngine()">Resetear defaults</button><button class="btn btn-primary" onclick="guardarScoringEngine()">Guardar cambios</button></div></div></div>';
+  html+='<div style="display:flex;gap:0;background:var(--s);border:1px solid var(--s3);border-radius:var(--rl2);padding:3px;margin-bottom:20px;max-width:640px">';
+  html+='<button class="sc-tab on" id="sct-vars" onclick="showScoringTab(\'vars\')">Variables y pesos</button>';
+  html+='<button class="sc-tab" id="sct-pen" onclick="showScoringTab(\'pen\')">Penalizaciones</button>';
+  html+='<button class="sc-tab" id="sct-c2" onclick="showScoringTab(\'c2\')">C2 directos</button>';
+  html+='<button class="sc-tab" id="sct-cat" onclick="showScoringTab(\'cat\')">Categorias</button>';
+  html+='</div>';
+  html+='<div id="scp-vars"></div>';
+  html+='<div id="scp-pen" style="display:none"></div>';
+  html+='<div id="scp-c2" style="display:none"></div>';
+  html+='<div id="scp-cat" style="display:none"></div>';
+  return html;
+}
+
+function initScoringAdmin(){
+  if(!document.getElementById('sc-tab-style')){
+    var s=document.createElement('style');
+    s.id='sc-tab-style';
+    s.textContent='.sc-tab{flex:1;padding:7px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--t3);border-radius:6px;cursor:pointer;transition:all .15s}.sc-tab.on{background:var(--s2);color:var(--g);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}.pen-in{width:70px;padding:5px 8px;font-size:12px;border:1px solid var(--s3);border-radius:6px;font-family:var(--mono);text-align:center}.pen-in:focus{outline:none;border-color:var(--g)}';
+    document.head.appendChild(s);
+  }
+  showScoringTab('vars');
+}
+
+function showScoringTab(tab){
+  ['vars','pen','c2','cat'].forEach(function(t){
+    var el=document.getElementById('scp-'+t);
+    var btn=document.getElementById('sct-'+t);
+    if(el)el.style.display=t===tab?'block':'none';
+    if(btn)btn.classList.toggle('on',t===tab);
+  });
+  if(tab==='vars'){renderVarsSA();renderRangosSA();chkPesosSA();}
+  if(tab==='pen'){renderPenRechSA();renderPenSFSA();renderPenFiscalSA();renderMatrizBaseSA();renderMatrizAntigSA();renderMatrizRecurrSA();}
+  if(tab==='c2')renderC2SA();
+  if(tab==='cat')renderCatSA();
+}
+
+function chkPesosSA(){
+  var tot=scoringVars.filter(function(v){return v.activa;}).reduce(function(s,v){return s+v.peso;},0);
+  var ok=Math.abs(tot-100)<0.01;
+  var okEl=document.getElementById('peso-ok');
+  var errEl=document.getElementById('peso-err');
+  var totEl=document.getElementById('peso-tot');
+  var errVEl=document.getElementById('peso-err-v');
+  if(okEl)okEl.style.display=ok?'block':'none';
+  if(errEl)errEl.style.display=ok?'none':'block';
+  if(totEl)totEl.textContent=tot.toFixed(1)+'%';
+  if(errVEl)errVEl.textContent=tot.toFixed(1)+'%';
+}
+function updPesoSA(id,v){var x=scoringVars.find(function(x){return x.id===id;});if(x){x.peso=parseFloat(v)||0;}chkPesosSA();}
+function togVarSA(id,ch){var x=scoringVars.find(function(x){return x.id===id;});if(x){x.activa=ch;}renderVarsSA();renderRangosSA();chkPesosSA();}
+function quitarVarSA(id){if(!confirm('Quitar esta variable?'))return;scoringVars=scoringVars.filter(function(x){return x.id!==id;});renderVarsSA();renderRangosSA();chkPesosSA();}
+function updRangoSA(vid,ri,k,v){var x=scoringVars.find(function(x){return x.id===vid;});if(x&&x.rangos[ri])x.rangos[ri][k]=v;}
+function addRangoSA(vid){var x=scoringVars.find(function(x){return x.id===vid;});if(!x)return;var esD=x.rangos[0]&&x.rangos[0].desc!==undefined;if(esD)x.rangos.push({desc:'Nueva opcion',p:50});else x.rangos.push({d:0,h:0,p:50});renderRangosSA();}
+function quitarRangoSA(vid,ri){var x=scoringVars.find(function(x){return x.id===vid;});if(x&&x.rangos.length>1){x.rangos.splice(ri,1);renderRangosSA();}}
+
+function renderVarsSA(){
+  var tb=document.getElementById('vars-tb');
+  if(!tb)return;
+  tb.innerHTML=scoringVars.map(function(v){
+    return '<tr>'+
+    '<td><input type="text" value="'+v.nm+'" style="width:100%;padding:4px 8px;font-size:12px;border:1px solid var(--s3);border-radius:6px" onchange="scoringVars.find(function(x){return x.id==='+v.id+'}).nm=this.value"></td>'+
+    '<td><code style="font-size:11px;background:var(--s3);padding:2px 6px;border-radius:4px">'+v.campo.split('/')[0]+'</code></td>'+
+    '<td><input class="pen-in" type="number" value="'+v.peso+'" min="0" max="100" onchange="updPesoSA('+v.id+',this.value)" '+((!v.activa)?'disabled':'')+'>%</td>'+
+    '<td><input type="checkbox" '+(v.activa?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" onchange="togVarSA('+v.id+',this.checked)"></td>'+
+    '<td style="display:flex;gap:5px"><button class="btn btn-sm" onclick="scrollToRango('+v.id+')">Ver rangos</button><button class="btn btn-sm btn-danger" onclick="quitarVarSA('+v.id+')">Quitar</button></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function scrollToRango(id){
+  var el=document.getElementById('rango-block-'+id);
+  if(el)el.scrollIntoView({behavior:'smooth'});
+  showToast('Rangos de la variable resaltados abajo','');
+}
+
+function renderRangosSA(){
+  var c=document.getElementById('rangos-cont');
+  if(!c)return;
+  c.innerHTML=scoringVars.filter(function(v){return v.activa;}).map(function(v){
+    var esDesc=v.rangos[0]&&v.rangos[0].desc!==undefined;
+    var filas=v.rangos.map(function(r,ri){
+      var celda=esDesc?
+        '<td colspan="2" style="padding:7px 14px"><input type="text" value="'+(r.desc||'')+'" style="width:100%;font-size:12px;border:1px solid var(--s3);border-radius:6px;padding:4px 8px" onchange="updRangoSA('+v.id+','+ri+',\'desc\',this.value)"></td>':
+        '<td style="padding:7px 14px"><input type="number" value="'+(r.d||0)+'" style="width:90px;font-size:12px;font-family:var(--mono);border:1px solid var(--s3);border-radius:6px;padding:4px 8px;text-align:right" onchange="updRangoSA('+v.id+','+ri+',\'d\',parseFloat(this.value))"><span style="font-size:11px;color:var(--t3)"> min</span></td>'+
+        '<td style="padding:7px 14px"><input type="text" value="'+(r.h===null?'inf':r.h)+'" style="width:90px;font-size:12px;font-family:var(--mono);border:1px solid var(--s3);border-radius:6px;padding:4px 8px;text-align:right" onchange="updRangoSA('+v.id+','+ri+',\'h\',this.value===\'inf\'?null:parseFloat(this.value))"><span style="font-size:11px;color:var(--t3)"> max</span></td>';
+      var pInput='<td style="padding:7px 14px"><input type="text" value="'+r.p+'" style="width:65px;font-size:12px;font-family:var(--mono);border:1px solid var(--s3);border-radius:6px;padding:4px 8px;text-align:center;'+(r.p==='C2'?'color:var(--rm);font-weight:700;background:var(--rl)':'')+'" onchange="updRangoSA('+v.id+','+ri+',\'p\',this.value===\'C2\'?\'C2\':parseFloat(this.value))"><span style="font-size:11px;color:var(--t3)"> pts</span></td>'+
+        '<td style="padding:7px 14px"><button onclick="quitarRangoSA('+v.id+','+ri+')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:18px;padding:0 4px">x</button></td>';
+      return '<tr style="border-bottom:1px solid var(--s3)">'+celda+pInput+'</tr>';
+    }).join('');
+    return '<div class="card" id="rango-block-'+v.id+'" style="margin-bottom:14px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
+      '<span style="font-size:13px;font-weight:600;color:var(--t2)">'+v.nm+'</span>'+
+      '<div class="flex gap-8 items-center">'+
+      '<span class="badge badge-B1" style="font-size:10px">'+v.peso+'%</span>'+
+      (esDesc?'':'<span style="font-size:11px;color:var(--t3)">Desde / Hasta / Puntos</span>')+
+      '<button class="btn btn-sm" onclick="addRangoSA('+v.id+')">+ Fila</button></div></div>'+
+      '<div class="table-wrap"><table style="border-collapse:collapse;width:100%;font-size:12px"><tbody>'+filas+'</tbody></table></div></div>';
+  }).join('');
+}
+
+function addVariable(){
+  var nid=Date.now();
+  scoringVars.push({id:nid,nm:'Nueva variable',campo:'CAMPO_NOSIS',peso:0,activa:false,rangos:[{d:1,h:null,p:100},{d:0,h:0,p:0}]});
+  renderVarsSA();renderRangosSA();chkPesosSA();
+  showToast('Variable agregada. Configurala y asignale un peso.','');
+}
+
+// PENALIZACIONES RENDERS
+function renderPenRechSA(){
+  var tb=document.getElementById('pen-rech-tb');
+  if(!tb)return;
+  tb.innerHTML=penRechazos.map(function(p,i){
+    return '<tr>'+
+    '<td><input type="text" value="'+p.cond+'" style="width:100%;padding:4px 8px;font-size:12px;border:1px solid var(--s3);border-radius:6px" onchange="penRechazos['+i+'].cond=this.value"></td>'+
+    '<td>'+(p.tipo==='c2_directo'?'<span class="badge badge-C2" style="font-size:11px">C2 directo</span>':'<input class="pen-in" type="number" value="'+p.reduccion+'" min="0" max="100" onchange="penRechazos['+i+'].reduccion=parseFloat(this.value)">%')+'</td>'+
+    '<td><select style="padding:4px 8px;font-size:11px;border:1px solid var(--s3);border-radius:6px" onchange="penRechazos['+i+'].tipo=this.value;renderPenRechSA()">'+
+    '<option value="c2_directo" '+(p.tipo==='c2_directo'?'selected':'')+'>C2 directo</option>'+
+    '<option value="penalizacion" '+(p.tipo!=='c2_directo'?'selected':'')+'>Penalizacion %</option>'+
+    '</select></td>'+
+    '<td><input type="checkbox" '+(p.activa?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" onchange="penRechazos['+i+'].activa=this.checked"></td>'+
+    '<td><button class="btn btn-sm btn-danger" onclick="penRechazos.splice('+i+',1);renderPenRechSA()">x</button></td></tr>';
+  }).join('');
+}
+function addPenRechSA(){penRechazos.push({id:Date.now(),cond:'Nueva condicion de rechazo',reduccion:10,tipo:'penalizacion',activa:true});renderPenRechSA();}
+
+function renderPenSFSA(){
+  var tb=document.getElementById('pen-sf-tb');
+  if(!tb)return;
+  tb.innerHTML=penSF.map(function(p,i){
+    return '<tr><td><input type="text" value="'+p.cond+'" style="width:100%;padding:4px 8px;font-size:12px;border:1px solid var(--s3);border-radius:6px" onchange="penSF['+i+'].cond=this.value"></td>'+
+    '<td><input class="pen-in" type="number" value="'+p.reduccion+'" min="0" max="100" onchange="penSF['+i+'].reduccion=parseFloat(this.value)">%</td>'+
+    '<td><input type="checkbox" '+(p.activa?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" onchange="penSF['+i+'].activa=this.checked"></td>'+
+    '<td><button class="btn btn-sm btn-danger" onclick="penSF.splice('+i+',1);renderPenSFSA()">x</button></td></tr>';
+  }).join('');
+}
+
+function renderPenFiscalSA(){
+  var tb=document.getElementById('pen-fiscal-tb');
+  if(!tb)return;
+  tb.innerHTML=penFiscal.map(function(p,i){
+    return '<tr><td style="font-size:12px">'+p.desc+'<br><span style="font-family:var(--mono);font-size:11px;color:var(--t3)">'+p.desde+'% - '+(p.hasta===null?'inf':p.hasta)+'%</span></td>'+
+    '<td><input class="pen-in" type="number" value="'+p.reduccion+'" min="0" max="50" onchange="penFiscal['+i+'].reduccion=parseFloat(this.value)">%</td>'+
+    '<td><input type="checkbox" '+(p.activa?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" onchange="penFiscal['+i+'].activa=this.checked"></td>'+
+    '<td><button class="btn btn-sm btn-danger" onclick="penFiscal.splice('+i+',1);renderPenFiscalSA()">x</button></td></tr>';
+  }).join('');
+}
+function addPenFiscalSA(){penFiscal.push({id:Date.now(),desde:0,hasta:null,reduccion:5,activa:true,desc:'Nuevo tramo fiscal'});renderPenFiscalSA();}
+
+function renderMatrizBaseSA(){
+  var tb=document.getElementById('mat-base-tb');
+  if(!tb)return;
+  tb.innerHTML=matrizBase.map(function(r,i){
+    return '<tr>'+
+    '<td style="font-size:11px;color:var(--t2)">'+r.desc+'</td>'+
+    '<td><input class="pen-in" type="number" value="'+r.scoreMin+'" style="width:55px" onchange="matrizBase['+i+'].scoreMin=parseFloat(this.value)">-<input class="pen-in" type="text" value="'+(r.scoreMax===null?'inf':r.scoreMax)+'" style="width:55px" onchange="matrizBase['+i+'].scoreMax=this.value===\'inf\'?null:parseFloat(this.value)"> pts</td>'+
+    '<td>$<input class="pen-in" type="number" value="'+r.montoMin+'" style="width:75px" onchange="matrizBase['+i+'].montoMin=parseFloat(this.value)">-$<input class="pen-in" type="text" value="'+(r.montoMax===null?'inf':r.montoMax)+'" style="width:75px" onchange="matrizBase['+i+'].montoMax=this.value===\'inf\'?null:parseFloat(this.value)"></td>'+
+    '<td><input class="pen-in" type="number" value="'+r.diasMin+'" style="width:50px" onchange="matrizBase['+i+'].diasMin=parseFloat(this.value)">-<input class="pen-in" type="text" value="'+(r.diasMax===null?'inf':r.diasMax)+'" style="width:50px" onchange="matrizBase['+i+'].diasMax=this.value===\'inf\'?null:parseFloat(this.value)"> dias</td>'+
+    '<td>'+(r.pen==='C2'?'<span class="badge badge-C2" style="font-size:11px">C2</span>':'<input class="pen-in" type="text" value="'+r.pen+'" style="width:55px" onchange="matrizBase['+i+'].pen=this.value===\'C2\'?\'C2\':parseFloat(this.value)">%')+'</td>'+
+    '<td><input type="checkbox" '+(r.activa?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" onchange="matrizBase['+i+'].activa=this.checked"></td>'+
+    '<td><button class="btn btn-sm btn-danger" onclick="matrizBase.splice('+i+',1);renderMatrizBaseSA()">x</button></td></tr>';
+  }).join('');
+}
+function addMatrizBaseSA(){matrizBase.push({id:Date.now(),scoreMin:0,scoreMax:null,montoMin:0,montoMax:null,diasMin:0,diasMax:null,pen:10,activa:true,desc:'Nueva regla'});renderMatrizBaseSA();}
+
+function renderMatrizAntigSA(){
+  var tb=document.getElementById('mat-antig-tb');
+  if(!tb)return;
+  tb.innerHTML=matrizAntig.map(function(r,i){
+    return '<tr><td style="font-size:12px">'+r.desc+'<br><span style="font-family:var(--mono);font-size:11px;color:var(--t3)">'+r.mesesMin+'-'+(r.mesesMax===null?'inf':r.mesesMax)+' meses</span></td>'+
+    '<td><input class="pen-in" type="number" value="'+r.factor+'" min="0" max="50" onchange="matrizAntig['+i+'].factor=parseFloat(this.value)">% adicional</td>'+
+    '<td><input type="checkbox" '+(r.activa?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" onchange="matrizAntig['+i+'].activa=this.checked"></td>'+
+    '<td><button class="btn btn-sm btn-danger" onclick="matrizAntig.splice('+i+',1);renderMatrizAntigSA()">x</button></td></tr>';
+  }).join('');
+}
+function addMatrizAntigSA(){matrizAntig.push({id:Date.now(),mesesMin:0,mesesMax:null,factor:5,activa:true,desc:'Nuevo tramo'});renderMatrizAntigSA();}
+
+function renderMatrizRecurrSA(){
+  var tb=document.getElementById('mat-recurr-tb');
+  if(!tb)return;
+  tb.innerHTML=matrizRecurr.map(function(r,i){
+    return '<tr><td style="font-size:12px">'+r.desc+'<br><span style="font-family:var(--mono);font-size:11px;color:var(--t3)">'+r.periodosMin+'-'+(r.periodosMax===null?'inf':r.periodosMax)+' periodos</span></td>'+
+    '<td><input class="pen-in" type="number" value="'+r.factor+'" min="0" max="50" onchange="matrizRecurr['+i+'].factor=parseFloat(this.value)">% adicional</td>'+
+    '<td><input type="checkbox" '+(r.activa?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" onchange="matrizRecurr['+i+'].activa=this.checked"></td>'+
+    '<td><button class="btn btn-sm btn-danger" onclick="matrizRecurr.splice('+i+',1);renderMatrizRecurrSA()">x</button></td></tr>';
+  }).join('');
+}
+function addMatrizRecurrSA(){matrizRecurr.push({id:Date.now(),periodosMin:1,periodosMax:null,factor:5,activa:true,desc:'Nuevo tramo'});renderMatrizRecurrSA();}
+
+function renderC2SA(){
+  var tb=document.getElementById('c2-tb');
+  if(!tb)return;
+  tb.innerHTML=c2List.map(function(c,i){
+    return '<tr>'+
+    '<td><input type="text" value="'+c.cond+'" style="width:100%;padding:4px 8px;font-size:12px;border:1px solid var(--s3);border-radius:6px" onchange="c2List['+i+'].cond=this.value"></td>'+
+    '<td><code style="font-size:11px;background:var(--s3);padding:2px 6px;border-radius:4px">'+c.campo+'</code></td>'+
+    '<td style="font-size:12px;color:var(--t2)">'+c.desc+'</td>'+
+    '<td><input type="checkbox" '+(c.activa?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" onchange="c2List['+i+'].activa=this.checked"></td>'+
+    '<td><button class="btn btn-sm btn-danger" onclick="c2List.splice('+i+',1);renderC2SA()">x</button></td></tr>';
+  }).join('');
+}
+function addC2SA(){c2List.push({id:Date.now(),cond:'Nueva condicion C2',campo:'CAMPO_NOSIS',desc:'Descripcion de la condicion',activa:true});renderC2SA();showToast('Condicion C2 agregada','');}
+
+function renderCatSA(){
+  var tb=document.getElementById('cat-tb');
+  if(!tb)return;
+  var clsMap={A1:'badge-A1',A2:'badge-A2',B1:'badge-B1',B2:'badge-B2',C1:'badge-C1',C2:'badge-C2'};
+  tb.innerHTML=catList.map(function(c,i){
+    return '<tr>'+
+    '<td><span class="badge '+(clsMap[c.cat]||'')+' mono">'+c.cat+'</span></td>'+
+    '<td><input class="pen-in" type="number" value="'+c.pMin+'" style="width:55px" onchange="catList['+i+'].pMin=parseInt(this.value)"></td>'+
+    '<td><input class="pen-in" type="number" value="'+c.pMax+'" style="width:55px" onchange="catList['+i+'].pMax=parseInt(this.value)"></td>'+
+    '<td><input class="pen-in" type="number" value="'+c.piso+'" style="width:55px" onchange="catList['+i+'].piso=parseInt(this.value)"></td>'+
+    '<td><input type="text" value="'+c.desc+'" style="width:100%;padding:4px 8px;font-size:12px;border:1px solid var(--s3);border-radius:6px" onchange="catList['+i+'].desc=this.value"></td>'+
+    '<td><input type="checkbox" '+(c.pub?'checked':'')+' style="accent-color:var(--g);width:16px;height:16px" '+(c.cat==='C2'?'disabled':'')+' onchange="catList['+i+'].pub=this.checked"></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function renderPenScoringContent(){
+  var html='';
+  html+='<div style="background:var(--al);border:1px solid #FAC775;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--am)">La penalizacion se calcula multiplicando los tres factores: base x antiguedad x recurrencia. El Score Nosis del librador determina la base.</div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Penalizaciones por rechazos del librador</div><button class="btn btn-sm" onclick="addPenRechSA()">+ Agregar</button></div>';
+  html+='<div class="table-wrap" style="margin-bottom:20px"><table><thead><tr><th>Condicion</th><th>Reduccion</th><th>Tipo</th><th>Activa</th><th></th></tr></thead><tbody id="pen-rech-tb"></tbody></table></div>';
+  html+='<div class="bold" style="margin-bottom:12px">Penalizacion SF sin pago de multa</div>';
+  html+='<div class="table-wrap" style="margin-bottom:20px"><table><thead><tr><th>Condicion</th><th>Reduccion</th><th>Activa</th><th></th></tr></thead><tbody id="pen-sf-tb"></tbody></table></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Penalizacion por deuda fiscal</div><button class="btn btn-sm" onclick="addPenFiscalSA()">+ Agregar tramo</button></div>';
+  html+='<div class="table-wrap" style="margin-bottom:20px"><table><thead><tr><th>Tramo deuda fiscal / bancaria</th><th>Reduccion puntaje</th><th>Activa</th><th></th></tr></thead><tbody id="pen-fiscal-tb"></tbody></table></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Matriz de atrasos crediticios (tabla base)</div><button class="btn btn-sm" onclick="addMatrizBaseSA()">+ Fila</button></div>';
+  html+='<div class="table-wrap" style="margin-bottom:20px"><table><thead><tr><th>Descripcion</th><th>Score Nosis (pts)</th><th>Monto del atraso</th><th>Dias de atraso</th><th>Penalizacion base</th><th>Activa</th><th></th></tr></thead><tbody id="mat-base-tb"></tbody></table></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Factor antiguedad del atraso</div><button class="btn btn-sm" onclick="addMatrizAntigSA()">+ Fila</button></div>';
+  html+='<div class="table-wrap" style="margin-bottom:20px"><table><thead><tr><th>Meses desde el atraso</th><th>Factor adicional</th><th>Activa</th><th></th></tr></thead><tbody id="mat-antig-tb"></tbody></table></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Factor recurrencia de atrasos</div><button class="btn btn-sm" onclick="addMatrizRecurrSA()">+ Fila</button></div>';
+  html+='<div class="table-wrap" style="margin-bottom:20px"><table><thead><tr><th>Cantidad de periodos con atraso</th><th>Factor adicional</th><th>Activa</th><th></th></tr></thead><tbody id="mat-recurr-tb"></tbody></table></div>';
+  return html;
+}
+
+function renderVarsContent(){
+  var html='';
+  html+='<div id="peso-ok" style="padding:10px 14px;background:var(--gl);border:1px solid var(--gb);border-radius:var(--r);margin-bottom:16px;font-size:13px;color:var(--gd)">Suma de pesos activos: <strong id="peso-tot">100%</strong> — Motor configurado correctamente</div>';
+  html+='<div id="peso-err" style="display:none;padding:10px 14px;background:var(--rl);border:1px solid #F7C1C1;border-radius:var(--r);margin-bottom:16px;font-size:13px;color:var(--rm)">Los pesos no suman 100%. Total actual: <strong id="peso-err-v">0%</strong></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Variables del motor</div><button class="btn btn-sm" onclick="addVariable()">+ Nueva variable</button></div>';
+  html+='<div class="table-wrap" style="margin-bottom:24px"><table><thead><tr><th>Variable</th><th>Campo Nosis</th><th>Peso %</th><th>Activa</th><th>Acciones</th></tr></thead><tbody id="vars-tb"></tbody></table></div>';
+  html+='<div class="bold" style="margin-bottom:12px">Rangos de puntaje por variable</div>';
+  html+='<div id="rangos-cont"></div>';
+  return html;
+}
+
+function initScoringAdminContent(){
+  // Populate the tab content divs before init
+  var varsDiv=document.getElementById('scp-vars');
+  var penDiv=document.getElementById('scp-pen');
+  var c2Div=document.getElementById('scp-c2');
+  var catDiv=document.getElementById('scp-cat');
+  if(varsDiv)varsDiv.innerHTML=renderVarsContent();
+  if(penDiv)penDiv.innerHTML=renderPenScoringContent();
+  if(c2Div)c2Div.innerHTML='<div style="background:var(--rl);border:1px solid #F7C1C1;border-radius:var(--r);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--rm)">Si cualquiera de estas condiciones se cumple, el cheque recibe categoria C2 automaticamente y no puede publicarse.</div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Condiciones C2 directo</div><button class="btn btn-sm" onclick="addC2SA()">+ Agregar</button></div><div class="table-wrap"><table><thead><tr><th>Condicion</th><th>Campo Nosis</th><th>Descripcion</th><th>Activa</th><th></th></tr></thead><tbody id="c2-tb"></tbody></table></div>';
+  if(catDiv)catDiv.innerHTML='<div class="table-wrap"><table><thead><tr><th>Cat.</th><th>Puntaje min</th><th>Puntaje max</th><th>Piso post-pen.</th><th>Descripcion</th><th>Publicable</th></tr></thead><tbody id="cat-tb"></tbody></table></div>';
+  initScoringAdmin();
+}
+function guardarScoringEngine(){
+  var tot=scoringVars.filter(function(v){return v.activa;}).reduce(function(s,v){return s+v.peso;},0);
+  if(Math.abs(tot-100)>0.01){showToast('Los pesos no suman 100% (actual: '+tot.toFixed(1)+'%) — corregilo antes de guardar','error');return;}
+  addLog('Motor de scoring guardado','system');
+  showToast('Motor de scoring guardado correctamente','success');
+}
+function resetScoringEngine(){
+  if(!confirm('Resetear todas las variables y penalizaciones a los valores por defecto?'))return;
+  showToast('Motor reseteado a defaults','success');
+  // Just re-render (variables are re-initialized from defaults on next page load)
+  navigateTo('admin-scoring');
+}
+
+// (scoring tab functions replaced by full engine above)
+
+// (penTable helper kept below)
+function savePenalties(){
+  var pen=getScoringPenalties();
+  var keys=['rechazo_6_12m','rechazo_12_24m','rechazo_24m_plus','df_lt1','df_1_5','df_5_10','df_10_20','df_gt20','sf_sin_multa'];
+  keys.forEach(function(k){
+    var el=document.getElementById('pen-'+k);
+    if(el)pen[k]=parseFloat(el.value)||0;
+  });
+  setScoringPenalties(pen);
+  addLog('Penalizaciones scoring actualizadas','system');
+  showToast('Penalizaciones guardadas','success');
+}
+
+function penTable(rows){
+  var html='<div class="table-wrap" style="margin-bottom:8px"><table><thead><tr><th>Condición</th><th>Penalización</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    var color=r[2]==='rm'?'var(--rm)':r[2]==='am'?'var(--am)':'var(--t2)';
+    html+='<tr><td>'+r[0]+'</td><td class="bold mono" style="color:'+color+'">'+r[1]+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  return html;
+}
+
+// (C2 and categories tab replaced by full engine above)
+
+// ============================================================
+// ADMIN USUARIOS
+// ============================================================
+function renderAdminUsuarios(){
+  var users=getUsers();
+  var html='<div class="page-header"><h1>Usuarios</h1><p>Gestion de cuentas del sistema</p></div>';
+  // Filter bar
+  html+='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
+  html+='<input id="usr-search" type="text" placeholder="Buscar por nombre, CUIT, email..." style="flex:1;min-width:180px;padding:8px 12px;font-size:13px;border:1.5px solid var(--s3);border-radius:var(--r);outline:none" oninput="filterUsuarios()">';
+  html+='<select id="usr-estado" class="input-inline" style="padding:8px 12px;font-size:13px" onchange="filterUsuarios()"><option value="todos">Todos los estados</option><option value="active">Activo</option><option value="suspended">Suspendido</option></select>';
+  html+='<select id="usr-tipo" class="input-inline" style="padding:8px 12px;font-size:13px" onchange="filterUsuarios()"><option value="todos">Todos</option><option value="fisica">Fisica</option><option value="juridica">Juridica</option></select>';
+  html+='</div>';
+  html+='<div class="card"><div class="table-wrap"><table id="users-table"><thead><tr><th>Nombre</th><th>CUIT/DNI</th><th>Tipo</th><th>Email</th><th>Registro</th><th>Identidad</th><th>TyC</th><th>Roles</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="users-tbody">';
+  html+=renderUsersRows(users);
+  html+='</tbody></table></div></div>';
+  return html;
+}
+
+function renderUsersRows(users){
+  if(!users.length)return '<tr><td colspan="10" class="text-center" style="padding:24px;color:var(--t3)">Sin usuarios</td></tr>';
+  return users.map(function(u){
+    var statusBadge=u.status==='active'?'badge-A1':'badge-C2';
+    var roles=(u.roles||[u.role]).map(function(r){return '<span class="badge badge-B1" style="margin-right:3px">'+r+'</span>';}).join('');
+    var actions='';
+    if(u.email!=='admin@opencheck.com'){
+      if(u.status==='active'){
+        actions='<button class="btn btn-danger btn-sm" onclick="toggleUserStatus(\''+u.id+'\',\'suspended\')">Suspender</button>';
+      } else {
+        actions='<button class="btn btn-primary btn-sm" onclick="toggleUserStatus(\''+u.id+'\',\'active\')">Activar</button>';
+      }
+    }
+    return '<tr>'+
+      '<td class="bold">'+u.name+'</td>'+
+      '<td class="mono" style="font-size:11px">'+formatCuit(u.cuit||'')+'</td>'+
+      '<td style="font-size:12px">'+(u.tipopersona||'—')+'</td>'+
+      '<td style="font-size:12px;color:var(--t2)">'+u.email+'</td>'+
+      '<td style="font-size:12px">'+new Date(u.createdAt||Date.now()).toLocaleDateString('es-AR')+'</td>'+
+      '<td>'+(u.idVerified?'<span style="color:var(--g);font-size:12px">✅ Validado</span>':'<span style="color:var(--rm);font-size:12px">❌ Pendiente</span>')+'</td>'+
+      '<td>'+(u.tyc?'<span style="color:var(--g);font-size:12px">✅ v1.0</span>':'<span style="color:var(--t3);font-size:12px">—</span>')+'</td>'+
+      '<td>'+roles+'</td>'+
+      '<td><span class="badge '+statusBadge+'">'+u.status+'</span></td>'+
+      '<td>'+actions+'</td></tr>';
+  }).join('');
+}
+
+function filterUsuarios(){
+  var search=(document.getElementById('usr-search').value||'').toLowerCase();
+  var estado=document.getElementById('usr-estado').value;
+  var tipo=document.getElementById('usr-tipo').value;
+  var users=getUsers().filter(function(u){
+    var matchSearch=!search||(u.name||'').toLowerCase().indexOf(search)>=0||(u.email||'').toLowerCase().indexOf(search)>=0||(u.cuit||'').indexOf(search)>=0;
+    var matchEstado=estado==='todos'||u.status===estado;
+    var matchTipo=tipo==='todos'||u.tipopersona===tipo;
+    return matchSearch&&matchEstado&&matchTipo;
+  });
+  var tb=document.getElementById('users-tbody');
+  if(tb)tb.innerHTML=renderUsersRows(users);
+}
+
+function toggleUserStatus(userId,newStatus){
+  var users=getUsers();
+  var idx=users.findIndex(function(u){return u.id===userId;});
+  if(idx<0)return;
+  users[idx].status=newStatus;
+  setUsers(users);
+  addLog('Usuario '+(newStatus==='active'?'activado':'suspendido')+': '+users[idx].email,'system');
+  showToast('Usuario '+newStatus,'success');
+  navigateTo('admin-usuarios');
+}
+
+// ============================================================
+// SCORING DETAIL MODAL
+// ============================================================
+function openScoringDetail(checkId){
+  var check=getChecks().find(function(c){return c.id===checkId;});
+  if(!check||!check.scoring)return;
+  var s=check.scoring;
+  var cat=s.cat;
+  var html='<div class="modal-header"><h3>Scoring — '+check.razonLibrador+'</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+  html+='<div class="modal-body">';
+  html+='<div class="scoring-card '+cat+'" style="margin-bottom:16px"><div class="flex gap-12 items-center" style="margin-bottom:12px"><span style="font-size:36px">'+CAT_EMOJI[cat]+'</span><div><div class="bold text-xl">'+cat+'</div><div class="text-lg mono">'+s.pts+' puntos</div></div></div>';
+  html+='<div class="grid-2"><div><div class="text-sm" style="color:var(--t2);margin-bottom:6px">Factores favorables</div>'+s.factores.map(function(f){return '<div style="font-size:12px;margin-top:4px">✅ '+f+'</div>';}).join('')+'</div>';
+  html+='<div><div class="text-sm" style="color:var(--t2);margin-bottom:6px">Puntos de atención</div>'+s.atencion.map(function(a){return '<div style="font-size:12px;margin-top:4px">⚠️ '+a+'</div>';}).join('')+'</div></div>';
+  html+='<div class="divider"></div><div style="font-size:13px;font-style:italic">'+s.rec+'</div></div>';
+  // Desglose si existe
+  if(s.desglose){
+    html+='<div style="margin-bottom:12px"><div class="bold text-sm" style="margin-bottom:8px;color:var(--t2)">DESGLOSE POR VARIABLE</div>';
+    html+='<div class="table-wrap"><table><thead><tr><th>Variable</th><th>Pts variable</th><th>Peso</th><th>Aporte</th></tr></thead><tbody>';
+    var dg=s.desglose;
+    var varNames={score_nosis:'Score Nosis',endeudamiento:'Endeudamiento librador',antiguedad:'Antigüedad CUIT',perfil_legal:'Perfil legal',bancos:'Bancos activos',consultas:'Consultas 12m',endeud_v:'Endeud. vendedor (BCRA)',rechazos_v:'Rechazos vendedor (BCRA)'};
+    Object.keys(dg).forEach(function(k){
+      var v=dg[k];
+      var fuenteBadge='';
+      if((k==='endeud_v'||k==='rechazos_v')&&v.fuente){
+        fuenteBadge=v.fuente==='bcra_real'
+          ?' <span style="font-size:10px;background:var(--gl);color:var(--gd);padding:1px 5px;border-radius:3px">BCRA</span>'
+          :' <span style="font-size:10px;background:var(--al);color:var(--am);padding:1px 5px;border-radius:3px">neutro</span>';
+      }
+      html+='<tr><td>'+(varNames[k]||k)+fuenteBadge+'</td><td class="mono">'+v.pts+'</td><td class="mono">'+v.peso+'%</td><td class="mono bold" style="color:var(--g)">'+v.aporte+'</td></tr>';
+    });
+    html+='</tbody></table></div></div>';
+  }
+  if(s.penAplicadas&&s.penAplicadas.length){
+    html+='<div class="alert alert-warning" style="font-size:12px"><span>⚠️</span><div><div class="bold" style="margin-bottom:4px">Penalizaciones aplicadas</div>'+s.penAplicadas.map(function(p){return '<div>'+p+'</div>';}).join('')+'</div></div>';
+  }
+  html+='</div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cerrar</button></div>';
+  showModal(html);
+}
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function showModal(html){
+  document.getElementById('modal-box').innerHTML=html;
+  var overlay=document.getElementById('modal-overlay');
+  overlay.style.display='flex';
+  setTimeout(function(){overlay.classList.add('show');},10);
+}
+function closeModal(){
+  var overlay=document.getElementById('modal-overlay');
+  overlay.classList.remove('show');
+  setTimeout(function(){overlay.style.display='none';},200);
+}
+function closeModalOverlay(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg,type){
+  var c=document.getElementById('toast-container');
+  var t=document.createElement('div');
+  t.className='toast '+(type||'');
+  t.textContent=msg;
+  c.appendChild(t);
+  setTimeout(function(){t.classList.add('show');},10);
+  setTimeout(function(){t.classList.remove('show');setTimeout(function(){c.removeChild(t);},300);},3000);
+}
+
+function togglePass(inputId,btn){
+  var inp=document.getElementById(inputId);
+  if(!inp)return;
+  var show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.textContent=show?'🙈':'👁';
+  btn.title=show?'Ocultar contraseña':'Mostrar contraseña';
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function show(id){document.getElementById(id).classList.remove('hidden');}
+function hide(id){document.getElementById(id).classList.add('hidden');}
+function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function formatMoney(n){
+  if(!n&&n!==0)return '—';
+  return '$'+Number(n).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function formatCuit(c){if(!c)return '—';var s=String(c);if(s.length===11)return s.slice(0,2)+'-'+s.slice(2,10)+'-'+s.slice(10);return s;}
+function getBankName(code){return BANKS[code]||'Banco '+code;}
+function getDays(fechaPago){
+  var today=new Date();today.setHours(0,0,0,0);
+  var pago=new Date(fechaPago);
+  return Math.max(0,Math.round((pago-today)/86400000));
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+initData();
+// screen-login starts visible (no hidden class), screen-register and screen-app start hidden
+// enterApp() calls show('screen-app') which removes .hidden, hide() adds it back
+
+</script>
+</body>
+</html>
