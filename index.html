@@ -969,17 +969,28 @@ function renderCargarEcheck(){
   '</div></div>';
 }
 
-function lookupRazonSocial(){
+async function lookupRazonSocial(){
   var cuit=document.getElementById('c-cuit').value.trim().replace(/-/g,'').replace(/\./g,'');
   var result=document.getElementById('razon-social-result');
   var razonInput=document.getElementById('c-razon');
   if(!cuit||cuit.length<10){result.textContent='';return;}
   var demo=DEMO_NOSIS[cuit];
   if(demo){
-    result.innerHTML='<span style="color:var(--g)">✅ Encontrado en base demo:</span> <strong>'+demo.razon+'</strong>';
+    result.innerHTML='<span style="color:var(--g)">✅ Encontrado:</span> <strong>'+demo.razon+'</strong>';
     razonInput.value=demo.razon;
-  } else {
-    result.innerHTML='<span style="color:var(--t3)">CUIT no encontrado en demo — ingresa la razon social manualmente</span>';
+    return;
+  }
+  result.innerHTML='<span style="color:var(--t3)">Consultando BCRA...</span>';
+  try {
+    var r=await fetch(BCRA_DEUDAS_URL+'/'+cuit,{method:'GET',headers:{'Accept':'application/json'}});
+    if(r.ok){
+      var data=await r.json();
+      var den=data.results&&data.results.denominacion;
+      if(den){result.innerHTML='<span style="color:var(--g)">✅ '+den+'</span>';razonInput.value=den;return;}
+    }
+    result.innerHTML='<span style="color:var(--t3)">No encontrado — ingresá la razon social manualmente</span>';
+  }catch(e){
+    result.innerHTML='<span style="color:var(--t3)">Error BCRA — ingresá la razon social manualmente</span>';
   }
 }
 
