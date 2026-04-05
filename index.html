@@ -1703,7 +1703,7 @@ async function calcScoring(nd,check){
 
   var s=(ptsSc*(w.SCO_Vig/100))+(ptsD*(w.CI_Vig_Total_Monto/100))+(ptsAg*(w.CI_Antiguedad/100))+(ptsLegal*(w.perfil_legal/100))+(ptsBc*(w.CI_Vig_Total_CantBcos/100))+(ptsCo*(w.CO_12m_Cant/100))+(ptsDeudaV*(w.endeud_vendedor/100))+(ptsRv*(w.HC_vendedor/100));
   // Normalize por el total de pesos (en caso de que no sumen 100)
-  s=s*(100/wTotal)*100;
+  s=s*(100/wTotal);
   s=Math.min(100,Math.max(0,s));
 
   var desglose={
