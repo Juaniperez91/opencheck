@@ -358,6 +358,7 @@ var NOSIS_KEY = '73643825-1dab-4d12-bff7-4d32af2331ba';
 var NOSIS_URL = 'https://ws01.nosis.com/rest/variables';
 var BCRA_URL = 'https://api.bcra.gob.ar/cheques/v1.0/denunciados';
 var BCRA_DEUDAS_URL = 'https://api.bcra.gob.ar/CentralDeDeudores/v1.0/Deudas';
+var BCRA_TAMAR_URL = 'https://api.bcra.gob.ar/estadisticas/v4.0/monetarias/44?limit=1';
 var BCRA_RECHAZADOS_URL = 'https://api.bcra.gob.ar/CentralDeDeudores/v1.0/Deudas/ChequesRechazados';
 var TAMAR = 29.5;
 
@@ -420,6 +421,22 @@ function setTamar(t){lsSet('tamar',t)}
 // ============================================================
 // INIT — seed demo data
 // ============================================================
+async function fetchTamarBCRA(){
+  try{
+    var r=await fetch(BCRA_TAMAR_URL,{method:'GET',headers:{'Accept':'application/json'}});
+    if(!r.ok)return;
+    var data=await r.json();
+    var ultimo=data.results&&data.results[0]&&data.results[0].detalle&&data.results[0].detalle[0];
+    if(ultimo&&ultimo.valor){
+      setTamar(parseFloat(ultimo.valor));
+      console.log('TAMAR BCRA actualizada:',ultimo.valor,'% ('+ultimo.fecha+')');
+      return {valor:ultimo.valor,fecha:ultimo.fecha};
+    }
+  }catch(e){
+    console.log('TAMAR BCRA error:',e.message,' — usando valor local');
+  }
+}
+
 function initData(){
   forceSeedDemoUsers();
   var checks=getChecks();
@@ -726,6 +743,7 @@ function regBack(){if(regStep>0){regStep--;renderRegStep();}}
 // APP ENTRY
 // ============================================================
 function enterApp(){
+  fetchTamarBCRA(); // Actualizar TAMAR desde BCRA al ingresar
   // Force correct display states
   document.getElementById('screen-login').style.display='none';
   document.getElementById('screen-register').style.display='none';
