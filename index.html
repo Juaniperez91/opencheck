@@ -1212,7 +1212,7 @@ async function showNosisResult(nd,isDemo){
     deudaFiscal: nd.deudaFiscal||false,
     inhabilitado: nd.inhabilitado||false
   };
-  var catResult = calcularCategoria(ndForCat);
+  var catResult = {cat:'B2',puntaje:0}; // placeholder, se reemplaza con calcScoring
 
   // Mostrar spinner mientras se consulta BCRA Central de Deudores (vendedor)
   var cuitVendedor=state.currentUser&&state.currentUser.cuit?state.currentUser.cuit:'';
@@ -1222,8 +1222,7 @@ async function showNosisResult(nd,isDemo){
 
   var scoring = await calcScoring(ndForCat, window._pwCheck);
   // Merge: calcularCategoria usa scoringVars editables para cat+puntaje
-  scoring.cat = catResult.cat;
-  scoring.pts = catResult.puntaje || scoring.pts;
+  // scoring.cat y scoring.pts ya vienen de calcScoring
   window._pwScoring = scoring;
   setPWStep(3);
   var ag = ndForCat.antiguedad;
