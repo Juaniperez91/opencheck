@@ -1202,6 +1202,7 @@ async function showNosisResult(nd,isDemo){
     score: nd.score||0,
     deuda: nd.deuda||0,
     antiguedad: nd.antiguedad !== undefined ? nd.antiguedad : (nd.antiguedad_meses||0)/12,
+    antiguedad_meses: nd.antiguedad_meses||Math.round((nd.antiguedad||0)*12),
     bancos: nd.bancos||0,
     consultas: nd.consultas||0,
     rechazos24m: nd.rechazos24m||0,
