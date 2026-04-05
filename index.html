@@ -944,7 +944,8 @@ function getStatusBadge(s){
 // CARGAR ECHEQUE
 // ============================================================
 function renderCargarEcheck(){
-  var bankOpts=Object.keys(BANKS).map(function(k){return '<option value="'+k+'">'+BANKS[k]+' (Cod. '+k+')</option>';}).join('');
+  var banksSorted=Object.keys(BANKS).sort(function(a,b){return BANKS[a].localeCompare(BANKS[b],'es');});
+  var bankOpts=banksSorted.map(function(k){return '<option value="'+k+'">'+BANKS[k]+' (Cod. '+k+')</option>';}).join('');
   return '<div class="page-header"><h1>Cargar eCheck</h1><p>Ingresa los datos del cheque electronico para cargarlo a tu cartera</p></div>'+
   '<div style="max-width:600px">'+
   '<div class="card">'+
