@@ -1454,7 +1454,7 @@ function calcularCategoria(vars) {
     else if (v.campo.indexOf('CO_12m') >= 0)          val = vars.consultas;
     else if (v.campo.indexOf('vendedor') >= 0)        val = 100; // asumido OK
     else if (v.campo.indexOf('HC_vend') >= 0)         val = 100; // asumido OK
-    else if (v.campo.indexOf('DF_Tiene') >= 0)        val = vars.deudaFiscal ? 40 : 100;
+    else if (v.campo.indexOf('DF_Tiene') >= 0 || (v.campo.indexOf('JU_24m') >= 0 && v.campo.indexOf('CQ_24m') >= 0)) val = (vars.deudaFiscal ? 40 : 100) - ((vars.juicios||0)*10);
     // Find points for this value in rangos
     var pts = ptsByRangos(v.rangos, val);
     if (pts === 'C2') return; // skip, already handled above
