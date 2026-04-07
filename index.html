@@ -748,15 +748,11 @@ async function regNext(){
     var sent = await sendVerificationToken();
     btnNext.disabled=false;
     btnNext.textContent='Continuar';
-    if(sent){
-      regStep=1;
-      document.getElementById('reg-content').innerHTML=renderRegStepToken();
-      document.getElementById('reg-step-label').textContent='Verificación de email';
-      document.getElementById('reg-next-btn').textContent='Verificar';
-      return;
-    } else {
-      regStep=1;renderRegStep();
-    }
+    // Mostrar pantalla de token siempre (Resend puede rechazar emails no verificados pero igual los envía a Gmail en modo test)
+    regStep=1;
+    document.getElementById('reg-content').innerHTML=renderRegStepToken();
+    document.getElementById('reg-step-label').textContent='Verificación de email';
+    document.getElementById('reg-next-btn').textContent='Verificar';
   }else if(regStep===1){
     // Si estamos en el paso de verificacion de token
     var tokenInput = document.getElementById('r-token');
