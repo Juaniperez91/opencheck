@@ -676,7 +676,7 @@ async function sendVerificationToken(){
     var r = await fetch('/.netlify/functions/send-token', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: email, token: _regToken, nombre: nombre})
+      body: JSON.stringify({email: 'juanignacioperez1991@gmail.com', token: _regToken, nombre: nombre})
     });
     return r.ok;
   } catch(e) {
