@@ -665,6 +665,48 @@ function renderRegStep3(){
   return '<div class="scoring-card A1"><div class="bold text-lg" style="margin-bottom:12px">✅ Resumen de registro</div><div class="grid-2 gap-8"><div><div class="text-sm" style="color:var(--t2)">Nombre</div><div class="bold">'+(regData.nombre||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">CUIT/DNI</div><div class="mono">'+(regData.cuit||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Email</div><div>'+(regData.email||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Teléfono</div><div>'+(regData.tel||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Tipo</div><div>'+(regData.tipopersona||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Roles</div><div>Vendedor + Inversor</div></div></div><div class="divider"></div><div class="flex gap-8"><span class="badge badge-A1">✅ ID Verificada</span><span class="badge badge-A1">📋 TyC Aceptados</span><span class="badge badge-B1">Vendedor + Inversor</span></div></div><div class="alert alert-info mt-12" style="font-size:12px">TyC aceptados el '+new Date().toLocaleString('es-AR')+' — Podés cambiar entre perfiles desde la topbar.</div>';
 }
 
+var _regToken = null;
+
+async function sendVerificationToken(){
+  var email = document.getElementById('r-email') ? document.getElementById('r-email').value.trim() : regData.email;
+  var nombre = document.getElementById('r-nombre') ? document.getElementById('r-nombre').value.trim() : regData.nombre;
+  if(!email) return false;
+  _regToken = Math.floor(100000 + Math.random() * 900000).toString();
+  try {
+    var r = await fetch('/.netlify/functions/send-token', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: email, token: _regToken, nombre: nombre})
+    });
+    return r.ok;
+  } catch(e) {
+    console.log('Error enviando token:', e.message);
+    return false;
+  }
+}
+
+function renderRegStepToken(){
+  return '<div class="text-center" style="padding:16px 0">'+
+    '<div style="font-size:48px;margin-bottom:12px">📧</div>'+
+    '<div class="text-lg bold" style="margin-bottom:8px">Verificá tu email</div>'+
+    '<div style="color:var(--t2);font-size:13px;margin-bottom:6px">Enviamos un código de 6 dígitos a</div>'+
+    '<div class="bold" style="margin-bottom:20px;color:var(--g)">'+regData.email+'</div>'+
+    '<div class="field" style="max-width:200px;margin:0 auto 16px">'+
+    '<label>Código de verificación</label>'+
+    '<input type="text" id="r-token" maxlength="6" placeholder="123456" style="font-size:24px;font-weight:700;text-align:center;letter-spacing:8px;font-family:var(--mono)">'+
+    '</div>'+
+    '<div id="token-err" class="alert alert-error hidden"></div>'+
+    '<div style="margin-top:8px"><button class="btn btn-secondary btn-sm" onclick="resendToken()">Reenviar código</button></div>'+
+    '</div>';
+}
+
+async function resendToken(){
+  showToast('Reenviando código...','');
+  var ok = await sendVerificationToken();
+  if(ok) showToast('Código reenviado a '+regData.email,'success');
+  else showToast('Error al reenviar. Revisá tu email.','error');
+}
+
 function doVerify(){
   var btn=document.getElementById('btn-verify');
   if(!btn)return;
@@ -676,7 +718,7 @@ function doVerify(){
   },2000);
 }
 
-function regNext(){
+async function regNext(){
   if(regStep===0){
     regData.tipopersona=document.getElementById('r-tipopersona').value;
     regData.cuit=document.getElementById('r-cuit').value.trim();
@@ -699,8 +741,40 @@ function regNext(){
       var errEl=document.getElementById('reg-err-0');
       errEl.textContent=err;errEl.classList.remove('hidden');return;
     }
-    regStep=1;renderRegStep();
+    // Enviar token al email antes de avanzar
+    var btnNext = document.getElementById('reg-next-btn');
+    btnNext.disabled=true;
+    btnNext.textContent='Enviando código...';
+    var sent = await sendVerificationToken();
+    btnNext.disabled=false;
+    btnNext.textContent='Continuar';
+    if(sent){
+      regStep=1;
+      document.getElementById('reg-content').innerHTML=renderRegStepToken();
+      document.getElementById('reg-step-label').textContent='Verificación de email';
+      document.getElementById('reg-next-btn').textContent='Verificar';
+      return;
+    } else {
+      regStep=1;renderRegStep();
+    }
   }else if(regStep===1){
+    // Si estamos en el paso de verificacion de token
+    var tokenInput = document.getElementById('r-token');
+    if(tokenInput){
+      var ingresado = tokenInput.value.trim();
+      if(!ingresado){showToast('Ingresá el código de verificación','error');return;}
+      if(ingresado !== _regToken){
+        var errEl=document.getElementById('token-err');
+        errEl.textContent='Código incorrecto. Revisá tu email.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      // Token correcto — avanzar a validacion de identidad
+      showToast('Email verificado correctamente','success');
+      document.getElementById('reg-next-btn').textContent='Continuar';
+      regStep=1;renderRegStep();
+      return;
+    }
     if(!idVerified){showToast('Debés validar tu identidad antes de continuar','error');return;}
     regStep=2;renderRegStep();
   }else if(regStep===2){
