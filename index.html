@@ -52,7 +52,7 @@ html,body{height:100%;font-family:var(--font);color:var(--t);background:var(--s2
 .register-steps{display:flex;gap:8px;margin-top:16px}
 .register-step{flex:1;height:4px;background:rgba(255,255,255,0.3);border-radius:2px;transition:background 0.3s}
 .register-step.done{background:white}
-.register-body{padding:36px}
+.register-body{padding:36px;overflow-y:auto;max-height:calc(100vh - 180px)}
 /* FORM ELEMENTS */
 .field{margin-bottom:16px}
 .field label{display:block;font-size:13px;font-weight:500;color:var(--t2);margin-bottom:6px}
@@ -309,7 +309,7 @@ tr:hover td{background:var(--s2)}
     <div class="register-body">
       <div id="reg-step-label" style="font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:16px"></div>
       <div id="reg-content"></div>
-      <div class="flex gap-8 mt-24" style="justify-content:space-between">
+      <div class="flex gap-8 mt-16" style="justify-content:space-between;position:sticky;bottom:0;background:var(--s);padding:12px 0 4px">
         <button class="btn btn-secondary" id="reg-back-btn" onclick="regBack()">Volver</button>
         <button class="btn btn-primary" id="reg-next-btn" onclick="regNext()">Continuar</button>
       </div>
