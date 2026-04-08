@@ -16,7 +16,7 @@ exports.handler = async function(event) {
   }
 
   const payload = JSON.stringify({
-    from: 'OpenCheck <onboarding@resend.dev>',
+    from: 'OpenCheck <noreply@opencheck.pro>',
     to: [email],
     subject: 'Tu codigo de verificacion OpenCheck',
     html: `
