@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenCheck — Motor de Riesgo Crediticio para eCheques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --b:#1A6FA8;--bm:#2A8FCC;--bl:#E6F4FB;--bd:#0C4A72;--bb:#9FD4EE;
+  --t:#1A1917;--t2:#6B6963;--t3:#9A9891;
+  --s:#fff;--s2:#F5F8FB;--s3:#E2EBF2;
+  --font:'Sora',sans-serif;--mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--t);background:var(--s);font-size:15px;line-height:1.6;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--s3)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-icon{width:34px;height:34px;background:var(--b);border-radius:9px;display:flex;align-items:center;justify-content:center}
+.nav-logo-icon svg{fill:white;width:18px;height:18px}
+.nav-logo-text{font-size:17px;font-weight:700;color:var(--t);letter-spacing:-0.4px}
+.nav-logo-text span{color:var(--b)}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{text-decoration:none;color:var(--t2);font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--b)}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 20px;border-radius:8px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .2s}
+.btn-outline{background:transparent;color:var(--b);border:1.5px solid var(--bb)}
+.btn-outline:hover{background:var(--bl)}
+.btn-primary{background:var(--b);color:white}
+.btn-primary:hover{background:var(--bd);transform:translateY(-1px)}
+.btn-xl{padding:14px 32px;font-size:16px;border-radius:10px}
+
+.hero{padding:140px 40px 100px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--bl);color:var(--bd);font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;margin-bottom:24px;border:1px solid var(--bb)}
+.hero-badge-dot{width:6px;height:6px;background:var(--bm);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:46px;font-weight:700;line-height:1.1;letter-spacing:-1.5px;margin-bottom:20px}
+.hero h1 span{color:var(--b)}
+.hero-sub{font-size:17px;color:var(--t2);line-height:1.7;margin-bottom:36px}
+.hero-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hero-note{font-size:13px;color:var(--t3);margin-top:16px}
+.hero-note strong{color:var(--t2)}
+
+.hero-visual{background:var(--s2);border:1px solid var(--s3);border-radius:20px;padding:28px;position:relative;overflow:hidden}
+.hero-visual::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(42,143,204,.12) 0%,transparent 70%);pointer-events:none}
+.vis-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:20px}
+.vis-flow{display:flex;flex-direction:column;gap:12px}
+.vis-step{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--s);border-radius:10px;border:1px solid var(--s3)}
+.vis-step-num{width:32px;height:32px;background:var(--b);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;font-family:var(--mono);flex-shrink:0}
+.vis-step-text{flex:1}
+.vis-step-title{font-size:13px;font-weight:600;color:var(--t)}
+.vis-step-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.vis-step-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;font-family:var(--mono);flex-shrink:0}
+.badge-ok{background:var(--bl);color:var(--bd)}
+.badge-live{background:#FEF3C7;color:#92400E}
+.vis-result{margin-top:16px;padding:16px;background:var(--bl);border-radius:10px;border:1px solid var(--bb);text-align:center}
+.vis-result-cat{font-size:36px;font-weight:700;color:var(--b);font-family:var(--mono);letter-spacing:-1px}
+.vis-result-sub{font-size:12px;color:var(--bd);margin-top:4px}
+
+.logos{padding:40px;border-top:1px solid var(--s3);border-bottom:1px solid var(--s3);background:var(--s2)}
+.logos-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.logos-label{font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.logos-list{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo-pill{display:flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--s3);border-radius:8px;font-size:13px;font-weight:600;color:var(--t2);background:var(--s)}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--bm)}
+
+.section{padding:100px 40px;max-width:1100px;margin:0 auto}
+.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--bm);margin-bottom:16px}
+.section h2{font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1.15;margin-bottom:20px}
+.section-sub{font-size:17px;color:var(--t2);max-width:560px;line-height:1.7}
+
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:60px}
+.problem-cards{display:flex;flex-direction:column;gap:16px}
+.problem-card{padding:24px;border-radius:12px;border:1px solid}
+.problem-card.bad{background:#FFF5F5;border-color:#FECACA}
+.problem-card.good{background:var(--bl);border-color:var(--bb)}
+.problem-card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.problem-card.bad .problem-card-label{color:#DC2626}
+.problem-card.good .problem-card-label{color:var(--bd)}
+.problem-card p{font-size:14px;line-height:1.7;color:var(--t2)}
+.problem-card strong{color:var(--t)}
+
+.how-bg{background:var(--s2);padding:100px 0;border-top:1px solid var(--s3);border-bottom:1px solid var(--s3)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:60px;position:relative}
+.step{position:relative}
+.step-num{width:42px;height:42px;background:var(--b);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:white;font-family:var(--mono);margin-bottom:16px}
+.step h3{font-size:16px;font-weight:600;margin-bottom:8px;letter-spacing:-.3px}
+.step p{font-size:14px;color:var(--t2);line-height:1.6}
+.step-connector{position:absolute;top:21px;right:-16px;width:32px;height:1px;background:var(--bb);z-index:1}
+
+.motor-bg{padding:100px 0}
+.motor-inner{max-width:1100px;margin:0 auto;padding:0 40px}
+.motor-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:60px}
+.motor-card{padding:28px;border-radius:14px;border:1px solid var(--s3);background:var(--s)}
+.motor-card-icon{width:44px;height:44px;background:var(--bl);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
+.motor-card h3{font-size:16px;font-weight:600;margin-bottom:8px;letter-spacing:-.3px}
+.motor-card p{font-size:14px;color:var(--t2);line-height:1.7}
+.motor-highlight{grid-column:1/-1;padding:28px 32px;background:var(--bl);border:1px solid var(--bb);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:32px}
+.motor-highlight p{font-size:15px;color:var(--bd);line-height:1.7;max-width:600px}
+.motor-highlight strong{color:var(--b)}
+
+.use-cases{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:60px}
+.use-card{padding:36px;border-radius:16px;border:1px solid var(--s3)}
+.use-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-size:24px}
+.use-card h3{font-size:20px;font-weight:600;margin-bottom:12px;letter-spacing:-.4px}
+.use-card p{font-size:14px;color:var(--t2);line-height:1.7;margin-bottom:20px}
+.use-features{list-style:none;display:flex;flex-direction:column;gap:10px}
+.use-features li{font-size:13px;color:var(--t2);display:flex;align-items:center;gap:10px}
+.use-features li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--b);flex-shrink:0}
+
+.contact-bg{background:var(--bd);padding:100px 40px}
+.contact-inner{max-width:700px;margin:0 auto;text-align:center}
+.contact-inner h2{font-size:40px;font-weight:700;color:white;letter-spacing:-1px;margin-bottom:16px}
+.contact-inner p{font-size:17px;color:rgba(255,255,255,.7);margin-bottom:40px}
+.contact-form{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:32px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-input{width:100%;padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s}
+.form-input::placeholder{color:rgba(255,255,255,.4)}
+.form-input:focus{border-color:rgba(255,255,255,.5)}
+.form-input.full{grid-column:1/-1}
+textarea.form-input{resize:vertical;min-height:100px}
+.btn-white{background:white;color:var(--bd);font-weight:700}
+.btn-white:hover{background:var(--bl)}
+
+footer{padding:40px;border-top:1px solid var(--s3)}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.footer-copy{font-size:13px;color:var(--t3)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:13px;color:var(--t3);text-decoration:none}
+.footer-links a:hover{color:var(--b)}
+
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero{grid-template-columns:1fr;padding:100px 20px 60px;gap:40px}
+  .hero h1{font-size:34px}
+  .hero-visual{display:none}
+  .problem-grid,.use-cases,.form-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .motor-cards{grid-template-columns:1fr}
+  .section{padding:60px 20px}
+  .section h2{font-size:28px}
+  .contact-bg{padding:60px 20px}
+  .contact-inner h2{font-size:28px}
+  .motor-highlight{flex-direction:column;text-align:left}
+  .logos-inner{flex-direction:column;align-items:flex-start;gap:16px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="nav-logo-text">Open<span>Check</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="#problema">El problema</a>
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#motor">Motor de riesgo</a>
+    <a href="#casos">Casos de uso</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+  <div class="nav-cta">
+    <a href="https://opencheck.netlify.app" class="btn btn-outline">Ingresar</a>
+    <a href="https://opencheck.netlify.app" class="btn btn-primary">Registrarse</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div>
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Scoring en tiempo real · BCRA + Nosis
+    </div>
+    <h1>El riesgo real está en el <span>librador</span>,<br>no en el vendedor</h1>
+    <p class="hero-sub">OpenCheck es el primer marketplace de eCheques con motor de riesgo propio sobre el librador, integrado con datos oficiales del BCRA y Nosis en tiempo real.</p>
+    <div class="hero-actions">
+      <a href="https://opencheck.netlify.app" class="btn btn-primary btn-xl">Acceder a la plataforma</a>
+      <a href="#contacto" class="btn btn-outline btn-xl">Hablar con nosotros</a>
+    </div>
+    <p class="hero-note">Demo disponible · <strong>vendedor@test.com</strong> · cualquier clave de 6 dígitos</p>
+  </div>
+  <div class="hero-visual">
+    <div class="vis-label">Flujo de evaluación OpenCheck</div>
+    <div class="vis-flow">
+      <div class="vis-step">
+        <div class="vis-step-num">1</div>
+        <div class="vis-step-text">
+          <div class="vis-step-title">Carga del eCheck</div>
+          <div class="vis-step-sub">CUIT librador · datos del cheque</div>
+        </div>
+      </div>
+      <div class="vis-step">
+        <div class="vis-step-num">2</div>
+        <div class="vis-step-text">
+          <div class="vis-step-title">Verificación BCRA</div>
+          <div class="vis-step-sub">Cheques denunciados · Central de Deudores</div>
+        </div>
+        <span class="vis-step-badge badge-live">Tiempo real</span>
+      </div>
+      <div class="vis-step">
+        <div class="vis-step-num">3</div>
+        <div class="vis-step-text">
+          <div class="vis-step-title">Análisis Nosis</div>
+          <div class="vis-step-sub">Score crediticio · historial · perfil fiscal</div>
+        </div>
+        <span class="vis-step-badge badge-live">Tiempo real</span>
+      </div>
+      <div class="vis-step">
+        <div class="vis-step-num">4</div>
+        <div class="vis-step-text">
+          <div class="vis-step-title">Motor de scoring OpenCheck</div>
+          <div class="vis-step-sub">Ponderación multivariable · penalizaciones</div>
+        </div>
+        <span class="vis-step-badge badge-ok">Propietario</span>
+      </div>
+    </div>
+    <div class="vis-result">
+      <div class="vis-result-cat">A1 · B2 · C1</div>
+      <div class="vis-result-sub">Categoría de riesgo con desglose completo + tasa sugerida TAMAR</div>
+    </div>
+  </div>
+</section>
+
+<div class="logos">
+  <div class="logos-inner">
+    <span class="logos-label">Integrado con</span>
+    <div class="logos-list">
+      <div class="logo-pill"><span class="logo-dot"></span>BCRA Central de Deudores</div>
+      <div class="logo-pill"><span class="logo-dot"></span>BCRA Cheques Rechazados</div>
+      <div class="logo-pill"><span class="logo-dot"></span>BCRA Cheques Denunciados</div>
+      <div class="logo-pill"><span class="logo-dot"></span>Nosis Variables API</div>
+      <div class="logo-pill"><span class="logo-dot"></span>BCRA TAMAR</div>
+    </div>
+  </div>
+</div>
+
+<section id="problema" class="section fade-in">
+  <div class="section-label">El problema</div>
+  <h2>El mercado evalúa al vendedor.<br>El riesgo real es el librador.</h2>
+  <p class="section-sub">Las plataformas actuales de descuento de cheques concentran el análisis en quien vende, ignorando que quien debe pagar es el librador.</p>
+  <div class="problem-grid">
+    <div class="problem-cards">
+      <div class="problem-card bad">
+        <div class="problem-card-label">❌ Modelo actual del mercado</div>
+        <p>Las tasas se calculan sobre el <strong>historial del vendedor</strong>. Una PyME con excelentes libradores paga tasas altas por su propio perfil crediticio, aunque los cheques sean de primera línea.</p>
+      </div>
+      <div class="problem-card good">
+        <div class="problem-card-label">✅ Modelo OpenCheck</div>
+        <p>El motor evalúa al <strong>librador en tiempo real</strong> con datos oficiales del BCRA y Nosis. Cada cheque recibe su propia calificación de riesgo según el perfil real del emisor.</p>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:15px;color:var(--t2);line-height:1.8;margin-bottom:24px">Esto permite a una PyME acceder a tasas competitivas cuando sus libradores tienen buen perfil crediticio, independientemente de su propia historia financiera.</p>
+      <p style="font-size:15px;color:var(--t2);line-height:1.8;margin-bottom:24px">Para el inversor, significa tomar decisiones con información real y actualizada sobre quien realmente va a pagar el cheque.</p>
+      <p style="font-size:15px;color:var(--t2);line-height:1.8">El motor de scoring es <strong style="color:var(--t)">configurable en tiempo real</strong> — los parámetros se ajustan ante cambios de coyuntura sin intervención técnica.</p>
+    </div>
+  </div>
+</section>
+
+<div id="como-funciona" class="how-bg fade-in">
+  <div class="section" style="padding-top:0;padding-bottom:0">
+    <div class="section-label">Cómo funciona</div>
+    <h2>De la carga del cheque<br>al inversor, en minutos</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Cargar eCheck</h3>
+        <p>El vendedor ingresa los datos del cheque electrónico. El sistema autocompleta la razón social desde BCRA.</p>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Verificación BCRA</h3>
+        <p>Consulta en tiempo real si el cheque figura en el registro de denunciados del Banco Central.</p>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Scoring automático</h3>
+        <p>El motor propietario analiza múltiples variables del librador y genera una calificación de riesgo con desglose.</p>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Publicar y negociar</h3>
+        <p>El cheque se publica con tasa sugerida basada en TAMAR. Los inversores hacen ofertas y se cierra la operación.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="motor" class="motor-bg fade-in">
+  <div class="motor-inner">
+    <div class="section-label">Motor de riesgo</div>
+    <h2 style="font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1.15;margin-bottom:20px">Tecnología propietaria.<br>Datos oficiales.</h2>
+    <p style="font-size:17px;color:var(--t2);max-width:560px;line-height:1.7;margin-bottom:0">El motor combina fuentes de datos oficiales con un algoritmo de ponderación multivariable, diseñado específicamente para el mercado de cheques argentino.</p>
+    <div class="motor-cards">
+      <div class="motor-card">
+        <div class="motor-card-icon">🏦</div>
+        <h3>Datos del BCRA</h3>
+        <p>Integración directa con la API oficial del Banco Central. Central de Deudores, Cheques Rechazados, Cheques Denunciados y TAMAR en tiempo real.</p>
+      </div>
+      <div class="motor-card">
+        <div class="motor-card-icon">📊</div>
+        <h3>Análisis Nosis</h3>
+        <p>Score crediticio, historial de endeudamiento, antigüedad fiscal, perfil legal y más de 50 variables del librador consultadas en cada operación.</p>
+      </div>
+      <div class="motor-card">
+        <div class="motor-card-icon">⚙️</div>
+        <h3>Configuración dinámica</h3>
+        <p>Los parámetros del motor se ajustan en tiempo real desde el panel administrativo, sin intervención técnica, ante cambios de coyuntura macroeconómica.</p>
+      </div>
+      <div class="motor-highlight">
+        <p>El motor evalúa al <strong>librador</strong> — no al vendedor — combinando historial crediticio, situación fiscal, antigüedad, concentración bancaria y comportamiento de pagos. El resultado es una <strong>calificación de riesgo objetiva y auditable</strong> para cada cheque.</p>
+        <a href="https://opencheck.netlify.app" class="btn btn-primary btn-xl" style="white-space:nowrap">Ver demo en vivo</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="casos" class="section fade-in">
+  <div class="section-label">Casos de uso</div>
+  <h2>Diseñado para<br>vendedores e inversores</h2>
+  <div class="use-cases">
+    <div class="use-card">
+      <div class="use-icon" style="background:var(--bl)">🏭</div>
+      <h3>Para PyMEs vendedoras</h3>
+      <p>Accedé a tasas basadas en el perfil real de tus libradores. Publicá cheques y negociá con múltiples inversores en una sola plataforma.</p>
+      <ul class="use-features">
+        <li>Carga y publicación de eCheques en minutos</li>
+        <li>Calificación automática de cada cheque</li>
+        <li>Tasa sugerida basada en TAMAR BCRA</li>
+        <li>Negociación con múltiples inversores</li>
+        <li>Dashboard completo de operaciones</li>
+      </ul>
+    </div>
+    <div class="use-card">
+      <div class="use-icon" style="background:#EEF2FF">📈</div>
+      <h3>Para inversores</h3>
+      <p>Tomá decisiones con información real sobre cada librador. El desglose completo del scoring te muestra exactamente qué riesgo estás asumiendo.</p>
+      <ul class="use-features">
+        <li>Marketplace con filtros por riesgo y plazo</li>
+        <li>Desglose completo de calificación por cheque</li>
+        <li>Calculadora de retorno neto integrada</li>
+        <li>Gestión de cartera e historial</li>
+        <li>Ofertas y contraofertas en tiempo real</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div id="contacto" class="contact-bg fade-in">
+  <div class="contact-inner">
+    <h2>¿Te interesa OpenCheck?</h2>
+    <p>Estamos disponibles para conversaciones con bancos, SGRs, fondos de inversión y empresas que quieran incorporar tecnología de evaluación de riesgo crediticio.</p>
+    <div class="contact-form">
+      <div class="form-grid">
+        <input class="form-input" type="text" placeholder="Nombre y apellido">
+        <input class="form-input" type="text" placeholder="Empresa / Organización">
+        <input class="form-input full" type="email" placeholder="Email de contacto">
+        <textarea class="form-input full" placeholder="¿En qué contexto te interesa OpenCheck?"></textarea>
+      </div>
+      <button class="btn btn-white btn-xl" style="width:100%" onclick="handleContact(this)">Enviar consulta</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-copy">© 2026 OpenCheck. Todos los derechos reservados.</span>
+    <div class="footer-links">
+      <a href="#">Términos y condiciones</a>
+      <a href="#">Privacidad</a>
+      <a href="https://opencheck.netlify.app">Ingresar a la app</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.1});
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+function handleContact(btn) {
+  btn.textContent = '✓ Mensaje enviado — te contactamos pronto';
+  btn.style.background = '#E6F4FB';
+  btn.style.color = '#0C4A72';
+  setTimeout(() => {
+    btn.textContent = 'Enviar consulta';
+    btn.style.background = '';
+    btn.style.color = '';
+  }, 4000);
+}
+</script>
+</body>
+</html>
