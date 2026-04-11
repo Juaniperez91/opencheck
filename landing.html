@@ -443,15 +443,34 @@ const observer = new IntersectionObserver((entries) => {
 }, {threshold: 0.1});
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-function handleContact(btn) {
-  btn.textContent = '✓ Mensaje enviado — te contactamos pronto';
-  btn.style.background = '#E6F4FB';
-  btn.style.color = '#0C4A72';
-  setTimeout(() => {
-    btn.textContent = 'Enviar consulta';
-    btn.style.background = '';
-    btn.style.color = '';
-  }, 4000);
+async function handleContact(btn) {
+  var form = btn.closest('.contact-form');
+  var inputs = form.querySelectorAll('input[type=text]');
+  var nombre = inputs[0].value.trim();
+  var empresa = inputs[1].value.trim();
+  var email = form.querySelector('input[type=email]').value.trim();
+  var mensaje = form.querySelector('textarea').value.trim();
+  if(!nombre||!email){alert('Por favor completa nombre y email.');return;}
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+  try {
+    var r = await fetch('/.netlify/functions/contact', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({nombre:nombre, empresa:empresa, email:email, mensaje:mensaje})
+    });
+    if(r.ok){
+      btn.textContent = '✓ Mensaje enviado';
+      btn.style.background = '#E6F4FB';
+      btn.style.color = '#0C4A72';
+    } else {
+      btn.textContent = 'Error al enviar — intentá de nuevo';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    btn.textContent = 'Error al enviar — intentá de nuevo';
+    btn.disabled = false;
+  }
 }
 </script>
 </body>
