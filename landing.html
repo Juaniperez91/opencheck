@@ -457,8 +457,7 @@ async function handleContact(btn) {
     var r = await fetch('/.netlify/functions/contact', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      var celular = form.querySelector('input[type=tel]') ? form.querySelector('input[type=tel]').value.trim() : '';
-      body: JSON.stringify({nombre:nombre, empresa:empresa, email:email, celular:celular, mensaje:mensaje})
+      body: JSON.stringify({nombre:nombre, empresa:empresa, email:email, celular: form.querySelector('input[type=tel]') ? form.querySelector('input[type=tel]').value.trim() : '', mensaje:mensaje})
     });
     if(r.ok){
       btn.textContent = '✓ Mensaje enviado';
