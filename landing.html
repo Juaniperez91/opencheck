@@ -419,7 +419,6 @@ footer{padding:40px;border-top:1px solid var(--s3)}
         <input class="form-input" type="text" placeholder="Nombre y apellido">
         <input class="form-input" type="text" placeholder="Empresa / Organización">
         <input class="form-input full" type="email" placeholder="Email de contacto">
-        <input class="form-input full" type="tel" placeholder="Celular de contacto (opcional)">
         <textarea class="form-input full" placeholder="¿En qué contexto te interesa OpenCheck?"></textarea>
       </div>
       <button class="btn btn-white btn-xl" style="width:100%" onclick="handleContact(this)">Enviar consulta</button>
@@ -458,7 +457,8 @@ async function handleContact(btn) {
     var r = await fetch('/.netlify/functions/contact', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({nombre:nombre, empresa:empresa, email:email, mensaje:mensaje})
+      var celular = form.querySelector('input[type=tel]') ? form.querySelector('input[type=tel]').value.trim() : '';
+      body: JSON.stringify({nombre:nombre, empresa:empresa, email:email, celular:celular, mensaje:mensaje})
     });
     if(r.ok){
       btn.textContent = '✓ Mensaje enviado';
