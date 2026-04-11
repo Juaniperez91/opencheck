@@ -9,6 +9,7 @@ exports.handler = async function(event) {
   const nombre = body.nombre || '';
   const empresa = body.empresa || '';
   const email = body.email || '';
+  const celular = body.celular || '';
   const mensaje = body.mensaje || '';
 
   if (!email || !nombre) {
@@ -24,6 +25,7 @@ exports.handler = async function(event) {
     + '<p><strong>Nombre:</strong> ' + nombre + '</p>'
     + '<p><strong>Empresa:</strong> ' + (empresa || '—') + '</p>'
     + '<p><strong>Email:</strong> ' + email + '</p>'
+    + '<p><strong>Celular:</strong> ' + (celular || '—') + '</p>'
     + '<p><strong>Mensaje:</strong> ' + (mensaje || '(sin mensaje)') + '</p>'
     + '<hr><p style="color:#aaa;font-size:12px">Responde a este email para contactar a ' + nombre + '</p>'
     + '</div>';
