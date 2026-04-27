@@ -803,6 +803,10 @@ async function regNext(){
     };
     users.push(newUser);
     setUsers(users);
+    // Guardar en Supabase
+    try {
+      await sbCreateUser(newUser);
+    } catch(e) { console.log('SB user create error:', e.message); }
     addLog('Registro: '+newUser.email,'auth');
     showLogin();
     showToast('Cuenta creada. Podés ingresar con tus credenciales','success');
@@ -3005,6 +3009,30 @@ async function sbRequest(endpoint, method, body) {
     console.log('Supabase request failed:', e.message);
     return null;
   }
+}
+
+async function sbCreateUser(user) {
+  return await sbRequest('users', 'POST', {
+    id: user.id,
+    email: user.email,
+    pass: user.pass,
+    name: user.name,
+    cuit: user.cuit,
+    tipopersona: user.tipopersona,
+    tel: user.tel,
+    role: user.role,
+    roles: user.roles,
+    status: user.status || 'active',
+    id_verified: user.idVerified || false,
+    tyc: user.tyc || false,
+    tyc_ts: user.tycTs,
+    created_at: user.createdAt
+  });
+}
+
+async function sbGetUserByEmail(email) {
+  var r = await sbRequest('users?email=eq.' + encodeURIComponent(email));
+  return (r && r.length > 0) ? r[0] : null;
 }
 
 async function sbInsertScoringHistory(checkId, cuitLibrador, cuitVendedor, scoringResult, motorConfig, bcraData, nosisData) {
