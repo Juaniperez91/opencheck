@@ -471,11 +471,32 @@ function initData(){
 // ============================================================
 // AUTH
 // ============================================================
-function doLogin(){
+async function doLogin(){
   var email=document.getElementById('login-email').value.trim().toLowerCase();
   var pass=document.getElementById('login-pass').value;
   clearLoginError();
   if(!email||!pass){showLoginError('Completá email y contraseña.');return;}
+  // Si no es admin ni demo, buscar en Supabase y sincronizar
+  var demoEmails=['admin@opencheck.com','vendedor@test.com','inversor@test.com'];
+  if(demoEmails.indexOf(email)<0){
+    try {
+      var sbUser = await sbGetUserByEmail(email);
+      if(sbUser){
+        var users = getUsers();
+        var idx = users.findIndex(function(u){return (u.email||'').toLowerCase()===email;});
+        var localUser = {
+          id: sbUser.id, email: sbUser.email, pass: sbUser.pass, name: sbUser.name,
+          cuit: sbUser.cuit, tipopersona: sbUser.tipopersona, tel: sbUser.tel,
+          role: sbUser.role, roles: sbUser.roles, status: sbUser.status,
+          idVerified: sbUser.id_verified, tyc: sbUser.tyc, tycTs: sbUser.tyc_ts,
+          createdAt: sbUser.created_at
+        };
+        if(idx>=0) users[idx] = localUser;
+        else users.push(localUser);
+        setUsers(users);
+      }
+    } catch(e) { console.log('SB login sync error:', e.message); }
+  }
 
   // Admin: strict validation
   if(email==='admin@opencheck.com'){
