@@ -414,6 +414,19 @@ function addLog(msg,type){
   logs.unshift({msg:msg,type:type||'info',ts:Date.now()});
   if(logs.length>200)logs=logs.slice(0,200);
   lsSet('logs',logs);
+  // Guardar en Supabase (fire-and-forget)
+  try {
+    sbInsertLog(msg, type, state.currentUser ? state.currentUser.id : null);
+  } catch(e) {}
+}
+
+async function sbGetAllLogs(limit) {
+  limit = limit || 100;
+  var r = await sbRequest('logs?order=ts.desc&limit=' + limit);
+  if (!r) return [];
+  return r.map(function(l){
+    return {msg: l.msg, type: l.type, ts: parseInt(l.ts), userId: l.user_id};
+  });
 }
 function getSpreads(){return lsGet('spreads')||SPREADS}
 function setSpreads(s){lsSet('spreads',s)}
@@ -942,7 +955,7 @@ function navigateTo(page){
   else if(page==='inversor-marketplace')mc.innerHTML=renderMarketplace();
   else if(page==='inversor-cartera')mc.innerHTML=renderCarteraInversor();
   else if(page==='inversor-ofertas')mc.innerHTML=renderMisOfertas();
-  else if(page==='admin-panel')mc.innerHTML=renderAdminPanel();
+  else if(page==='admin-panel'){mc.innerHTML=renderAdminPanel();loadAdminLogsFromSupabase();}
   else if(page==='admin-tasas')mc.innerHTML=renderAdminTasas();
   else if(page==='admin-scoring'){mc.innerHTML=renderAdminScoring();initScoringAdminContent();}
   else if(page==='admin-usuarios')mc.innerHTML=renderAdminUsuarios();
@@ -2357,7 +2370,7 @@ function renderAdminPanel(){
   });
   html+='</div></div>';
   // Activity log
-  html+='<div class="card"><div class="card-header"><div class="card-title">Log de actividad</div></div>';
+  html+='<div class="card"><div class="card-header"><div class="card-title">Log de actividad (centralizado)</div><span style="font-size:11px;color:var(--t3)" id="logs-source">Cargando desde Supabase...</span></div>';
   html+='<div id="admin-logs">';
   if(!logs.length)html+='<div class="empty-state"><div class="empty-state-icon">📋</div><h3>Sin actividad</h3></div>';
   else logs.slice(0,20).forEach(function(l){
@@ -2366,6 +2379,26 @@ function renderAdminPanel(){
   });
   html+='</div></div>';
   return html;
+}
+
+async function loadAdminLogsFromSupabase() {
+  try {
+    var sbLogs = await sbGetAllLogs(50);
+    var container = document.getElementById('admin-logs');
+    var sourceEl = document.getElementById('logs-source');
+    if (!container) return;
+    if (sbLogs.length === 0) {
+      if (sourceEl) sourceEl.textContent = 'Sin logs en Supabase';
+      return;
+    }
+    if (sourceEl) sourceEl.textContent = sbLogs.length + ' eventos desde Supabase';
+    var colors = {auth:'var(--bd)',check:'var(--g)',offer:'var(--am)',system:'var(--t3)'};
+    container.innerHTML = sbLogs.map(function(l){
+      var color = colors[l.type] || 'var(--t3)';
+      var userTag = l.userId ? '<span style="font-size:11px;color:var(--t3);margin-left:8px">[' + l.userId + ']</span>' : '';
+      return '<div class="log-entry"><div class="log-dot" style="background:' + color + '"></div><div style="flex:1"><div class="log-text">' + l.msg + userTag + '</div><div class="log-time">' + new Date(l.ts).toLocaleString('es-AR') + '</div></div></div>';
+    }).join('');
+  } catch(e) { console.log('Error cargando logs:', e.message); }
 }
 
 // ============================================================
