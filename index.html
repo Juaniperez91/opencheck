@@ -350,6 +350,7 @@ tr:hover td{background:var(--s2)}
   <div class="modal" id="modal-box"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============================================================
 // CONSTANTS & STATE
@@ -593,6 +594,7 @@ function showLoginError(msg){
 function clearLoginError(){document.getElementById('login-error').classList.add('hidden')}
 function doLogout(){
   addLog('Logout: '+state.currentUser.email,'auth');
+  unsubscribeAll();
   state.currentUser=null;state.currentRole=null;state.currentPage=null;
   var appEl=document.getElementById('screen-app');
   appEl.classList.add('hidden');
@@ -854,6 +856,12 @@ function regBack(){if(regStep>0){regStep--;renderRegStep();}}
 // ============================================================
 async function enterApp(){
   fetchTamarBCRA(); // Actualizar TAMAR desde BCRA al ingresar
+  // Inicializar Realtime
+  initRealtime();
+  unsubscribeAll();
+  subscribeToChecks();
+  subscribeToOffers();
+  if (state.currentRole === 'admin') subscribeToLogs();
   // Sincronizar cheques desde Supabase si no es admin
   if (state.currentUser && state.currentRole !== 'admin') {
     try {
@@ -3249,6 +3257,117 @@ async function sbInsertLog(msg, type, userId) {
 async function sbTestConnection() {
   var r = await sbRequest('users?limit=1');
   return r !== null;
+}
+
+// ============================================================
+// SUPABASE REALTIME
+// ============================================================
+var sbRealtimeClient = null;
+var sbChannels = [];
+
+function initRealtime() {
+  if (typeof supabase === 'undefined') { console.log('Supabase SDK no cargado'); return; }
+  if (sbRealtimeClient) return;
+  try {
+    sbRealtimeClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('Realtime inicializado');
+  } catch(e) { console.log('Error realtime:', e.message); }
+}
+
+function subscribeToChecks() {
+  if (!sbRealtimeClient) return;
+  var ch = sbRealtimeClient.channel('checks-changes')
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'checks'}, function(payload) {
+      console.log('Check change:', payload.eventType, payload.new || payload.old);
+      handleCheckChange(payload);
+    })
+    .subscribe();
+  sbChannels.push(ch);
+}
+
+function subscribeToOffers() {
+  if (!sbRealtimeClient) return;
+  var ch = sbRealtimeClient.channel('offers-changes')
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'offers'}, function(payload) {
+      console.log('Offer change:', payload.eventType, payload.new || payload.old);
+      handleOfferChange(payload);
+    })
+    .subscribe();
+  sbChannels.push(ch);
+}
+
+function subscribeToLogs() {
+  if (!sbRealtimeClient) return;
+  var ch = sbRealtimeClient.channel('logs-changes')
+    .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'logs'}, function(payload) {
+      handleLogChange(payload);
+    })
+    .subscribe();
+  sbChannels.push(ch);
+}
+
+function unsubscribeAll() {
+  sbChannels.forEach(function(ch) { try { sbRealtimeClient.removeChannel(ch); } catch(e) {} });
+  sbChannels = [];
+}
+
+function handleCheckChange(payload) {
+  if (!state.currentUser) return;
+  var newRecord = payload.new;
+  if (!newRecord) return;
+  var checks = getChecks();
+  var idx = checks.findIndex(function(c){ return c.id === newRecord.id; });
+  var localCheck = {
+    id: newRecord.id, ownerId: newRecord.owner_id, tipo: newRecord.tipo,
+    cuitLibrador: newRecord.cuit_librador, razonLibrador: newRecord.razon_librador,
+    monto: parseFloat(newRecord.monto), fechaEmision: newRecord.fecha_emision,
+    fechaPago: newRecord.fecha_pago, banco: newRecord.banco, nroEcheq: newRecord.nro_echeq,
+    status: newRecord.status, scoring: newRecord.scoring,
+    tasa: newRecord.tasa ? parseFloat(newRecord.tasa) : null,
+    acordadoCon: newRecord.acordado_con, createdAt: newRecord.created_at
+  };
+  if (idx >= 0) checks[idx] = localCheck;
+  else checks.push(localCheck);
+  setChecks(checks);
+  if (state.page === 'marketplace' || state.page === 'vendedor-dashboard' || state.page === 'inversor-mis-ofertas') {
+    navigateTo(state.page);
+    showToast('Actualización en tiempo real','info');
+  }
+}
+
+function handleOfferChange(payload) {
+  if (!state.currentUser) return;
+  var newRecord = payload.new;
+  if (!newRecord) return;
+  var offers = getOffers();
+  var idx = offers.findIndex(function(o){ return o.id === newRecord.id; });
+  var localOffer = {
+    id: newRecord.id, checkId: newRecord.check_id, investorId: newRecord.investor_id,
+    tasa: parseFloat(newRecord.tasa), status: newRecord.status,
+    counteroffered: newRecord.counteroffered, createdAt: newRecord.created_at
+  };
+  if (idx >= 0) offers[idx] = localOffer;
+  else offers.push(localOffer);
+  setOffers(offers);
+  // Notificar al vendedor de cheque relevante
+  var checks = getChecks();
+  var related = checks.find(function(c){ return c.id === newRecord.check_id; });
+  if (related && related.ownerId === state.currentUser.id && payload.eventType === 'INSERT') {
+    showToast('Nueva oferta recibida en tu cheque','success');
+  }
+  if (newRecord.investor_id === state.currentUser.id && payload.eventType === 'UPDATE') {
+    if (newRecord.status === 'aceptada') showToast('¡Tu oferta fue aceptada!','success');
+    if (newRecord.status === 'rechazada') showToast('Tu oferta fue rechazada','warning');
+  }
+  if (state.page === 'marketplace' || state.page === 'vendedor-dashboard' || state.page === 'inversor-mis-ofertas') {
+    navigateTo(state.page);
+  }
+}
+
+function handleLogChange(payload) {
+  if (state.currentRole !== 'admin') return;
+  if (state.page !== 'admin-panel') return;
+  loadAdminLogsFromSupabase();
 }
 
 // ============================================================
