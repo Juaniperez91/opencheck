@@ -3330,8 +3330,8 @@ function handleCheckChange(payload) {
   else checks.push(localCheck);
   setChecks(checks);
   if (state.page === 'marketplace' || state.page === 'vendedor-dashboard' || state.page === 'inversor-mis-ofertas') {
-    navigateTo(state.page);
     showToast('Actualización en tiempo real','info');
+    setTimeout(function(){ navigateTo(state.page); }, 100);
   }
 }
 
@@ -3360,7 +3360,7 @@ function handleOfferChange(payload) {
     if (newRecord.status === 'rechazada') showToast('Tu oferta fue rechazada','warning');
   }
   if (state.page === 'marketplace' || state.page === 'vendedor-dashboard' || state.page === 'inversor-mis-ofertas') {
-    navigateTo(state.page);
+    setTimeout(function(){ navigateTo(state.page); }, 100);
   }
 }
 
