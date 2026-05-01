@@ -421,6 +421,15 @@ function addLog(msg,type){
   } catch(e) {}
 }
 
+async function sbGetScoringHistory(limit, offset, cuitFilter, dateFromFilter) {
+  limit = limit || 50; offset = offset || 0;
+  var query = 'scoring_history?order=created_at.desc&limit=' + limit + '&offset=' + offset;
+  if (cuitFilter) query += '&cuit_librador=ilike.*' + encodeURIComponent(cuitFilter) + '*';
+  if (dateFromFilter) query += '&created_at=gte.' + encodeURIComponent(dateFromFilter);
+  var r = await sbRequest(query);
+  return r || [];
+}
+
 async function sbGetAllLogs(limit) {
   limit = limit || 100;
   var r = await sbRequest('logs?order=ts.desc&limit=' + limit);
@@ -963,7 +972,7 @@ function navigateTo(page){
   else if(page==='inversor-marketplace')mc.innerHTML=renderMarketplace();
   else if(page==='inversor-cartera')mc.innerHTML=renderCarteraInversor();
   else if(page==='inversor-ofertas')mc.innerHTML=renderMisOfertas();
-  else if(page==='admin-panel'){mc.innerHTML=renderAdminPanel();loadAdminLogsFromSupabase();}
+  else if(page==='admin-panel'){mc.innerHTML=renderAdminPanel();loadAdminLogsFromSupabase();loadScoringHistory(true);}
   else if(page==='admin-tasas')mc.innerHTML=renderAdminTasas();
   else if(page==='admin-scoring'){mc.innerHTML=renderAdminScoring();initScoringAdminContent();}
   else if(page==='admin-usuarios')mc.innerHTML=renderAdminUsuarios();
@@ -2400,6 +2409,78 @@ function doCalcHTML(monto,tasa,dias){
 // ============================================================
 // ADMIN PANEL
 // ============================================================
+var _shState = {page: 0, pageSize: 50, cuit: '', dateFrom: '', total: 0, items: []};
+
+async function loadScoringHistory(reset) {
+  if (reset) _shState.page = 0;
+  var dateFromIso = _shState.dateFrom ? new Date(_shState.dateFrom).toISOString() : '';
+  _shState.items = await sbGetScoringHistory(_shState.pageSize, _shState.page * _shState.pageSize, _shState.cuit, dateFromIso);
+  _shState.total = _shState.items.length;
+  renderScoringHistoryTable();
+}
+
+function renderScoringHistoryTable() {
+  var c = document.getElementById('sh-table-container');
+  if (!c) return;
+  if (_shState.items.length === 0) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Sin resultados</h3></div>'; return; }
+  var catColors = {A1:'#085041',A2:'#0F6E56',B1:'#0C447C',B2:'#3730A3',C1:'#854F0B',C2:'#791F1F'};
+  var catBgs = {A1:'#E1F5EE',A2:'#E1F5EE',B1:'#E6F1FB',B2:'#EEF2FF',C1:'#FAEEDA',C2:'#FCEBEB'};
+  var h = '<table class="data-table"><thead><tr><th>Fecha</th><th>CUIT Librador</th><th>Categoría</th><th>Puntos</th><th>TAMAR</th><th></th></tr></thead><tbody>';
+  _shState.items.forEach(function(item, idx){
+    var sr = item.scoring_result || {}; var mc = item.motor_config || {};
+    var cat = sr.cat || '—';
+    h += '<tr><td style="font-size:13px;color:var(--t2)">' + new Date(item.created_at).toLocaleString('es-AR') + '</td>';
+    h += '<td style="font-family:var(--mono);font-size:13px">' + (item.cuit_librador || '—') + '</td>';
+    h += '<td><span style="display:inline-block;padding:4px 10px;border-radius:6px;background:' + (catBgs[cat]||'#f5f5f5') + ';color:' + (catColors[cat]||'#666') + ';font-family:var(--mono);font-size:12px;font-weight:700">' + cat + '</span></td>';
+    h += '<td style="font-family:var(--mono);font-weight:600">' + (sr.pts || '—') + '</td>';
+    h += '<td style="font-family:var(--mono);font-size:13px;color:var(--t2)">' + (mc.tamar ? mc.tamar.toFixed(2) + '%' : '—') + '</td>';
+    h += '<td><button class="btn btn-sm" onclick="showScoringDetail(' + idx + ')">Ver</button></td></tr>';
+  });
+  h += '</tbody></table>';
+  c.innerHTML = h;
+}
+
+function shApplyFilters(){
+  _shState.cuit = document.getElementById('sh-filter-cuit').value.trim();
+  _shState.dateFrom = document.getElementById('sh-filter-date').value;
+  loadScoringHistory(true);
+}
+function shClearFilters(){
+  document.getElementById('sh-filter-cuit').value = '';
+  document.getElementById('sh-filter-date').value = '';
+  _shState.cuit = ''; _shState.dateFrom = '';
+  loadScoringHistory(true);
+}
+
+function showScoringDetail(idx) {
+  var item = _shState.items[idx]; if (!item) return;
+  var sr = item.scoring_result || {}; var mc = item.motor_config || {};
+  var h = '<div class="modal-backdrop" onclick="closeScoringDetail()"><div class="modal" onclick="event.stopPropagation()" style="max-width:680px;max-height:80vh;overflow-y:auto">';
+  h += '<div class="modal-header"><h3>Detalle del scoring</h3><button class="modal-close" onclick="closeScoringDetail()">×</button></div>';
+  h += '<div class="modal-body">';
+  h += '<div style="background:var(--s2);padding:16px;border-radius:8px;margin-bottom:16px">';
+  h += '<p style="margin:4px 0"><strong>Fecha:</strong> ' + new Date(item.created_at).toLocaleString('es-AR') + '</p>';
+  h += '<p style="margin:4px 0"><strong>CUIT librador:</strong> ' + (item.cuit_librador || '—') + '</p>';
+  h += '<p style="margin:4px 0"><strong>CUIT vendedor:</strong> ' + (item.cuit_vendedor || '—') + '</p>';
+  h += '<p style="margin:4px 0"><strong>Resultado:</strong> ' + (sr.cat || '—') + ' · ' + (sr.pts || 0) + ' puntos</p>';
+  h += '<p style="margin:4px 0"><strong>Recomendación:</strong> ' + (sr.rec || '—') + '</p></div>';
+  if (sr.factores && sr.factores.length) {
+    h += '<div style="margin-bottom:16px"><div style="font-size:12px;color:var(--t3);text-transform:uppercase;margin-bottom:8px">Factores evaluados</div><ul style="font-size:13px;color:var(--t2);padding-left:20px">';
+    sr.factores.forEach(function(f){ h += '<li>' + f + '</li>'; });
+    h += '</ul></div>';
+  }
+  if (mc.weights) {
+    h += '<div style="margin-bottom:16px"><div style="font-size:12px;color:var(--t3);text-transform:uppercase;margin-bottom:8px">Config motor</div>';
+    h += '<div style="background:var(--s2);padding:12px;border-radius:8px;font-family:var(--mono);font-size:12px">TAMAR: ' + (mc.tamar ? mc.tamar.toFixed(4) + '%' : '—') + '<br>';
+    Object.keys(mc.weights).forEach(function(k){ h += k + ': ' + mc.weights[k] + '%<br>'; });
+    h += '</div></div>';
+  }
+  h += '</div></div></div>';
+  document.getElementById('modal-container').innerHTML = h;
+}
+
+function closeScoringDetail() { document.getElementById('modal-container').innerHTML = ''; }
+
 function renderAdminPanel(){
   var users=getUsers();
   var checks=getChecks();
@@ -2493,6 +2574,16 @@ function renderAdminPanel(){
     html+='<div style="flex:1;min-width:80px;text-align:center;background:var(--s2);border-radius:var(--rl2);padding:12px"><span class="badge badge-'+c+'">'+c+'</span><div class="bold text-xl" style="margin-top:6px">'+cnt+'</div><div class="text-sm" style="color:var(--t3)">cheques</div></div>';
   });
   html+='</div></div>';
+  // Scoring history
+  html+='<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Historial de scorings</div><span style="font-size:11px;color:var(--t3)">Auditoría de operaciones</span></div>';
+  html+='<div class="flex gap-8" style="margin-bottom:16px;flex-wrap:wrap">';
+  html+='<input type="text" id="sh-filter-cuit" placeholder="CUIT librador" class="input" style="flex:1;min-width:160px">';
+  html+='<input type="date" id="sh-filter-date" class="input" style="flex:1;min-width:160px">';
+  html+='<button class="btn btn-primary btn-sm" onclick="shApplyFilters()">Filtrar</button>';
+  html+='<button class="btn btn-secondary btn-sm" onclick="shClearFilters()">Limpiar</button>';
+  html+='</div>';
+  html+='<div id="sh-table-container"><div style="text-align:center;padding:40px;color:var(--t3)">Cargando historial...</div></div>';
+  html+='</div>';
   // Activity log
   html+='<div class="card"><div class="card-header"><div class="card-title">Log de actividad (centralizado)</div><span style="font-size:11px;color:var(--t3)" id="logs-source">Cargando desde Supabase...</span></div>';
   html+='<div id="admin-logs">';
