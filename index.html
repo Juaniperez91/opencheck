@@ -244,6 +244,7 @@ tr:hover td{background:var(--s2)}
 
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
+<div id="modal-container"></div>
 
 <!-- SCREEN: LOGIN -->
 <div id="screen-login">
@@ -421,11 +422,12 @@ function addLog(msg,type){
   } catch(e) {}
 }
 
-async function sbGetScoringHistory(limit, offset, cuitFilter, dateFromFilter) {
+async function sbGetScoringHistory(limit, offset, cuitFilter, dateFromFilter, dateToFilter) {
   limit = limit || 50; offset = offset || 0;
   var query = 'scoring_history?order=created_at.desc&limit=' + limit + '&offset=' + offset;
   if (cuitFilter) query += '&cuit_librador=ilike.*' + encodeURIComponent(cuitFilter) + '*';
   if (dateFromFilter) query += '&created_at=gte.' + encodeURIComponent(dateFromFilter);
+  if (dateToFilter) query += '&created_at=lte.' + encodeURIComponent(dateToFilter);
   var r = await sbRequest(query);
   return r || [];
 }
@@ -2409,12 +2411,18 @@ function doCalcHTML(monto,tasa,dias){
 // ============================================================
 // ADMIN PANEL
 // ============================================================
-var _shState = {page: 0, pageSize: 50, cuit: '', dateFrom: '', total: 0, items: []};
+var _shState = {page: 0, pageSize: 50, cuit: '', dateFrom: '', dateTo: '', total: 0, items: []};
 
 async function loadScoringHistory(reset) {
   if (reset) _shState.page = 0;
   var dateFromIso = _shState.dateFrom ? new Date(_shState.dateFrom).toISOString() : '';
-  _shState.items = await sbGetScoringHistory(_shState.pageSize, _shState.page * _shState.pageSize, _shState.cuit, dateFromIso);
+  var dateToIso = '';
+  if (_shState.dateTo) {
+    var dt = new Date(_shState.dateTo);
+    dt.setHours(23,59,59,999);
+    dateToIso = dt.toISOString();
+  }
+  _shState.items = await sbGetScoringHistory(_shState.pageSize, _shState.page * _shState.pageSize, _shState.cuit, dateFromIso, dateToIso);
   _shState.total = _shState.items.length;
   renderScoringHistoryTable();
 }
@@ -2442,13 +2450,15 @@ function renderScoringHistoryTable() {
 
 function shApplyFilters(){
   _shState.cuit = document.getElementById('sh-filter-cuit').value.trim();
-  _shState.dateFrom = document.getElementById('sh-filter-date').value;
+  _shState.dateFrom = document.getElementById('sh-filter-date-from').value;
+  _shState.dateTo = document.getElementById('sh-filter-date-to').value;
   loadScoringHistory(true);
 }
 function shClearFilters(){
   document.getElementById('sh-filter-cuit').value = '';
-  document.getElementById('sh-filter-date').value = '';
-  _shState.cuit = ''; _shState.dateFrom = '';
+  document.getElementById('sh-filter-date-from').value = '';
+  document.getElementById('sh-filter-date-to').value = '';
+  _shState.cuit = ''; _shState.dateFrom = ''; _shState.dateTo = '';
   loadScoringHistory(true);
 }
 
@@ -2578,7 +2588,8 @@ function renderAdminPanel(){
   html+='<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Historial de scorings</div><span style="font-size:11px;color:var(--t3)">Auditoría de operaciones</span></div>';
   html+='<div class="flex gap-8" style="margin-bottom:16px;flex-wrap:wrap">';
   html+='<input type="text" id="sh-filter-cuit" placeholder="CUIT librador" class="input" style="flex:1;min-width:160px">';
-  html+='<input type="date" id="sh-filter-date" class="input" style="flex:1;min-width:160px">';
+  html+='<input type="date" id="sh-filter-date-from" placeholder="Desde" class="input" style="flex:1;min-width:140px" title="Desde">';
+  html+='<input type="date" id="sh-filter-date-to" placeholder="Hasta" class="input" style="flex:1;min-width:140px" title="Hasta">';
   html+='<button class="btn btn-primary btn-sm" onclick="shApplyFilters()">Filtrar</button>';
   html+='<button class="btn btn-secondary btn-sm" onclick="shClearFilters()">Limpiar</button>';
   html+='</div>';
