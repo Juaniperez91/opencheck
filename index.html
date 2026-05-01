@@ -2070,6 +2070,28 @@ async function respondOffer(offerId,status,checkId){
   try {
     await sbUpdateOffer(offerId, {status: status});
   } catch(e) { console.log('SB offer update error:', e.message); }
+  // Notificar al inversor por email
+  try {
+    var users = getUsers();
+    var investor = users.find(function(u){ return u.id === offers[idx].investorId; });
+    if (!investor) {
+      try {
+        var r = await sbRequest('users?id=eq.' + offers[idx].investorId);
+        if (r && r.length > 0) investor = r[0];
+      } catch(e) {}
+    }
+    if (investor && investor.email) {
+      var checks = getChecks();
+      var theCheck = checks.find(function(c){ return c.id === checkId; });
+      var tipo = status === 'aceptada' ? 'oferta_aceptada' : 'oferta_rechazada';
+      await sendNotification(tipo, investor.email, {
+        nombre: investor.name || '',
+        librador: theCheck ? theCheck.razonLibrador : '',
+        monto: theCheck ? formatMoney(theCheck.monto) : '',
+        tasa: offers[idx].tasa
+      });
+    }
+  } catch(e) { console.log('Notif error:', e.message); }
   if(status==='aceptada'){
     var checks=getChecks();
     var ci=checks.findIndex(function(c){return c.id===checkId;});
@@ -2250,6 +2272,31 @@ async function submitOffer(checkId){
   try {
     await sbCreateOffer(newOffer);
   } catch(e) { console.log('SB offer create error:', e.message); }
+  // Notificar al vendedor por email
+  try {
+    var checks = getChecks();
+    var theCheck = checks.find(function(c){ return c.id === checkId; });
+    if (theCheck) {
+      var users = getUsers();
+      var owner = users.find(function(u){ return u.id === theCheck.ownerId; });
+      if (!owner && theCheck.ownerId) {
+        var sbOwner = await sbGetUserByEmail('').catch(function(){ return null; });
+        // Buscar por id en supabase
+        try {
+          var r = await sbRequest('users?id=eq.' + theCheck.ownerId);
+          if (r && r.length > 0) owner = r[0];
+        } catch(e) {}
+      }
+      if (owner && owner.email) {
+        await sendNotification('nueva_oferta', owner.email, {
+          nombre: owner.name || '',
+          librador: theCheck.razonLibrador,
+          monto: formatMoney(theCheck.monto),
+          tasa: tasa
+        });
+      }
+    }
+  } catch(e) { console.log('Notif error:', e.message); }
   // update check status
   var checks=getChecks();
   var idx=checks.findIndex(function(c){return c.id===checkId;});
@@ -3262,6 +3309,17 @@ async function sbInsertLog(msg, type, userId) {
 async function sbTestConnection() {
   var r = await sbRequest('users?limit=1');
   return r !== null;
+}
+
+async function sendNotification(tipo, destinatario, data) {
+  if (!destinatario) return;
+  try {
+    await fetch('/.netlify/functions/notify', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({tipo: tipo, destinatario: destinatario, data: data})
+    });
+  } catch(e) { console.log('Notify error:', e.message); }
 }
 
 // ============================================================
