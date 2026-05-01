@@ -1521,7 +1521,7 @@ async function confirmPublish(tasa){
   addLog('Cheque publicado: '+checks[idx].razonLibrador+' $'+formatMoney(checks[idx].monto)+' '+window._pwScoring.cat,'check');
   try {
     await sbUpdateCheck(checks[idx].id, {status: 'publicado', scoring: window._pwScoring, tasa: tasa});
-    await sbInsertScoringHistory(checks[idx].id, checks[idx].cuitLibrador, state.currentUser ? state.currentUser.cuit : '', window._pwScoring, {weights: getScoringWeights(), tamar: getTamar()}, window._pwBcraData || null, window._pwNosis || null);
+    await sbInsertScoringHistory(checks[idx].id, checks[idx].cuitLibrador, state.currentUser ? state.currentUser.cuit : '', window._pwScoring, {weights: getScoringWeights(), tamar: getTamar()}, window._pwBcraData || null, window._pwNosis || null, checks[idx].razonLibrador, state.currentUser ? state.currentUser.name : '');
   } catch(e) { console.log('SB error:', e.message); }
   closeModal();
   showToast('Cheque publicado en el marketplace','success');
@@ -2433,12 +2433,12 @@ function renderScoringHistoryTable() {
   if (_shState.items.length === 0) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Sin resultados</h3></div>'; return; }
   var catColors = {A1:'#085041',A2:'#0F6E56',B1:'#0C447C',B2:'#3730A3',C1:'#854F0B',C2:'#791F1F'};
   var catBgs = {A1:'#E1F5EE',A2:'#E1F5EE',B1:'#E6F1FB',B2:'#EEF2FF',C1:'#FAEEDA',C2:'#FCEBEB'};
-  var h = '<table class="data-table"><thead><tr><th>Fecha</th><th>CUIT Librador</th><th>Categoría</th><th>Puntos</th><th>TAMAR</th><th></th></tr></thead><tbody>';
+  var h = '<table class="data-table"><thead><tr><th>Fecha</th><th>Librador</th><th>Categoría</th><th>Puntos</th><th>TAMAR</th><th></th></tr></thead><tbody>';
   _shState.items.forEach(function(item, idx){
     var sr = item.scoring_result || {}; var mc = item.motor_config || {};
     var cat = sr.cat || '—';
     h += '<tr><td style="font-size:13px;color:var(--t2)">' + new Date(item.created_at).toLocaleString('es-AR') + '</td>';
-    h += '<td style="font-family:var(--mono);font-size:13px">' + (item.cuit_librador || '—') + '</td>';
+    h += '<td><div style="font-size:13px;font-weight:500">' + (item.razon_librador || '—') + '</div><div style="font-family:var(--mono);font-size:11px;color:var(--t3)">' + (item.cuit_librador || '—') + '</div></td>';
     h += '<td><span style="display:inline-block;padding:4px 10px;border-radius:6px;background:' + (catBgs[cat]||'#f5f5f5') + ';color:' + (catColors[cat]||'#666') + ';font-family:var(--mono);font-size:12px;font-weight:700">' + cat + '</span></td>';
     h += '<td style="font-family:var(--mono);font-weight:600">' + (sr.pts || '—') + '</td>';
     h += '<td style="font-family:var(--mono);font-size:13px;color:var(--t2)">' + (mc.tamar ? mc.tamar.toFixed(2) + '%' : '—') + '</td>';
@@ -2469,8 +2469,8 @@ function showScoringDetail(idx) {
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--s3)"><h3 style="margin:0;font-size:18px;font-weight:600">Detalle del scoring</h3><button onclick="closeScoringDetail()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--t3);padding:0 8px">×</button></div>';
   h += '<div style="background:var(--s2);padding:16px;border-radius:8px;margin-bottom:16px">';
   h += '<p style="margin:4px 0"><strong>Fecha:</strong> ' + new Date(item.created_at).toLocaleString('es-AR') + '</p>';
-  h += '<p style="margin:4px 0"><strong>CUIT librador:</strong> ' + (item.cuit_librador || '—') + '</p>';
-  h += '<p style="margin:4px 0"><strong>CUIT vendedor:</strong> ' + (item.cuit_vendedor || '—') + '</p>';
+  h += '<p style="margin:4px 0"><strong>Librador:</strong> ' + (item.razon_librador || '—') + ' <span style="font-family:var(--mono);color:var(--t3);font-size:13px">(' + (item.cuit_librador || '—') + ')</span></p>';
+  h += '<p style="margin:4px 0"><strong>Vendedor:</strong> ' + (item.razon_vendedor || '—') + ' <span style="font-family:var(--mono);color:var(--t3);font-size:13px">(' + (item.cuit_vendedor || '—') + ')</span></p>';
   h += '<p style="margin:4px 0"><strong>Resultado:</strong> ' + (sr.cat || '—') + ' · ' + (sr.pts || 0) + ' puntos</p>';
   h += '<p style="margin:4px 0"><strong>Recomendación:</strong> ' + (sr.rec || '—') + '</p></div>';
   if (sr.factores && sr.factores.length) {
@@ -2586,9 +2586,9 @@ function renderAdminPanel(){
   // Scoring history
   html+='<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Historial de scorings</div><span style="font-size:11px;color:var(--t3)">Auditoría de operaciones</span></div>';
   html+='<div class="flex gap-8" style="margin-bottom:16px;flex-wrap:wrap">';
-  html+='<input type="text" id="sh-filter-cuit" placeholder="CUIT librador" class="input" style="flex:1;min-width:160px">';
-  html+='<input type="date" id="sh-filter-date-from" placeholder="Desde" class="input" style="flex:1;min-width:140px" title="Desde">';
-  html+='<input type="date" id="sh-filter-date-to" placeholder="Hasta" class="input" style="flex:1;min-width:140px" title="Hasta">';
+  html+='<div style="flex:1;min-width:160px"><label style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:block">CUIT librador</label><input type="text" id="sh-filter-cuit" placeholder="Ej: 30715813951" class="input" style="width:100%"></div>';
+  html+='<div style="flex:1;min-width:140px"><label style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:block">Desde</label><input type="date" id="sh-filter-date-from" class="input" style="width:100%"></div>';
+  html+='<div style="flex:1;min-width:140px"><label style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:block">Hasta</label><input type="date" id="sh-filter-date-to" class="input" style="width:100%"></div>';
   html+='<button class="btn btn-primary btn-sm" onclick="shApplyFilters()">Filtrar</button>';
   html+='<button class="btn btn-secondary btn-sm" onclick="shClearFilters()">Limpiar</button>';
   html+='</div>';
@@ -3455,11 +3455,13 @@ async function sbGetUserByEmail(email) {
   return (r && r.length > 0) ? r[0] : null;
 }
 
-async function sbInsertScoringHistory(checkId, cuitLibrador, cuitVendedor, scoringResult, motorConfig, bcraData, nosisData) {
+async function sbInsertScoringHistory(checkId, cuitLibrador, cuitVendedor, scoringResult, motorConfig, bcraData, nosisData, razonLibrador, razonVendedor) {
   return await sbRequest('scoring_history', 'POST', {
     check_id: checkId,
     cuit_librador: cuitLibrador,
     cuit_vendedor: cuitVendedor,
+    razon_librador: razonLibrador || null,
+    razon_vendedor: razonVendedor || null,
     scoring_result: scoringResult,
     motor_config: motorConfig,
     bcra_data: bcraData,
