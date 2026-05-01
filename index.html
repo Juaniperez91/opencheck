@@ -3055,12 +3055,17 @@ function closeModalOverlay(e){if(e.target===document.getElementById('modal-overl
 // ============================================================
 function showToast(msg,type){
   var c=document.getElementById('toast-container');
+  if (!c) {
+    c = document.createElement('div');
+    c.id = 'toast-container';
+    document.body.appendChild(c);
+  }
   var t=document.createElement('div');
   t.className='toast '+(type||'');
   t.textContent=msg;
   c.appendChild(t);
   setTimeout(function(){t.classList.add('show');},10);
-  setTimeout(function(){t.classList.remove('show');setTimeout(function(){c.removeChild(t);},300);},3000);
+  setTimeout(function(){t.classList.remove('show');setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},300);},5000);
 }
 
 function togglePass(inputId,btn){
