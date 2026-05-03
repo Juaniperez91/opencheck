@@ -422,6 +422,28 @@ function addLog(msg,type){
   } catch(e) {}
 }
 
+async function sbGetInvitaciones() {
+  var r = await sbRequest('invitaciones?order=created_at.desc');
+  return r || [];
+}
+
+async function sbCreateInvitacion(codigo, nombre, empresa, notas) {
+  return await sbRequest('invitaciones', 'POST', {
+    codigo: codigo,
+    nombre_invitado: nombre || null,
+    empresa_invitado: empresa || null,
+    notas: notas || null
+  });
+}
+
+async function sbToggleInvitacion(id, activo) {
+  return await sbRequest('invitaciones?id=eq.' + id, 'PATCH', {activo: activo});
+}
+
+async function sbDeleteInvitacion(id) {
+  return await sbRequest('invitaciones?id=eq.' + id, 'DELETE');
+}
+
 async function sbGetScoringHistory(limit, offset, cuitFilter, dateFromFilter, dateToFilter) {
   limit = limit || 50; offset = offset || 0;
   var query = 'scoring_history?order=created_at.desc&limit=' + limit + '&offset=' + offset;
@@ -974,7 +996,7 @@ function navigateTo(page){
   else if(page==='inversor-marketplace')mc.innerHTML=renderMarketplace();
   else if(page==='inversor-cartera')mc.innerHTML=renderCarteraInversor();
   else if(page==='inversor-ofertas')mc.innerHTML=renderMisOfertas();
-  else if(page==='admin-panel'){mc.innerHTML=renderAdminPanel();loadAdminLogsFromSupabase();loadScoringHistory(true);}
+  else if(page==='admin-panel'){mc.innerHTML=renderAdminPanel();loadAdminLogsFromSupabase();loadScoringHistory(true);loadInvitaciones();}
   else if(page==='admin-tasas')mc.innerHTML=renderAdminTasas();
   else if(page==='admin-scoring'){mc.innerHTML=renderAdminScoring();initScoringAdminContent();}
   else if(page==='admin-usuarios')mc.innerHTML=renderAdminUsuarios();
@@ -2490,6 +2512,91 @@ function showScoringDetail(idx) {
 
 function closeScoringDetail() { document.getElementById('modal-container').innerHTML = ''; }
 
+async function loadInvitaciones() {
+  var c = document.getElementById('invitaciones-container');
+  if (!c) return;
+  var invs = await sbGetInvitaciones();
+  if (invs.length === 0) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✉️</div><h3>Sin invitaciones</h3><p>Creá la primera invitación para compartir acceso al sitio.</p></div>';
+    return;
+  }
+  var h = '<table class="data-table"><thead><tr><th>Código</th><th>Invitado</th><th>Empresa</th><th>Accesos</th><th>Último acceso</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
+  invs.forEach(function(inv){
+    var ultimo = inv.ultimo_acceso ? new Date(inv.ultimo_acceso).toLocaleString('es-AR') : '—';
+    var stateLabel = inv.activo ? '<span style="display:inline-block;padding:3px 10px;background:#E1F5EE;color:#085041;border-radius:6px;font-size:11px;font-weight:600">Activo</span>' : '<span style="display:inline-block;padding:3px 10px;background:#FCEBEB;color:#791F1F;border-radius:6px;font-size:11px;font-weight:600">Desactivado</span>';
+    h += '<tr>';
+    h += '<td style="font-family:var(--mono);font-weight:600">' + inv.codigo + '</td>';
+    h += '<td>' + (inv.nombre_invitado || '—') + '</td>';
+    h += '<td style="color:var(--t2);font-size:13px">' + (inv.empresa_invitado || '—') + '</td>';
+    h += '<td style="text-align:center;font-weight:600">' + (inv.accesos || 0) + '</td>';
+    h += '<td style="font-size:13px;color:var(--t2)">' + ultimo + '</td>';
+    h += '<td>' + stateLabel + '</td>';
+    h += '<td>';
+    h += '<button class="btn btn-sm" style="margin-right:4px;background:var(--s2);color:var(--t)" onclick="copyInviteLink(\\''+inv.codigo+'\\')">Copiar link</button>';
+    h += '<button class="btn btn-sm" style="margin-right:4px;background:'+(inv.activo?'#FEF3C7':'#E1F5EE')+';color:'+(inv.activo?'#92400E':'#085041')+'" onclick="toggleInvitacion('+inv.id+','+(!inv.activo)+')">' + (inv.activo ? 'Desactivar' : 'Activar') + '</button>';
+    h += '<button class="btn btn-sm" style="background:#FCEBEB;color:#791F1F" onclick="deleteInvitacion('+inv.id+')">Eliminar</button>';
+    h += '</td></tr>';
+  });
+  h += '</tbody></table>';
+  c.innerHTML = h;
+}
+
+function showCreateInvitacion() {
+  var h = '<div onclick="closeModal()" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px"><div onclick="event.stopPropagation()" style="background:white;border-radius:12px;max-width:480px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--s3)"><h3 style="margin:0;font-size:18px;font-weight:600">Nueva invitación</h3><button onclick="closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--t3);padding:0 8px">×</button></div>';
+  h += '<div style="display:flex;flex-direction:column;gap:12px">';
+  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Nombre del invitado *</label><input type="text" id="inv-nombre" class="input" style="width:100%" placeholder="Ej: Hernán Villegas"></div>';
+  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Empresa / Organización</label><input type="text" id="inv-empresa" class="input" style="width:100%" placeholder="Ej: Banco de Comercio"></div>';
+  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Notas (opcional)</label><textarea id="inv-notas" class="input" style="width:100%;min-height:60px;resize:vertical" placeholder="Contexto, fecha de la reunión, etc."></textarea></div>';
+  h += '<button class="btn btn-primary" onclick="createInvitacion()" style="margin-top:12px">Crear invitación</button>';
+  h += '</div></div></div>';
+  document.getElementById('modal-container').innerHTML = h;
+}
+
+function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
+
+async function createInvitacion() {
+  var nombre = document.getElementById('inv-nombre').value.trim();
+  var empresa = document.getElementById('inv-empresa').value.trim();
+  var notas = document.getElementById('inv-notas').value.trim();
+  if (!nombre) { showToast('El nombre del invitado es requerido','error'); return; }
+  // Generar codigo unico tipo OC-XXXX-NNN
+  var rand = Math.random().toString(36).substring(2,6).toUpperCase();
+  var num = String(Math.floor(Math.random()*900)+100);
+  var codigo = 'OC-' + rand + '-' + num;
+  var r = await sbCreateInvitacion(codigo, nombre, empresa, notas);
+  if (r) {
+    showToast('Invitación creada: ' + codigo,'success');
+    closeModal();
+    loadInvitaciones();
+  } else {
+    showToast('Error al crear la invitación','error');
+  }
+}
+
+async function toggleInvitacion(id, activo) {
+  await sbToggleInvitacion(id, activo);
+  loadInvitaciones();
+}
+
+async function deleteInvitacion(id) {
+  if (!confirm('¿Eliminar esta invitación? No se podrá deshacer.')) return;
+  await sbDeleteInvitacion(id);
+  showToast('Invitación eliminada','info');
+  loadInvitaciones();
+}
+
+function copyInviteLink(codigo) {
+  var link = 'https://opencheck.pro?invite=' + codigo;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function(){
+      showToast('Link copiado al portapapeles','success');
+    });
+  } else {
+    prompt('Copiá el link:', link);
+  }
+}
+
 function renderAdminPanel(){
   var users=getUsers();
   var checks=getChecks();
@@ -2583,6 +2690,10 @@ function renderAdminPanel(){
     html+='<div style="flex:1;min-width:80px;text-align:center;background:var(--s2);border-radius:var(--rl2);padding:12px"><span class="badge badge-'+c+'">'+c+'</span><div class="bold text-xl" style="margin-top:6px">'+cnt+'</div><div class="text-sm" style="color:var(--t3)">cheques</div></div>';
   });
   html+='</div></div>';
+  // Invitaciones
+  html+='<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Invitaciones de acceso</div><button class="btn btn-primary btn-sm" onclick="showCreateInvitacion()">+ Nueva invitación</button></div>';
+  html+='<div id="invitaciones-container"><div style="text-align:center;padding:40px;color:var(--t3)">Cargando invitaciones...</div></div>';
+  html+='</div>';
   // Scoring history
   html+='<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Historial de scorings</div><span style="font-size:11px;color:var(--t3)">Auditoría de operaciones</span></div>';
   html+='<div class="flex gap-8" style="margin-bottom:16px;flex-wrap:wrap">';
