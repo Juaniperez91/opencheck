@@ -347,6 +347,7 @@ tr:hover td{background:var(--s2)}
 </div>
 
 <!-- MODAL CONTAINER -->
+<script>function closeModalOverlay(e){if(e&&e.target&&e.target.id!=="modal-overlay")return;var ov=document.getElementById("modal-overlay");if(ov)ov.classList.remove("active");var box=document.getElementById("modal-box");if(box)box.innerHTML="";}</script>
 <div class="modal-overlay" id="modal-overlay" onclick="closeModalOverlay(event)">
   <div class="modal" id="modal-box"></div>
 </div>
@@ -2554,7 +2555,7 @@ function showCreateInvitacion() {
 }
 
 function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
-function closeModalOverlay(e) { if(e && e.target && e.target.id !== 'modal-overlay') return; var ov = document.getElementById('modal-overlay'); if(ov) ov.classList.remove('active'); var box = document.getElementById('modal-box'); if(box) box.innerHTML = ''; }
+
 
 async function createInvitacion() {
   var nombre = document.getElementById('inv-nombre').value.trim();
