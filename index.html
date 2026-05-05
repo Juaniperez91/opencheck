@@ -348,7 +348,7 @@ tr:hover td{background:var(--s2)}
 
 <!-- MODAL CONTAINER -->
 <script>function closeModalOverlay(e){if(e&&e.target&&e.target.id!=="modal-overlay")return;var ov=document.getElementById("modal-overlay");if(ov)ov.classList.remove("active");var box=document.getElementById("modal-box");if(box)box.innerHTML="";}</script>
-<div class="modal-overlay" id="modal-overlay" onclick="closeModalOverlay(event)">
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOverlay(event)" style="display:none">
   <div class="modal" id="modal-box"></div>
 </div>
 
@@ -3389,7 +3389,11 @@ function showModal(html){
   overlay.style.display='flex';
   setTimeout(function(){overlay.classList.add('show');},10);
 }
-
+function closeModal(){
+  var overlay=document.getElementById('modal-overlay');
+  overlay.classList.remove('show');
+  setTimeout(function(){overlay.style.display='none';},200);
+}
 function closeModalOverlay(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
 
 // ============================================================
@@ -3735,7 +3739,7 @@ function handleLogChange(payload) {
 // ============================================================
 initData();
 // screen-login starts visible (no hidden class), screen-register and screen-app start hidden
-// enterApp() calls show('screen-app') which removes .hidde</script>
+// enterApp() calls show('screen-app') which removes .hidden, hide(</script>
 </body>
 </html>
  
