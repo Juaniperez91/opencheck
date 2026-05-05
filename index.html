@@ -2533,7 +2533,7 @@ async function loadInvitaciones() {
     h += '<td style="font-size:13px;color:var(--t2)">' + ultimo + '</td>';
     h += '<td>' + stateLabel + '</td>';
     h += '<td>';
-    h += '<button class="btn btn-sm" style="margin-right:4px;background:var(--s2);color:var(--t)" onclick="copyInviteLink(\\''+inv.codigo+'\\')">Copiar link</button>';
+    h += '<button class="btn btn-sm" style="margin-right:4px;background:var(--s2);color:var(--t)" onclick="copyInviteLink('"+inv.codigo+"')">Copiar link</button>';
     h += '<button class="btn btn-sm" style="margin-right:4px;background:'+(inv.activo?'#FEF3C7':'#E1F5EE')+';color:'+(inv.activo?'#92400E':'#085041')+'" onclick="toggleInvitacion('+inv.id+','+(!inv.activo)+')">' + (inv.activo ? 'Desactivar' : 'Activar') + '</button>';
     h += '<button class="btn btn-sm" style="background:#FCEBEB;color:#791F1F" onclick="deleteInvitacion('+inv.id+')">Eliminar</button>';
     h += '</td></tr>';
