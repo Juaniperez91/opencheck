@@ -3389,11 +3389,7 @@ function showModal(html){
   overlay.style.display='flex';
   setTimeout(function(){overlay.classList.add('show');},10);
 }
-function closeModal(){
-  var overlay=document.getElementById('modal-overlay');
-  overlay.classList.remove('show');
-  setTimeout(function(){overlay.style.display='none';},200);
-}
+
 function closeModalOverlay(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
 
 // ============================================================
@@ -3739,7 +3735,7 @@ function handleLogChange(payload) {
 // ============================================================
 initData();
 // screen-login starts visible (no hidden class), screen-register and screen-app start hidden
-// enterApp() calls show('screen-app') which removes .hidden, hide(</script>
+// enterApp() calls show('screen-app') which removes .hidde</script>
 </body>
 </html>
  
