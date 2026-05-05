@@ -428,12 +428,13 @@ async function sbGetInvitaciones() {
   return r || [];
 }
 
-async function sbCreateInvitacion(codigo, nombre, empresa, notas) {
+async function sbCreateInvitacion(codigo, nombre, empresa, notas, email) {
   return await sbRequest('invitaciones', 'POST', {
     codigo: codigo,
     nombre_invitado: nombre || null,
     empresa_invitado: empresa || null,
-    notas: notas || null
+    notas: notas || null,
+    email_invitado: email || null
   });
 }
 
@@ -2542,39 +2543,55 @@ async function loadInvitaciones() {
   c.innerHTML = h;
 }
 function showCreateInvitacion() {
-  var h = '<div onclick="closeModal()" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px"><div onclick="event.stopPropagation()" style="background:white;border-radius:12px;max-width:480px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">';
-  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--s3)"><h3 style="margin:0;font-size:18px;font-weight:600">Nueva invitación</h3><button onclick="closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--t3);padding:0 8px">×</button></div>';
+  var h = '';
+  h += '<div id="inv-overlay" onclick="closeModal()" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">';
+  h += '<div onclick="event.stopPropagation()" style="background:white;border-radius:12px;max-width:480px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--s3)">';
+  h += '<h3 style="margin:0;font-size:18px;font-weight:600">Nueva invitacion</h3>';
+  h += '<button onclick="closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--t3);padding:0 8px;line-height:1">&times;</button>';
+  h += '</div>';
   h += '<div style="display:flex;flex-direction:column;gap:12px">';
-  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Nombre del invitado *</label><input type="text" id="inv-nombre" class="input" style="width:100%" placeholder="Ej: Hernán Villegas"></div>';
-  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Empresa / Organización</label><input type="text" id="inv-empresa" class="input" style="width:100%" placeholder="Ej: Banco de Comercio"></div>';
-  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Notas (opcional)</label><textarea id="inv-notas" class="input" style="width:100%;min-height:60px;resize:vertical" placeholder="Contexto, fecha de la reunión, etc."></textarea></div>';
-  h += '<button class="btn btn-primary" onclick="createInvitacion()" style="margin-top:12px">Crear invitación</button>';
+  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Nombre y apellido *</label><input type="text" id="inv-nombre" class="input" style="width:100%" placeholder="Ej: Hernan Villegas"></div>';
+  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Email *</label><input type="email" id="inv-email" class="input" style="width:100%" placeholder="Ej: hernan@empresa.com"></div>';
+  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Empresa / Organizacion</label><input type="text" id="inv-empresa" class="input" style="width:100%" placeholder="Ej: Banco de Comercio"></div>';
+  h += '<div><label style="font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block">Notas personales (opcional)</label><textarea id="inv-notas" class="input" style="width:100%;min-height:60px;resize:vertical" placeholder="Contexto, observaciones, etc."></textarea></div>';
+  h += '<button class="btn btn-primary" onclick="createInvitacion()" style="margin-top:12px">Crear y enviar invitacion</button>';
   h += '</div></div></div>';
   document.getElementById('modal-container').innerHTML = h;
 }
 
 function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
 
-
 async function createInvitacion() {
-  var nombre = document.getElementById('inv-nombre').value.trim();
-  var empresa = document.getElementById('inv-empresa').value.trim();
-  var notas = document.getElementById('inv-notas').value.trim();
-  if (!nombre) { showToast('El nombre del invitado es requerido','error'); return; }
-  // Generar codigo unico tipo OC-XXXX-NNN
+  var nombre = (document.getElementById('inv-nombre')||{}).value;
+  var email  = (document.getElementById('inv-email')||{}).value;
+  var empresa= (document.getElementById('inv-empresa')||{}).value;
+  var notas  = (document.getElementById('inv-notas')||{}).value;
+  nombre = nombre ? nombre.trim() : '';
+  email  = email  ? email.trim()  : '';
+  empresa= empresa? empresa.trim(): '';
+  notas  = notas  ? notas.trim()  : '';
+  if (!nombre) { showToast('El nombre y apellido es requerido','error'); return; }
+  if (!email || !email.includes('@')) { showToast('El email es requerido','error'); return; }
   var rand = Math.random().toString(36).substring(2,6).toUpperCase();
   var num = String(Math.floor(Math.random()*900)+100);
   var codigo = 'OC-' + rand + '-' + num;
-  var r = await sbCreateInvitacion(codigo, nombre, empresa, notas);
+  var r = await sbCreateInvitacion(codigo, nombre, empresa, notas, email);
   if (r) {
-    showToast('Invitación creada: ' + codigo,'success');
+    try {
+      await fetch('/.netlify/functions/send-invite', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ nombre: nombre, email: email, codigo: codigo })
+      });
+    } catch(e) { console.log('Email no enviado:', e.message); }
+    showToast('Invitacion creada y enviada a ' + email,'success');
     closeModal();
     loadInvitaciones();
   } else {
-    showToast('Error al crear la invitación','error');
+    showToast('Error al crear la invitacion','error');
   }
 }
-
 async function toggleInvitacion(id, activo) {
   await sbToggleInvitacion(id, activo);
   loadInvitaciones();
@@ -3722,7 +3739,8 @@ function handleLogChange(payload) {
 // ============================================================
 initData();
 // screen-login starts visible (no hidden class), screen-register and screen-app start hidden
-// enterApp() calls show('screen-app') which removes .hidden, hide() adds i</script>
+// enterApp() calls show('screen-app') which removes .hidden, hide(</script>
 </body>
 </html>
  
+
