@@ -483,7 +483,7 @@ async function fetchTamarBCRA(){
       return {valor:ultimo.valor,fecha:ultimo.fecha};
     }
   }catch(e){
-    console.log('TAMAR BCRA error:',e.message,' — usando valor local');
+    console.log('TAMAR BCRA error:',e.message,' - usando valor local');
   }
 }
 
@@ -569,7 +569,7 @@ async function doLogin(){
     showLoginError('La contraseña debe tener al menos 6 caracteres.');return;
   }
 
-  // Look up user — force re-seed first to ensure demo users are fresh
+  // Look up user - force re-seed first to ensure demo users are fresh
   forceSeedDemoUsers();
   var users=getUsers();
   // Normalize email comparison
@@ -674,7 +674,7 @@ function initReg(){
 var regStepLabels=['Datos básicos','Validación de identidad','Términos y condiciones','Confirmación'];
 
 function renderRegStep(){
-  document.getElementById('reg-step-label').textContent='Paso '+(regStep+1)+' — '+regStepLabels[regStep];
+  document.getElementById('reg-step-label').textContent='Paso '+(regStep+1)+' - '+regStepLabels[regStep];
   for(var i=0;i<4;i++){
     var el=document.getElementById('rstep-'+i);
     if(i<regStep){el.style.background='rgba(255,255,255,1)';}
@@ -702,7 +702,7 @@ function renderRegStep1(){
   if(!idVerified){
     html+='<button class="btn btn-primary btn-lg" id="btn-verify" onclick="doVerify()">Verificar identidad</button>';
   }else{
-    html+='<div class="alert alert-success" style="display:inline-flex;margin:0 auto"><span>✅</span><div><div class="bold">Identidad validada</div><div style="font-size:12px;opacity:.8">Badge: Demo — simulado (Cresium)</div></div></div>';
+    html+='<div class="alert alert-success" style="display:inline-flex;margin:0 auto"><span>✅</span><div><div class="bold">Identidad validada</div><div style="font-size:12px;opacity:.8">Badge: Demo - simulado (Cresium)</div></div></div>';
   }
   html+='</div>';
   return html;
@@ -710,7 +710,7 @@ function renderRegStep1(){
 
 function renderRegStep2(){
   var tycHtml='<div style="max-height:200px;overflow-y:auto;background:var(--s2);border-radius:var(--r);padding:16px;font-size:12px;color:var(--t2);margin-bottom:16px;line-height:1.7">';
-  tycHtml+='<div class="bold" style="margin-bottom:8px;color:var(--t);font-size:13px">Términos y Condiciones — OpenCheck v1.0</div>';
+  tycHtml+='<div class="bold" style="margin-bottom:8px;color:var(--t);font-size:13px">Términos y Condiciones - OpenCheck v1.0</div>';
   tycHtml+='<div style="margin-bottom:8px">1. ACEPTACIÓN DE TÉRMINOS: Al utilizar la plataforma OpenCheck, el usuario acepta los presentes Términos y Condiciones en su totalidad. OpenCheck es una plataforma de intermediación para la negociación de cheques electrónicos (eCheques) en el mercado argentino.</div>';
   tycHtml+='<div style="margin-bottom:8px">2. SERVICIO DE INTERMEDIACIÓN: OpenCheck actúa exclusivamente como intermediario entre vendedores e inversores de eCheques. La plataforma no garantiza la solvencia de las partes ni la efectivización de los pagos.</div>';
   tycHtml+='<div style="margin-bottom:8px">3. MOTOR DE SCORING: El sistema de scoring A1-C2 es informativo y no constituye una recomendación de inversión. OpenCheck no se responsabiliza por pérdidas derivadas del uso de esta información.</div>';
@@ -734,7 +734,7 @@ function renderRegStep2(){
 }
 
 function renderRegStep3(){
-  return '<div class="scoring-card A1"><div class="bold text-lg" style="margin-bottom:12px">✅ Resumen de registro</div><div class="grid-2 gap-8"><div><div class="text-sm" style="color:var(--t2)">Nombre</div><div class="bold">'+(regData.nombre||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">CUIT/DNI</div><div class="mono">'+(regData.cuit||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Email</div><div>'+(regData.email||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Teléfono</div><div>'+(regData.tel||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Tipo</div><div>'+(regData.tipopersona||'—')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Roles</div><div>Vendedor + Inversor</div></div></div><div class="divider"></div><div class="flex gap-8"><span class="badge badge-A1">✅ ID Verificada</span><span class="badge badge-A1">📋 TyC Aceptados</span><span class="badge badge-B1">Vendedor + Inversor</span></div></div><div class="alert alert-info mt-12" style="font-size:12px">TyC aceptados el '+new Date().toLocaleString('es-AR')+' — Podés cambiar entre perfiles desde la topbar.</div>';
+  return '<div class="scoring-card A1"><div class="bold text-lg" style="margin-bottom:12px">✅ Resumen de registro</div><div class="grid-2 gap-8"><div><div class="text-sm" style="color:var(--t2)">Nombre</div><div class="bold">'+(regData.nombre||'-')+'</div></div><div><div class="text-sm" style="color:var(--t2)">CUIT/DNI</div><div class="mono">'+(regData.cuit||'-')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Email</div><div>'+(regData.email||'-')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Teléfono</div><div>'+(regData.tel||'-')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Tipo</div><div>'+(regData.tipopersona||'-')+'</div></div><div><div class="text-sm" style="color:var(--t2)">Roles</div><div>Vendedor + Inversor</div></div></div><div class="divider"></div><div class="flex gap-8"><span class="badge badge-A1">✅ ID Verificada</span><span class="badge badge-A1">📋 TyC Aceptados</span><span class="badge badge-B1">Vendedor + Inversor</span></div></div><div class="alert alert-info mt-12" style="font-size:12px">TyC aceptados el '+new Date().toLocaleString('es-AR')+' - Podés cambiar entre perfiles desde la topbar.</div>';
 }
 
 var _regToken = null;
@@ -837,7 +837,7 @@ async function regNext(){
         errEl.classList.remove('hidden');
         return;
       }
-      // Token correcto — avanzar a validacion de identidad
+      // Token correcto - avanzar a validacion de identidad
       showToast('Email verificado correctamente','success');
       document.getElementById('reg-next-btn').textContent='Continuar';
       regStep=1;renderRegStep();
@@ -853,7 +853,7 @@ async function regNext(){
     if(!regChecks[0]||!regChecks[1]||!regChecks[2]||!regChecks[3]){showToast('Debés aceptar todos los términos','error');return;}
     regStep=3;renderRegStep();
   }else{
-    // CREATE ACCOUNT — always both roles
+    // CREATE ACCOUNT - always both roles
     var users=getUsers();
     var newUser={
       id:'u'+Date.now(),
@@ -1095,7 +1095,7 @@ function renderChecksRows(checks,filter){
   var filtered=filter==='todos'?checks:checks.filter(function(c){return c.status===filter;});
   if(!filtered.length)return '<tr><td colspan="10" class="text-center" style="padding:32px;color:var(--t3)">No hay cheques</td></tr>';
   return filtered.map(function(c){
-    var cat=c.scoring?c.scoring.cat:'—';
+    var cat=c.scoring?c.scoring.cat:'-';
     var badgeCls=c.scoring?'badge-'+cat:'';
     var dias=getDays(c.fechaPago);
     var actions='';
@@ -1112,8 +1112,8 @@ function renderChecksRows(checks,filter){
       '<td style="font-size:12px">'+c.fechaPago+'</td>'+
       '<td class="mono" style="font-size:12px;color:'+(dias<=7?'var(--rm)':dias<=30?'var(--am)':'var(--t2)')+'">'+dias+'d</td>'+
       '<td><span class="bank-chip">'+getBankName(c.banco)+'</span></td>'+
-      '<td>'+(c.scoring?'<span class="badge '+badgeCls+'">'+cat+'</span>':'<span style="color:var(--t3);font-size:12px">—</span>')+'</td>'+
-      '<td class="mono">'+(c.tasa?c.tasa.toFixed(1)+'%':'—')+'</td>'+
+      '<td>'+(c.scoring?'<span class="badge '+badgeCls+'">'+cat+'</span>':'<span style="color:var(--t3);font-size:12px">-</span>')+'</td>'+
+      '<td class="mono">'+(c.tasa?c.tasa.toFixed(1)+'%':'-')+'</td>'+
       '<td><span class="badge badge-'+getStatusBadge(c.status)+'">'+c.status+'</span></td>'+
       '<td>'+actions+'</td></tr>';
   }).join('');
@@ -1182,9 +1182,9 @@ async function lookupRazonSocial(){
       var den=data.results&&data.results.denominacion;
       if(den){result.innerHTML='<span style="color:var(--g)">✅ '+den+'</span>';razonInput.value=den;return;}
     }
-    result.innerHTML='<span style="color:var(--t3)">No encontrado — ingresá la razon social manualmente</span>';
+    result.innerHTML='<span style="color:var(--t3)">No encontrado - ingresá la razon social manualmente</span>';
   }catch(e){
-    result.innerHTML='<span style="color:var(--t3)">Error BCRA — ingresá la razon social manualmente</span>';
+    result.innerHTML='<span style="color:var(--t3)">Error BCRA - ingresá la razon social manualmente</span>';
   }
 }
 
@@ -1295,7 +1295,7 @@ function showBCRAResult(denunciado,isDemo){
     return;
   }
   var fuente=isDemo
-    ?'<span style="font-size:11px;background:var(--al);color:var(--am);padding:2px 7px;border-radius:4px;margin-left:6px">Demo — API no disponible</span>'
+    ?'<span style="font-size:11px;background:var(--al);color:var(--am);padding:2px 7px;border-radius:4px;margin-left:6px">Demo - API no disponible</span>'
     :'<span style="font-size:11px;background:var(--gl);color:var(--gd);padding:2px 7px;border-radius:4px;margin-left:6px">API BCRA real</span>';
   var html='<div class="alert alert-success"><span>✅</span><div><div class="bold" style="display:flex;align-items:center">Cheque sin denuncias'+fuente+'</div><div style="margin-top:4px">No figura en el registro de cheques denunciados del BCRA.</div></div></div>';
   html+='<div class="text-center mt-16"><button class="btn btn-primary" onclick="pwGoStep2()">Continuar → Scoring Nosis</button></div>';
@@ -1303,7 +1303,7 @@ function showBCRAResult(denunciado,isDemo){
 }
 
 // ============================================================
-// BCRA — CENTRAL DE DEUDORES (endeudamiento + cheques rechazados del vendedor)
+// BCRA - CENTRAL DE DEUDORES (endeudamiento + cheques rechazados del vendedor)
 // Documentación oficial: api.bcra.gob.ar/CentralDeDeudores/v1.0
 // ============================================================
 async function consultarDeudorBCRA(cuit) {
@@ -1436,14 +1436,14 @@ async function showNosisResult(nd,isDemo){
   window._pwScoring = scoring;
   setPWStep(3);
   var ag = ndForCat.antiguedad;
-  var html='<div class="alert alert-info" style="margin-bottom:16px"><span>📊</span><div>Datos Nosis '+(isDemo?'<strong>(Demo — simulado)</strong>':'<strong>(Tiempo real)</strong>')+'<br>CUIT: '+formatCuit(window._pwCheck.cuitLibrador)+'</div></div>';
+  var html='<div class="alert alert-info" style="margin-bottom:16px"><span>📊</span><div>Datos Nosis '+(isDemo?'<strong>(Demo - simulado)</strong>':'<strong>(Tiempo real)</strong>')+'<br>CUIT: '+formatCuit(window._pwCheck.cuitLibrador)+'</div></div>';
   // Badge de fuente BCRA vendedor
   if(scoring.desglose&&scoring.desglose.endeud_v){
     var fv=scoring.desglose.endeud_v.fuente;
     html+='<div style="margin-bottom:12px">';
     html+=fv==='bcra_real'
       ?'<span style="font-size:11px;background:var(--gl);color:var(--gd);padding:2px 8px;border-radius:4px">🏦 Vendedor consultado via BCRA Central de Deudores</span>'
-      :'<span style="font-size:11px;background:var(--al);color:var(--am);padding:2px 8px;border-radius:4px">⚠️ Vendedor: BCRA no disponible — score neutro aplicado</span>';
+      :'<span style="font-size:11px;background:var(--al);color:var(--am);padding:2px 8px;border-radius:4px">⚠️ Vendedor: BCRA no disponible - score neutro aplicado</span>';
     html+='</div>';
   }
   html+='<div class="grid-2 gap-8" style="margin-bottom:16px">';
@@ -1470,7 +1470,7 @@ function nosisItem(label,val,unit){
 function pwGoStep4(){
   var scoring=window._pwScoring;
   if(scoring.cat==='C2'){
-    document.getElementById('pw-content').innerHTML='<div class="alert alert-error"><span>🚫</span><div><div class="bold">Scoring C2 — No publicable</div><div>El librador no cumple los requisitos mínimos de calificación para publicar en el marketplace.</div></div></div><div class="mt-12"><div style="font-size:13px;color:var(--t2)">Razones:</div><ul style="margin-top:8px;padding-left:20px;font-size:13px">'+scoring.c2Reasons.map(function(r){return '<li>'+r+'</li>';}).join('')+'</ul></div><button class="btn btn-secondary mt-16" onclick="closeModal()">Cerrar</button>';
+    document.getElementById('pw-content').innerHTML='<div class="alert alert-error"><span>🚫</span><div><div class="bold">Scoring C2 - No publicable</div><div>El librador no cumple los requisitos mínimos de calificación para publicar en el marketplace.</div></div></div><div class="mt-12"><div style="font-size:13px;color:var(--t2)">Razones:</div><ul style="margin-top:8px;padding-left:20px;font-size:13px">'+scoring.c2Reasons.map(function(r){return '<li>'+r+'</li>';}).join('')+'</ul></div><button class="btn btn-secondary mt-16" onclick="closeModal()">Cerrar</button>';
     return;
   }
   setPWStep(4);
@@ -1501,7 +1501,7 @@ function pwGoStep4(){
   }
   html+='<div style="font-size:12px;font-style:italic;color:var(--t2)">'+scoring.rec+'</div>';
   html+='</div>';
-  html+='<div class="field"><label>Tasa TNA (%) — Rango sugerido: '+tasaMin.toFixed(1)+'% a '+tasaMax.toFixed(1)+'%</label>';
+  html+='<div class="field"><label>Tasa TNA (%) - Rango sugerido: '+tasaMin.toFixed(1)+'% a '+tasaMax.toFixed(1)+'%</label>';
   html+='<input type="number" id="pw-tasa" step="0.1" value="'+tasaMid.toFixed(1)+'" min="'+tasaMin.toFixed(1)+'" max="'+tasaMax.toFixed(1)+'"></div>';
   html+='<div class="rate-range-bar"><div class="rate-range-fill" style="left:0;right:0"></div></div>';
   html+='<div class="flex justify-between text-sm" style="color:var(--t3)"><span>'+tasaMin.toFixed(1)+'%</span><span>Rango Motor 3.1</span><span>'+tasaMax.toFixed(1)+'%</span></div>';
@@ -1563,7 +1563,7 @@ function setPWStep(n){
 }
 
 // ============================================================
-// NOSIS — INTEGRACION REAL (ported from reference)
+// NOSIS - INTEGRACION REAL (ported from reference)
 // ============================================================
 async function consultarNosis(cuit) {
   var cuitLimpio = cuit.split('-').join('').split('.').join('').trim();
@@ -1806,7 +1806,7 @@ function convRechazosVendedor(r){
   return r===0?100:r<=3?80:r<=8?50:r<=15?20:0;
 }
 
-// Matriz de atrasos (16 combinaciones) — retorna penalización % o 'C2'
+// Matriz de atrasos (16 combinaciones) - retorna penalización % o 'C2'
 function calcAtrasosPenalty(sc,monto,diasAtraso){
   // diasAtraso = dias promedio de atraso en mora vigente (0 si sin atrasos)
   if(diasAtraso===0)return 0;
@@ -1874,7 +1874,7 @@ async function calcScoring(nd,check){
   if(nd.inhabilitado)c2Reasons.push('Inhabilitación vigente por BCRA u organismo oficial');
   if(nd.situacionBCRA&&nd.situacionBCRA>=3)c2Reasons.push('Situación BCRA '+nd.situacionBCRA+' registrada');
   if(c2Reasons.length){
-    return{cat:'C2',pts:0,factores:[],atencion:c2Reasons,rec:'No publicable — condición C2 directa',c2Reasons:c2Reasons,desglose:null};
+    return{cat:'C2',pts:0,factores:[],atencion:c2Reasons,rec:'No publicable - condición C2 directa',c2Reasons:c2Reasons,desglose:null};
   }
 
   // Antigüedad C2 por tabla
@@ -1934,7 +1934,7 @@ async function calcScoring(nd,check){
   // ---- PENALIZACIONES ----
   var penAplicadas=[];
 
-  // Rechazos librador — antigüedad del rechazo más reciente
+  // Rechazos librador - antigüedad del rechazo más reciente
   var rechazos12m=nd.rechazos12m||0;
   if(nd.rechazos24m>0){
     if(rechazos12m>0){
@@ -1973,7 +1973,7 @@ async function calcScoring(nd,check){
   var montoAtraso=nd.montoAtraso||(check?check.monto:0);
   var atrasoResult=calcAtrasosPenalty(sc,montoAtraso,diasAtraso);
   if(atrasoResult==='C2'){
-    return{cat:'C2',pts:0,factores:[],atencion:['Matriz de atrasos: monto>$500K con mora ≥60 días'],rec:'No publicable — condición C2 por matriz de atrasos',c2Reasons:['Matriz de atrasos da C2 directo'],desglose:desglose};
+    return{cat:'C2',pts:0,factores:[],atencion:['Matriz de atrasos: monto>$500K con mora ≥60 días'],rec:'No publicable - condición C2 por matriz de atrasos',c2Reasons:['Matriz de atrasos da C2 directo'],desglose:desglose};
   }else if(atrasoResult<0){
     // Aplicar factor de antigüedad del atraso
     var mesesDesde=nd.mesesDesdeAtraso||0;
@@ -2042,13 +2042,13 @@ async function calcScoring(nd,check){
       factores.push('Vendedor: sin rechazos en Central de Cheques BCRA');
     }
   }else if(cuitVendedor){
-    atencion.push('Vendedor: consulta BCRA no disponible (CORS/red) — score vendedor con valor neutro');
+    atencion.push('Vendedor: consulta BCRA no disponible (CORS/red) - score vendedor con valor neutro');
   }
 
   if(penAplicadas.length)atencion=atencion.concat(penAplicadas.map(function(p){return 'Penalización: '+p;}));
 
-  var recs={A1:'Operación altamente recomendada — riesgo muy bajo',A2:'Operación favorable — riesgo bajo',B1:'Operación aceptable con monitoreo — riesgo moderado',B2:'Operación de mediano riesgo — evaluar exposición',C1:'Operación de alto riesgo — requiere garantías adicionales',C2:'No publicable'};
-  return{cat:cat,pts:Math.round(s),factores:factores,atencion:atencion,rec:recs[cat]||'—',c2Reasons:[],desglose:desglose,penAplicadas:penAplicadas};
+  var recs={A1:'Operación altamente recomendada - riesgo muy bajo',A2:'Operación favorable - riesgo bajo',B1:'Operación aceptable con monitoreo - riesgo moderado',B2:'Operación de mediano riesgo - evaluar exposición',C1:'Operación de alto riesgo - requiere garantías adicionales',C2:'No publicable'};
+  return{cat:cat,pts:Math.round(s),factores:factores,atencion:atencion,rec:recs[cat]||'-',c2Reasons:[],desglose:desglose,penAplicadas:penAplicadas};
 }
 
 // ============================================================
@@ -2066,8 +2066,8 @@ function renderNegociaciones(){
   checks.forEach(function(check){
     var myOffers=offers.filter(function(o){return o.checkId===check.id&&o.status==='pendiente';});
     html+='<div class="offer-row"><div class="flex justify-between items-center" style="margin-bottom:12px">';
-    html+='<div><div class="bold">'+check.razonLibrador+'</div><div class="text-sm mono" style="color:var(--t2)">'+formatMoney(check.monto)+' — Vence '+check.fechaPago+'</div></div>';
-    html+='<div class="flex gap-8 items-center"><span class="badge badge-'+(check.scoring?check.scoring.cat:'B2')+'">'+( check.scoring?check.scoring.cat:'—')+'</span><span class="bold mono" style="color:var(--g)">'+( check.tasa?check.tasa.toFixed(1)+'% TNA':'—')+'</span></div>';
+    html+='<div><div class="bold">'+check.razonLibrador+'</div><div class="text-sm mono" style="color:var(--t2)">'+formatMoney(check.monto)+' - Vence '+check.fechaPago+'</div></div>';
+    html+='<div class="flex gap-8 items-center"><span class="badge badge-'+(check.scoring?check.scoring.cat:'B2')+'">'+( check.scoring?check.scoring.cat:'-')+'</span><span class="bold mono" style="color:var(--g)">'+( check.tasa?check.tasa.toFixed(1)+'% TNA':'-')+'</span></div>';
     html+='</div>';
     if(!myOffers.length){
       html+='<div style="color:var(--t3);font-size:13px">Sin ofertas pendientes</div>';
@@ -2139,7 +2139,7 @@ async function respondOffer(offerId,status,checkId){
       } catch(e) { console.log('SB check update error:', e.message); }
     }
     addLog('Oferta aceptada: cheque '+checkId,'offer');
-    showToast('Oferta aceptada — operación acordada','success');
+    showToast('Oferta aceptada - operación acordada','success');
   }else{
     addLog('Oferta rechazada: '+offerId,'offer');
     showToast('Oferta rechazada','warning');
@@ -2155,7 +2155,7 @@ function openCounteroffer(offerId,checkId){
   if(!offer||!check)return;
   var html='<div class="modal-header"><h3>Contraofertar</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
   html+='<div class="modal-body">';
-  html+='<div class="alert alert-info" style="margin-bottom:16px">Oferta recibida: <span class="bold mono">'+offer.tasa.toFixed(1)+'% TNA</span><br>Tu tasa publicada: <span class="bold mono">'+(check.tasa?check.tasa.toFixed(1):'—')+'% TNA</span></div>';
+  html+='<div class="alert alert-info" style="margin-bottom:16px">Oferta recibida: <span class="bold mono">'+offer.tasa.toFixed(1)+'% TNA</span><br>Tu tasa publicada: <span class="bold mono">'+(check.tasa?check.tasa.toFixed(1):'-')+'% TNA</span></div>';
   html+='<div class="field"><label>Tu contrapropuesta de tasa TNA (%)</label><input type="number" id="co-tasa" step="0.1" value="'+(check.tasa||30)+'"></div>';
   html+='</div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="doCounteroffer(\''+offerId+'\')">Enviar contraoferta</button></div>';
   showModal(html);
@@ -2244,7 +2244,7 @@ function openOfferModal(checkId){
   html+='<div class="modal-body">';
   // Scoring card
   html+='<div class="scoring-card '+cat+'" style="margin-bottom:16px">';
-  html+='<div class="flex justify-between items-center" style="margin-bottom:10px"><div class="flex gap-8 items-center"><span style="font-size:24px">'+CAT_EMOJI[cat]+'</span><div><div class="bold">'+cat+' — '+scoring.pts+' puntos</div><div class="text-sm" style="color:var(--t2)">'+check.razonLibrador+'</div></div></div></div>';
+  html+='<div class="flex justify-between items-center" style="margin-bottom:10px"><div class="flex gap-8 items-center"><span style="font-size:24px">'+CAT_EMOJI[cat]+'</span><div><div class="bold">'+cat+' - '+scoring.pts+' puntos</div><div class="text-sm" style="color:var(--t2)">'+check.razonLibrador+'</div></div></div></div>';
   html+='<div class="grid-2 gap-8" style="margin-bottom:10px"><div><div style="font-size:11px;color:var(--t2)">Factores favorables</div>'+scoring.factores.map(function(f){return '<div style="font-size:11px;margin-top:3px">✅ '+f+'</div>';}).join('')+'</div><div><div style="font-size:11px;color:var(--t2)">Puntos de atención</div>'+scoring.atencion.map(function(a){return '<div style="font-size:11px;margin-top:3px">⚠️ '+a+'</div>';}).join('')+'</div></div>';
   html+='<div style="font-size:12px;color:var(--t2)">'+scoring.rec+'</div>';
   html+='</div>';
@@ -2365,8 +2365,8 @@ function renderCarteraInversor(){
       var desc=c.monto*(c.tasa/100)*(dias/365);
       var com=c.monto*0.01;
       var rend=((desc-com)/(c.monto-desc))*100;
-      var cat=c.scoring?c.scoring.cat:'—';
-      html+='<tr><td><div class="bold">'+c.razonLibrador+'</div></td><td class="mono bold">'+formatMoney(c.monto)+'</td><td>'+c.fechaPago+'</td><td><span class="badge badge-'+cat+'">'+cat+'</span></td><td class="mono">'+( c.tasa?c.tasa.toFixed(1)+'%':'—')+'</td><td class="mono" style="color:var(--g)">'+( c.tasa?rend.toFixed(2)+'%':'—')+'</td></tr>';
+      var cat=c.scoring?c.scoring.cat:'-';
+      html+='<tr><td><div class="bold">'+c.razonLibrador+'</div></td><td class="mono bold">'+formatMoney(c.monto)+'</td><td>'+c.fechaPago+'</td><td><span class="badge badge-'+cat+'">'+cat+'</span></td><td class="mono">'+( c.tasa?c.tasa.toFixed(1)+'%':'-')+'</td><td class="mono" style="color:var(--g)">'+( c.tasa?rend.toFixed(2)+'%':'-')+'</td></tr>';
     });
     html+='</tbody></table></div>';
   }
@@ -2385,9 +2385,9 @@ function renderMisOfertas(){
   html+='<div class="card"><div class="table-wrap"><table><thead><tr><th>Cheque / Librador</th><th>Monto</th><th>Mi oferta TNA</th><th>Tasa publicada</th><th>Estado</th><th>Fecha</th></tr></thead><tbody>';
   if(!offers.length){html+='<tr><td colspan="6" class="text-center" style="padding:32px;color:var(--t3)">Sin ofertas realizadas</td></tr>';}
   offers.forEach(function(o){
-    var c=checks.find(function(x){return x.id===o.checkId;})||{razonLibrador:'—',monto:0,tasa:0};
+    var c=checks.find(function(x){return x.id===o.checkId;})||{razonLibrador:'-',monto:0,tasa:0};
     var st={pendiente:'badge-B1',aceptada:'badge-A1',rechazada:'badge-C2'}[o.status]||'badge-B2';
-    html+='<tr><td class="bold">'+c.razonLibrador+'</td><td class="mono">'+formatMoney(c.monto)+'</td><td class="mono bold" style="color:var(--g)">'+o.tasa.toFixed(1)+'%</td><td class="mono">'+(c.tasa?c.tasa.toFixed(1)+'%':'—')+'</td><td><span class="badge '+st+'">'+o.status+'</span></td><td style="color:var(--t3)">'+new Date(o.createdAt).toLocaleDateString('es-AR')+'</td></tr>';
+    html+='<tr><td class="bold">'+c.razonLibrador+'</td><td class="mono">'+formatMoney(c.monto)+'</td><td class="mono bold" style="color:var(--g)">'+o.tasa.toFixed(1)+'%</td><td class="mono">'+(c.tasa?c.tasa.toFixed(1)+'%':'-')+'</td><td><span class="badge '+st+'">'+o.status+'</span></td><td style="color:var(--t3)">'+new Date(o.createdAt).toLocaleDateString('es-AR')+'</td></tr>';
   });
   html+='</tbody></table></div></div>';
   return html;
@@ -2419,7 +2419,7 @@ function doCalcHTML(monto,tasa,dias){
   var netoI=monto-descuento;
   var retBruto=netoI>0?(descuento-comision)/netoI*100:0;
   var tea=netoI>0?(Math.pow(1+(descuento/netoI),365/dias)-1)*100:0;
-  var html='<div class="bold text-sm" style="margin-bottom:12px;color:var(--t2)">RESULTADO — '+dias+' días</div>';
+  var html='<div class="bold text-sm" style="margin-bottom:12px;color:var(--t2)">RESULTADO - '+dias+' días</div>';
   html+=calcRow('Días al vencimiento',dias,'');
   html+=calcRow('Descuento',formatMoney(descuento),false);
   html+=calcRow('Comisión OpenCheck (1%)',formatMoney(comision),false);
@@ -2459,12 +2459,12 @@ function renderScoringHistoryTable() {
   var h = '<table class="data-table"><thead><tr><th>Fecha</th><th>Librador</th><th>Categoría</th><th>Puntos</th><th>TAMAR</th><th></th></tr></thead><tbody>';
   _shState.items.forEach(function(item, idx){
     var sr = item.scoring_result || {}; var mc = item.motor_config || {};
-    var cat = sr.cat || '—';
+    var cat = sr.cat || '-';
     h += '<tr><td style="font-size:13px;color:var(--t2)">' + new Date(item.created_at).toLocaleString('es-AR') + '</td>';
-    h += '<td><div style="font-size:13px;font-weight:500">' + (item.razon_librador || '—') + '</div><div style="font-family:var(--mono);font-size:11px;color:var(--t3)">' + (item.cuit_librador || '—') + '</div></td>';
+    h += '<td><div style="font-size:13px;font-weight:500">' + (item.razon_librador || '-') + '</div><div style="font-family:var(--mono);font-size:11px;color:var(--t3)">' + (item.cuit_librador || '-') + '</div></td>';
     h += '<td><span style="display:inline-block;padding:4px 10px;border-radius:6px;background:' + (catBgs[cat]||'#f5f5f5') + ';color:' + (catColors[cat]||'#666') + ';font-family:var(--mono);font-size:12px;font-weight:700">' + cat + '</span></td>';
-    h += '<td style="font-family:var(--mono);font-weight:600">' + (sr.pts || '—') + '</td>';
-    h += '<td style="font-family:var(--mono);font-size:13px;color:var(--t2)">' + (mc.tamar ? mc.tamar.toFixed(2) + '%' : '—') + '</td>';
+    h += '<td style="font-family:var(--mono);font-weight:600">' + (sr.pts || '-') + '</td>';
+    h += '<td style="font-family:var(--mono);font-size:13px;color:var(--t2)">' + (mc.tamar ? mc.tamar.toFixed(2) + '%' : '-') + '</td>';
     h += '<td><button class="btn btn-sm" onclick="showScoringDetail(' + idx + ')">Ver</button></td></tr>';
   });
   h += '</tbody></table>';
@@ -2492,10 +2492,10 @@ function showScoringDetail(idx) {
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--s3)"><h3 style="margin:0;font-size:18px;font-weight:600">Detalle del scoring</h3><button onclick="closeScoringDetail()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--t3);padding:0 8px">×</button></div>';
   h += '<div style="background:var(--s2);padding:16px;border-radius:8px;margin-bottom:16px">';
   h += '<p style="margin:4px 0"><strong>Fecha:</strong> ' + new Date(item.created_at).toLocaleString('es-AR') + '</p>';
-  h += '<p style="margin:4px 0"><strong>Librador:</strong> ' + (item.razon_librador || '—') + ' <span style="font-family:var(--mono);color:var(--t3);font-size:13px">(' + (item.cuit_librador || '—') + ')</span></p>';
-  h += '<p style="margin:4px 0"><strong>Vendedor:</strong> ' + (item.razon_vendedor || '—') + ' <span style="font-family:var(--mono);color:var(--t3);font-size:13px">(' + (item.cuit_vendedor || '—') + ')</span></p>';
-  h += '<p style="margin:4px 0"><strong>Resultado:</strong> ' + (sr.cat || '—') + ' · ' + (sr.pts || 0) + ' puntos</p>';
-  h += '<p style="margin:4px 0"><strong>Recomendación:</strong> ' + (sr.rec || '—') + '</p></div>';
+  h += '<p style="margin:4px 0"><strong>Librador:</strong> ' + (item.razon_librador || '-') + ' <span style="font-family:var(--mono);color:var(--t3);font-size:13px">(' + (item.cuit_librador || '-') + ')</span></p>';
+  h += '<p style="margin:4px 0"><strong>Vendedor:</strong> ' + (item.razon_vendedor || '-') + ' <span style="font-family:var(--mono);color:var(--t3);font-size:13px">(' + (item.cuit_vendedor || '-') + ')</span></p>';
+  h += '<p style="margin:4px 0"><strong>Resultado:</strong> ' + (sr.cat || '-') + ' · ' + (sr.pts || 0) + ' puntos</p>';
+  h += '<p style="margin:4px 0"><strong>Recomendación:</strong> ' + (sr.rec || '-') + '</p></div>';
   if (sr.factores && sr.factores.length) {
     h += '<div style="margin-bottom:16px"><div style="font-size:12px;color:var(--t3);text-transform:uppercase;margin-bottom:8px">Factores evaluados</div><ul style="font-size:13px;color:var(--t2);padding-left:20px">';
     sr.factores.forEach(function(f){ h += '<li>' + f + '</li>'; });
@@ -2503,7 +2503,7 @@ function showScoringDetail(idx) {
   }
   if (mc.weights) {
     h += '<div style="margin-bottom:16px"><div style="font-size:12px;color:var(--t3);text-transform:uppercase;margin-bottom:8px">Config motor</div>';
-    h += '<div style="background:var(--s2);padding:12px;border-radius:8px;font-family:var(--mono);font-size:12px">TAMAR: ' + (mc.tamar ? mc.tamar.toFixed(4) + '%' : '—') + '<br>';
+    h += '<div style="background:var(--s2);padding:12px;border-radius:8px;font-family:var(--mono);font-size:12px">TAMAR: ' + (mc.tamar ? mc.tamar.toFixed(4) + '%' : '-') + '<br>';
     Object.keys(mc.weights).forEach(function(k){ h += k + ': ' + mc.weights[k] + '%<br>'; });
     h += '</div></div>';
   }
@@ -2523,12 +2523,12 @@ async function loadInvitaciones() {
   }
   var h = '<table class="data-table"><thead><tr><th>Código</th><th>Invitado</th><th>Empresa</th><th>Accesos</th><th>Último acceso</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
   invs.forEach(function(inv){
-    var ultimo = inv.ultimo_acceso ? new Date(inv.ultimo_acceso).toLocaleString('es-AR') : '—';
+    var ultimo = inv.ultimo_acceso ? new Date(inv.ultimo_acceso).toLocaleString('es-AR') : '-';
     var stateLabel = inv.activo ? '<span style="display:inline-block;padding:3px 10px;background:#E1F5EE;color:#085041;border-radius:6px;font-size:11px;font-weight:600">Activo</span>' : '<span style="display:inline-block;padding:3px 10px;background:#FCEBEB;color:#791F1F;border-radius:6px;font-size:11px;font-weight:600">Desactivado</span>';
     h += '<tr>';
     h += '<td style="font-family:var(--mono);font-weight:600">' + inv.codigo + '</td>';
-    h += '<td>' + (inv.nombre_invitado || '—') + '</td>';
-    h += '<td style="color:var(--t2);font-size:13px">' + (inv.empresa_invitado || '—') + '</td>';
+    h += '<td>' + (inv.nombre_invitado || '-') + '</td>';
+    h += '<td style="color:var(--t2);font-size:13px">' + (inv.empresa_invitado || '-') + '</td>';
     h += '<td style="text-align:center;font-weight:600">' + (inv.accesos || 0) + '</td>';
     h += '<td style="font-size:13px;color:var(--t2)">' + ultimo + '</td>';
     h += '<td>' + stateLabel + '</td>';
@@ -2648,7 +2648,7 @@ function renderAdminPanel(){
       if (dias >= 0 && dias < 365) tiempos.push(dias);
     }
   });
-  var tiempoPromedio = tiempos.length ? (tiempos.reduce(function(s,t){return s+t;},0)/tiempos.length).toFixed(1) : '—';
+  var tiempoPromedio = tiempos.length ? (tiempos.reduce(function(s,t){return s+t;},0)/tiempos.length).toFixed(1) : '-';
   html+=statCard('Tiempo a acuerdo',tiempoPromedio + ' días','Promedio publicación → acuerdo','neutral');
   html+='</div>';
   
@@ -2657,11 +2657,11 @@ function renderAdminPanel(){
   html+='<div class="flex gap-8" style="flex-wrap:wrap">';
   ['A1','A2','B1','B2','C1','C2'].forEach(function(cat){
     var tasas = tasasPorCat[cat] || [];
-    var promedio = tasas.length ? (tasas.reduce(function(s,t){return s+t;},0)/tasas.length).toFixed(1) : '—';
+    var promedio = tasas.length ? (tasas.reduce(function(s,t){return s+t;},0)/tasas.length).toFixed(1) : '-';
     var color = cat.startsWith('A') ? 'var(--g)' : (cat.startsWith('B') ? 'var(--bd)' : '#92400E');
     html+='<div style="flex:1;min-width:120px;text-align:center;background:var(--s2);border-radius:var(--rl2);padding:16px">';
     html+='<div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">'+cat+'</div>';
-    html+='<div style="font-size:24px;font-weight:700;color:'+color+';font-family:var(--mono);margin-bottom:4px">'+(promedio !== '—' ? promedio+'%' : promedio)+'</div>';
+    html+='<div style="font-size:24px;font-weight:700;color:'+color+';font-family:var(--mono);margin-bottom:4px">'+(promedio !== '-' ? promedio+'%' : promedio)+'</div>';
     html+='<div style="font-size:11px;color:var(--t3)">'+tasas.length+' operación'+(tasas.length !== 1 ? 'es' : '')+'</div>';
     html+='</div>';
   });
@@ -2753,7 +2753,7 @@ function renderAdminTasas(){
 
   // TAMAR banner
   html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--gl);border:1px solid var(--gb);border-radius:var(--rl2);margin-bottom:24px">';
-  html+='<div><div class="bold" style="color:var(--gd)">TAMAR vigente (BCRA)</div><div style="font-size:12px;color:var(--gd);margin-top:2px">Editable — afecta todos los rangos de tasas</div></div>';
+  html+='<div><div class="bold" style="color:var(--gd)">TAMAR vigente (BCRA)</div><div style="font-size:12px;color:var(--gd);margin-top:2px">Editable - afecta todos los rangos de tasas</div></div>';
   html+='<div style="display:flex;align-items:center;gap:12px"><input type="number" id="tamar-val" step="0.1" value="'+tamar+'" style="font-size:24px;font-weight:700;color:var(--g);font-family:var(--mono);width:100px;border:1.5px solid var(--gb);border-radius:var(--r);padding:6px 10px;text-align:center;background:var(--s)" oninput="recalcAllSpr()"><span style="color:var(--gd);font-size:14px">% TNA</span><button class="btn btn-primary" onclick="saveTamar()">Guardar</button></div>';
   html+='</div>';
 
@@ -2808,7 +2808,7 @@ function renderAdminTasas(){
     html+='<td class="mono" style="font-size:12px">'+((getSpreads()[cat]||SPREADS[cat]||{plazo:0}).plazo)+'%/30d</td>';
     html+='<td class="mono" style="color:var(--g)">'+tasas.min+'-'+tasas.max+'%</td>';
     html+='<td class="mono">'+c.tasa.toFixed(1)+'%</td>';
-    html+='<td class="mono" style="color:var(--g);font-weight:600">'+(c.status==='acordado'?c.tasa.toFixed(1)+'%':'—')+'</td>';
+    html+='<td class="mono" style="color:var(--g);font-weight:600">'+(c.status==='acordado'?c.tasa.toFixed(1)+'%':'-')+'</td>';
     html+='</tr>';
   });
   if(!checks.length)html+='<tr><td colspan="10" class="text-center" style="padding:24px;color:var(--t3)">Sin operaciones registradas</td></tr>';
@@ -2860,7 +2860,7 @@ function saveTamar(){
 // saveCatSpread replaced by saveSpreadsTable
 
 // ============================================================
-// ADMIN SCORING — FULL ENGINE (ported from reference)
+// ADMIN SCORING - FULL ENGINE (ported from reference)
 // ============================================================
 
 // Scoring data structures (live state, persisted to localStorage)
@@ -2922,11 +2922,11 @@ var matrizBase = [
 ];
 
 var matrizAntig = [
-  {id:1,mesesMin:0,mesesMax:3,factor:20,activa:true,desc:'Menos de 3 meses — penaliza mas'},
+  {id:1,mesesMin:0,mesesMax:3,factor:20,activa:true,desc:'Menos de 3 meses - penaliza mas'},
   {id:2,mesesMin:3,mesesMax:6,factor:15,activa:true,desc:'3 a 6 meses'},
   {id:3,mesesMin:6,mesesMax:12,factor:10,activa:true,desc:'6 a 12 meses'},
   {id:4,mesesMin:12,mesesMax:24,factor:5,activa:true,desc:'12 a 24 meses'},
-  {id:5,mesesMin:24,mesesMax:null,factor:0,activa:true,desc:'Mas de 24 meses — no penaliza'}
+  {id:5,mesesMin:24,mesesMax:null,factor:0,activa:true,desc:'Mas de 24 meses - no penaliza'}
 ];
 
 var matrizRecurr = [
@@ -2942,7 +2942,7 @@ var c2List = [
   {id:3,cond:'Concurso preventivo o quiebra registrada',campo:'CQ_24m_Cant',desc:'Concurso preventivo o quiebra en los ultimos 24 meses',activa:true},
   {id:4,cond:'Inhabilitacion vigente por BCRA u organismo oficial',campo:'IN_Tiene + IN_Fecha_Hasta',desc:'Inhabilitacion con vigencia >= hoy',activa:true},
   {id:5,cond:'Situacion BCRA 3, 4, 5 o 6 en el ultimo mes',campo:'CI_Sit_Mes_Actual',desc:'Atraso grave (sit.3), alto riesgo (sit.4/5/6)',activa:true},
-  {id:6,cond:'Matriz de atrasos da C2 directo',campo:'Matriz combinada score/monto/dias',desc:'Segun tabla de 16 combinaciones — ver Penalizaciones',activa:true}
+  {id:6,cond:'Matriz de atrasos da C2 directo',campo:'Matriz combinada score/monto/dias',desc:'Segun tabla de 16 combinaciones - ver Penalizaciones',activa:true}
 ];
 
 var catList = [
@@ -3194,7 +3194,7 @@ function renderPenScoringContent(){
 
 function renderVarsContent(){
   var html='';
-  html+='<div id="peso-ok" style="padding:10px 14px;background:var(--gl);border:1px solid var(--gb);border-radius:var(--r);margin-bottom:16px;font-size:13px;color:var(--gd)">Suma de pesos activos: <strong id="peso-tot">100%</strong> — Motor configurado correctamente</div>';
+  html+='<div id="peso-ok" style="padding:10px 14px;background:var(--gl);border:1px solid var(--gb);border-radius:var(--r);margin-bottom:16px;font-size:13px;color:var(--gd)">Suma de pesos activos: <strong id="peso-tot">100%</strong> - Motor configurado correctamente</div>';
   html+='<div id="peso-err" style="display:none;padding:10px 14px;background:var(--rl);border:1px solid #F7C1C1;border-radius:var(--r);margin-bottom:16px;font-size:13px;color:var(--rm)">Los pesos no suman 100%. Total actual: <strong id="peso-err-v">0%</strong></div>';
   html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="bold">Variables del motor</div><button class="btn btn-sm" onclick="addVariable()">+ Nueva variable</button></div>';
   html+='<div class="table-wrap" style="margin-bottom:24px"><table><thead><tr><th>Variable</th><th>Campo Nosis</th><th>Peso %</th><th>Activa</th><th>Acciones</th></tr></thead><tbody id="vars-tb"></tbody></table></div>';
@@ -3217,7 +3217,7 @@ function initScoringAdminContent(){
 }
 function guardarScoringEngine(){
   var tot=scoringVars.filter(function(v){return v.activa;}).reduce(function(s,v){return s+v.peso;},0);
-  if(Math.abs(tot-100)>0.01){showToast('Los pesos no suman 100% (actual: '+tot.toFixed(1)+'%) — corregilo antes de guardar','error');return;}
+  if(Math.abs(tot-100)>0.01){showToast('Los pesos no suman 100% (actual: '+tot.toFixed(1)+'%) - corregilo antes de guardar','error');return;}
   addLog('Motor de scoring guardado','system');
   showToast('Motor de scoring guardado correctamente','success');
 }
@@ -3289,11 +3289,11 @@ function renderUsersRows(users){
     return '<tr>'+
       '<td class="bold">'+u.name+'</td>'+
       '<td class="mono" style="font-size:11px">'+formatCuit(u.cuit||'')+'</td>'+
-      '<td style="font-size:12px">'+(u.tipopersona||'—')+'</td>'+
+      '<td style="font-size:12px">'+(u.tipopersona||'-')+'</td>'+
       '<td style="font-size:12px;color:var(--t2)">'+u.email+'</td>'+
       '<td style="font-size:12px">'+new Date(u.createdAt||Date.now()).toLocaleDateString('es-AR')+'</td>'+
       '<td>'+(u.idVerified?'<span style="color:var(--g);font-size:12px">✅ Validado</span>':'<span style="color:var(--rm);font-size:12px">❌ Pendiente</span>')+'</td>'+
-      '<td>'+(u.tyc?'<span style="color:var(--g);font-size:12px">✅ v1.0</span>':'<span style="color:var(--t3);font-size:12px">—</span>')+'</td>'+
+      '<td>'+(u.tyc?'<span style="color:var(--g);font-size:12px">✅ v1.0</span>':'<span style="color:var(--t3);font-size:12px">-</span>')+'</td>'+
       '<td>'+roles+'</td>'+
       '<td><span class="badge '+statusBadge+'">'+u.status+'</span></td>'+
       '<td>'+actions+'</td></tr>';
@@ -3333,7 +3333,7 @@ function openScoringDetail(checkId){
   if(!check||!check.scoring)return;
   var s=check.scoring;
   var cat=s.cat;
-  var html='<div class="modal-header"><h3>Scoring — '+check.razonLibrador+'</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
+  var html='<div class="modal-header"><h3>Scoring - '+check.razonLibrador+'</h3><button class="modal-close" onclick="closeModal()">✕</button></div>';
   html+='<div class="modal-body">';
   html+='<div class="scoring-card '+cat+'" style="margin-bottom:16px"><div class="flex gap-12 items-center" style="margin-bottom:12px"><span style="font-size:36px">'+CAT_EMOJI[cat]+'</span><div><div class="bold text-xl">'+cat+'</div><div class="text-lg mono">'+s.pts+' puntos</div></div></div>';
   html+='<div class="grid-2"><div><div class="text-sm" style="color:var(--t2);margin-bottom:6px">Factores favorables</div>'+s.factores.map(function(f){return '<div style="font-size:12px;margin-top:4px">✅ '+f+'</div>';}).join('')+'</div>';
@@ -3414,10 +3414,10 @@ function show(id){document.getElementById(id).classList.remove('hidden');}
 function hide(id){document.getElementById(id).classList.add('hidden');}
 function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function formatMoney(n){
-  if(!n&&n!==0)return '—';
+  if(!n&&n!==0)return '-';
   return '$'+Number(n).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function formatCuit(c){if(!c)return '—';var s=String(c);if(s.length===11)return s.slice(0,2)+'-'+s.slice(2,10)+'-'+s.slice(10);return s;}
+function formatCuit(c){if(!c)return '-';var s=String(c);if(s.length===11)return s.slice(0,2)+'-'+s.slice(2,10)+'-'+s.slice(10);return s;}
 function getBankName(code){return BANKS[code]||'Banco '+code;}
 function getDays(fechaPago){
   var today=new Date();today.setHours(0,0,0,0);
